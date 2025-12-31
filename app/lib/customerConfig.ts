@@ -93,7 +93,7 @@ export const CUSTOMER_CONFIG: Record<string, CustomerConfig> = {
     },
 	
 	deposit: {
-  enabled: true,
+  enabled: false,
   amountLabel: "$20 deposit required to confirm",
   stripePaymentLink: "https://buy.stripe.com/abc123",
 	},
