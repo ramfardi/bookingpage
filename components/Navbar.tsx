@@ -22,11 +22,16 @@ export default function Navbar() {
 
         {/* Desktop menu */}
         <div className="hidden md:flex items-center gap-8">
+		
+		  <Link href="/booking" className="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
+            Book appointment
+          </Link>
+		
           <Link href="/pricing" className="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
             Pricing
           </Link>
 		  
-		 <Link
+		  <Link
             href="/about"
             className="py-3 text-base font-medium"
             onClick={() => setOpen(false)}
