@@ -51,7 +51,7 @@ export const CUSTOMER_CONFIG: Record<string, CustomerConfig> = {
   vida: {
     businessName: "Your Hair by Vida",
     heroImage: "/images/hair.jpg",
-    bookingEmailForm: "https://buy.stripe.com/test_28EaEXfOA0n1fL6eg473G00",
+    bookingEmailForm: "https://formspree.io/f/xykyrayq",
     services: [
       "Haircut",
       "Beard trim",
