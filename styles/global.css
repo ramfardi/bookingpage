@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ShadCN styles reset */
+html, body {
+  height: 100%;
+  width: 100%;
+}

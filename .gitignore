@@ -1,0 +1,47 @@
+# =========================
+# Node / Next.js
+# =========================
+node_modules/
+.next/
+out/
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.local
+.env.*.local
+
+# =========================
+# Logs
+# =========================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# OS / Editor junk
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# =========================
+# Temporary / cache
+# =========================
+.cache/
+.turbo/
+.vercel/
+
+# =========================
+# User-generated uploads (OPTIONAL)
+# =========================
+uploads/
+tmp/
+
+# =========================
+# PDFs (only if generated, not source)
+# =========================
+*.pdf
