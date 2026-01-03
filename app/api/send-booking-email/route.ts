@@ -125,26 +125,27 @@ export async function POST(req: Request) {
       `Service: ${service}`,
       startDate
     );
+	
+	const calendarAttachment = {
+  filename: "booking.ics",
+  content: Buffer.from(ics).toString("base64"),
+};
 
-    await resend.emails.send({
-      from: "Booking <booking@simplebookme.com>",
-      to: customer_email,
-      subject: "Your booking request",
-      html: `
-        <h2>Booking received</h2>
-        <p>Your request has been sent to ${customer.businessName}.</p>
-        <p><strong>Service:</strong> ${service}</p>
-        <p><strong>Date:</strong> ${preferred_date}</p>
-        <p><strong>Time:</strong> ${preferred_time}</p>
-        <p>The calendar invite is attached.</p>
-      `,
-      attachments: [
-        {
-          filename: "booking.ics",
-          content: Buffer.from(ics).toString("base64"),
-        },
-      ],
-    });
+	await resend.emails.send({
+	  from: "Booking <booking@simplebookme.com>",
+	  to: customer.email.bookingNotifications,
+	  replyTo: customer_email,
+	  subject: `New booking – ${customer.businessName}`,
+	  html: `
+		<h2>New Booking</h2>
+		<p><strong>Service:</strong> ${service}</p>
+		<p><strong>Date:</strong> ${preferred_date}</p>
+		<p><strong>Time:</strong> ${preferred_time}</p>
+		<p><strong>Client:</strong> ${customer_email}</p>
+	  `,
+	  attachments: [calendarAttachment], // ✅ ADD THIS
+	});
+
 
     return Response.json({ success: true });
   } catch (err) {
