@@ -27,13 +27,21 @@ export default function BookingPage() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    const payload = {
-      businessName: customer.businessName,
-      service: formData.get("service"),
-      preferred_date: formData.get("preferred_date"),
-      preferred_time: formData.get("preferred_time"),
-      customer_email: formData.get("email"),
-    };
+    //const payload = {
+    //  businessName: customer.businessName,
+    //  service: formData.get("service"),
+    //  preferred_date: formData.get("preferred_date"),
+    //  preferred_time: formData.get("preferred_time"),
+    //  customer_email: formData.get("email"),
+    //};
+	
+	const payload = {
+	  customerKey: "vida", // 🔴 REQUIRED
+	  service: formData.get("service"),
+	  preferred_date: formData.get("preferred_date"),
+	  preferred_time: formData.get("preferred_time"),
+	  customer_email: formData.get("email"),
+	};
 
     try {
       // ===============================
