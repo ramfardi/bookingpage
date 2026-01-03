@@ -109,7 +109,7 @@ export const CUSTOMER_CONFIG: Record<string, CustomerConfig> = {
 	},
 	
   email: {
-    bookingNotifications: "vida@simplebookme.com",
+    bookingNotifications: "myvisualrf@gmail.com",
     replyTo: "myvisualrf@gmail.com",
   },
 
