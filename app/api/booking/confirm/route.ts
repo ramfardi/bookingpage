@@ -1,9 +1,9 @@
 export const runtime = "nodejs";
 
-import { verifyToken } from "@/lib/bookingTokens";
-import { createICS } from "@/lib/calendar";
+import { verifyToken } from "@/app/lib/bookingTokens";
+import { createICS } from "@/app/lib/calendar";
 import { Resend } from "resend";
-import { CUSTOMER_CONFIG } from "@/lib/customerConfig";
+import { CUSTOMER_CONFIG } from "@/app/lib/customerConfig";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
