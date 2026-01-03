@@ -1,3 +1,6 @@
+
+export const runtime = "nodejs";
+
 import { Resend } from "resend";
 import { CUSTOMER_CONFIG } from "@/app/lib/customerConfig";
 import crypto from "crypto";
