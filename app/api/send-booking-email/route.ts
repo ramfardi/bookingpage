@@ -2,7 +2,7 @@
 export const runtime = "nodejs";
 
 import { Resend } from "resend";
-import { CUSTOMER_CONFIG } from "@/lib/customerConfig";
+import { CUSTOMER_CONFIG } from "@/app/lib/customerConfig";
 import crypto from "crypto";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
