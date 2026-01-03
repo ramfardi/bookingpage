@@ -32,7 +32,8 @@ export default function BookingPage() {
     const formData = new FormData(form);
 
     const payload = {
-      businessName: customer.businessName,
+      customerKey,
+	  businessName: customer.businessName,
       service: formData.get("service"),
       preferred_date: formData.get("preferred_date"),
       preferred_time: formData.get("preferred_time"),
