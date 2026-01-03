@@ -5,12 +5,17 @@ import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import { CustomerConfig } from "@/app/lib/customerConfig";
 
 export default function AboutPage() {
-  const [customer, setCustomer] = useState<CustomerConfig | null>(null);
+const [customer, setCustomer] = useState<CustomerConfig | null>(null);
+const [customerKey, setCustomerKey] = useState<string | null>(null);
 
-  useEffect(() => {
-    const hostname = window.location.hostname;
-    setCustomer(getCustomerConfigFromHost(hostname));
-  }, []);
+useEffect(() => {
+  const hostname = window.location.hostname;
+  const result = getCustomerConfigFromHost(hostname);
+
+  setCustomer(result.config);
+  setCustomerKey(result.key);
+}, []);
+
 
   if (!customer) return null;
 
