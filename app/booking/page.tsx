@@ -5,26 +5,22 @@ import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import { CustomerConfig } from "@/app/lib/customerConfig";
 
 export default function BookingPage() {
-
+  const [customer, setCustomer] = useState<CustomerConfig | null>(null);
+  const [customerKey, setCustomerKey] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [customerKey, setCustomerKey] = useState<string | null>(null);
-	const [customer, setCustomer] = useState<CustomerConfig | null>(null);
 
-  // Load customer config from subdomain
-	useEffect(() => {
-	  const hostname = window.location.hostname;
-	  const result = getCustomerConfigFromHost(hostname);
+  useEffect(() => {
+    const hostname = window.location.hostname;
+    const result = getCustomerConfigFromHost(hostname);
 
-	  setCustomerKey(result.key);
-	  setCustomer(result.config);
-	}, []);
+    setCustomer(result.config);
+    setCustomerKey(result.key);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
-    // ✅ REQUIRED: guard for TS + runtime safety
-    if (!customer) return;
+    if (!customer || !customerKey) return;
 
     setLoading(true);
 
@@ -33,65 +29,36 @@ export default function BookingPage() {
 
     const payload = {
       customerKey,
-	  businessName: customer.businessName,
       service: formData.get("service"),
       preferred_date: formData.get("preferred_date"),
       preferred_time: formData.get("preferred_time"),
       customer_email: formData.get("email"),
+      company: formData.get("company"), // honeypot
     };
-	
-	if (!customerKey) {
-		alert("Booking not available.");
-		return;
-	}
-	
-	//const payload = {
-	//  customerKey: "vida", // 🔴 REQUIRED
-	//  service: formData.get("service"),
-	//  preferred_date: formData.get("preferred_date"),
-	//  preferred_time: formData.get("preferred_time"),
-	//  customer_email: formData.get("email"),
-	//};
 
     try {
-      // ===============================
-      // ✅ NEW: Send booking via email API (Resend)
-      // ===============================
-      await fetch("/api/send-booking-email", {
+      const res = await fetch("/api/send-booking-email", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      // ===============================
-      // 🔒 OLD FORMSPREE (KEPT, COMMENTED)
-      // ===============================
-      /*
-      await fetch(customer.bookingEmailForm, {
-        method: "POST",
-        body: formData,
-        headers: {
-          Accept: "application/json",
-        },
-      });
-      */
+      if (!res.ok) {
+        throw new Error("Booking failed");
+      }
 
-      // 🔹 Redirect to Stripe if deposit is enabled
       if (customer.deposit?.enabled && customer.deposit.stripePaymentLink) {
         window.location.href = customer.deposit.stripePaymentLink;
       } else {
         setSubmitted(true);
       }
-    } catch (err) {
+    } catch {
       alert("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
-  // Loading state
   if (!customer) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -100,14 +67,13 @@ export default function BookingPage() {
     );
   }
 
-  // Success state (no deposit)
   if (submitted) {
     return (
       <main className="min-h-screen flex items-center justify-center px-6">
         <div className="bg-white rounded-2xl shadow-md p-8 text-center max-w-md">
           <h1 className="text-2xl font-bold">Request sent</h1>
           <p className="mt-3 text-gray-600">
-            We’ll confirm your appointment by email shortly.
+            Check your email for confirmation and calendar invite.
           </p>
         </div>
       </main>
@@ -126,7 +92,6 @@ export default function BookingPage() {
           Request an appointment with {customer.businessName}
         </p>
 
-        {/* Deposit notice (optional per client) */}
         {customer.deposit?.enabled && (
           <p className="mt-4 text-center text-sm text-indigo-600 font-medium">
             {customer.deposit.amountLabel}
@@ -135,12 +100,16 @@ export default function BookingPage() {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
 
-          {/* Service dropdown (CUSTOM PER CLIENT) */}
-          <select
-            name="service"
-            required
-            className="w-full border rounded-xl p-3"
-          >
+          {/* Honeypot (spam trap) */}
+          <input
+            type="text"
+            name="company"
+            tabIndex={-1}
+            autoComplete="off"
+            className="hidden"
+          />
+
+          <select name="service" required className="w-full border rounded-xl p-3">
             <option value="">Select service</option>
             {customer.services.map((service) => (
               <option key={service} value={service}>
@@ -149,23 +118,9 @@ export default function BookingPage() {
             ))}
           </select>
 
-          {/* Date */}
-          <input
-            type="date"
-            name="preferred_date"
-            required
-            className="w-full border rounded-xl p-3"
-          />
+          <input type="date" name="preferred_date" required className="w-full border rounded-xl p-3" />
+          <input type="time" name="preferred_time" required className="w-full border rounded-xl p-3" />
 
-          {/* Time */}
-          <input
-            type="time"
-            name="preferred_time"
-            required
-            className="w-full border rounded-xl p-3"
-          />
-
-          {/* Email */}
           <input
             type="email"
             name="email"
@@ -174,24 +129,13 @@ export default function BookingPage() {
             className="w-full border rounded-xl p-3"
           />
 
-          {/* Hidden context */}
-          <input
-            type="hidden"
-            name="business"
-            value={customer.businessName}
-          />
-
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition disabled:opacity-60"
+            className="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition disabled:opacity-50"
           >
             {loading ? "Sending..." : "Request appointment"}
           </button>
-
-          <p className="text-sm text-center text-gray-500 mt-2">
-            You’ll receive confirmation by email.
-          </p>
         </form>
       </div>
     </main>
