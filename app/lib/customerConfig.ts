@@ -36,6 +36,11 @@ export type CustomerConfig = {
   is_external: boolean;
   bookingLink?: string;
   };
+  
+	email?: {
+    bookingNotifications?: string;
+    replyTo?: string;
+  };
 
   about: {
     title: string;
@@ -102,6 +107,11 @@ export const CUSTOMER_CONFIG: Record<string, CustomerConfig> = {
   is_external: true,
   bookingLink: "https://www.vagaro.com/yourhairbyvida",
 	},
+	
+  email: {
+    bookingNotifications: "vida@simplebookme.com",
+    replyTo: "myvisualrf@gmail.com",
+  },
 
     about: {
       title: "About Alex Hair Studio",
@@ -165,6 +175,10 @@ export const CUSTOMER_CONFIG: Record<string, CustomerConfig> = {
   is_external: false,
   bookingLink: "https://vagaro.com/yourhairbyvida",
 	},
+	
+	email: {
+  bookingNotifications: "john@simplebookme.com",
+},
 
     about: {
       title: "About John the Handyman",
@@ -227,6 +241,10 @@ export const CUSTOMER_CONFIG: Record<string, CustomerConfig> = {
   is_external: false,
   bookingLink: "https://vagaro.com/yourhairbyvida",
 	},
+	
+	email: {
+  bookingNotifications: "sarah@simplebookme.com",
+},
 
     about: {
       title: "About Sarah Cleaning",

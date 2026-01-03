@@ -7,6 +7,7 @@ import { CustomerConfig } from "@/app/lib/customerConfig";
 export default function BookingPage() {
   const [customer, setCustomer] = useState<CustomerConfig | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Load customer config from subdomain
   useEffect(() => {
@@ -15,33 +16,61 @@ export default function BookingPage() {
     setCustomer(config);
   }, []);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     // ✅ REQUIRED: guard for TS + runtime safety
     if (!customer) return;
 
+    setLoading(true);
+
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    fetch(customer.bookingEmailForm, {
-      method: "POST",
-      body: formData,
-      headers: {
-        Accept: "application/json",
-      },
-    })
-      .then(() => {
-        // 🔹 Redirect to Stripe if deposit is enabled
-        if (customer.deposit?.enabled && customer.deposit.stripePaymentLink) {
-          window.location.href = customer.deposit.stripePaymentLink;
-        } else {
-          setSubmitted(true);
-        }
-      })
-      .catch(() => {
-        alert("Something went wrong. Please try again.");
+    const payload = {
+      businessName: customer.businessName,
+      service: formData.get("service"),
+      preferred_date: formData.get("preferred_date"),
+      preferred_time: formData.get("preferred_time"),
+      customer_email: formData.get("email"),
+    };
+
+    try {
+      // ===============================
+      // ✅ NEW: Send booking via email API (Resend)
+      // ===============================
+      await fetch("/api/send-booking-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
+
+      // ===============================
+      // 🔒 OLD FORMSPREE (KEPT, COMMENTED)
+      // ===============================
+      /*
+      await fetch(customer.bookingEmailForm, {
+        method: "POST",
+        body: formData,
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      */
+
+      // 🔹 Redirect to Stripe if deposit is enabled
+      if (customer.deposit?.enabled && customer.deposit.stripePaymentLink) {
+        window.location.href = customer.deposit.stripePaymentLink;
+      } else {
+        setSubmitted(true);
+      }
+    } catch (err) {
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   // Loading state
@@ -136,9 +165,10 @@ export default function BookingPage() {
 
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition"
+            disabled={loading}
+            className="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition disabled:opacity-60"
           >
-            Request appointment
+            {loading ? "Sending..." : "Request appointment"}
           </button>
 
           <p className="text-sm text-center text-gray-500 mt-2">
