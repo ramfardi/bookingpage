@@ -1,5 +1,5 @@
 {
-  "name": "job-match-ai",
+  "name": "bookingpage",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -20,7 +20,8 @@
     "react-dom": "18.2.0",
     "stripe": "^16.0.0",
     "tailwind-merge": "^2.2.0",
-    "zod": "^3.23.0"
+    "zod": "^3.23.0",
+	"resend": "^4.x.x"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
