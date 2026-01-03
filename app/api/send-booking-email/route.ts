@@ -1,8 +1,8 @@
-
 export const runtime = "nodejs";
 
 import { Resend } from "resend";
 import { CUSTOMER_CONFIG } from "@/app/lib/customerConfig";
+import { signToken } from "@/app/lib/bookingTokens";
 import crypto from "crypto";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -111,12 +111,13 @@ export async function POST(req: Request) {
       );
     }
 
+    const providerEmail = customer.email.bookingNotifications;
+
     /* =====================
-       Create calendar once
+       Stable event UID
     ===================== */
     const startDate = new Date(`${preferred_date}T${preferred_time}`);
 
-    // Stable UID so future updates replace the event
     const eventUID = `booking-${crypto
       .createHash("sha1")
       .update(
@@ -124,6 +125,27 @@ export async function POST(req: Request) {
       )
       .digest("hex")}`;
 
+    /* =====================
+       Sign booking token
+    ===================== */
+    const token = signToken({
+      customerKey,
+      service,
+      preferred_date,
+      preferred_time,
+      customer_email,
+      eventUID,
+    });
+
+    const confirmUrl =
+      `https://simplebookme.com/api/booking/confirm?token=${token}`;
+
+    const rescheduleUrl =
+      `https://simplebookme.com/api/booking/reschedule?token=${token}`;
+
+    /* =====================
+       Calendar attachment
+    ===================== */
     const ics = createICS(
       eventUID,
       `Booking with ${customer.businessName}`,
@@ -141,43 +163,70 @@ export async function POST(req: Request) {
     ===================== */
     await resend.emails.send({
       from: "Booking <booking@simplebookme.com>",
-      to: customer.email.bookingNotifications,
-      replyTo: customer_email,
-      subject: `New booking – ${customer.businessName}`,
+      to: providerEmail,
+      subject: "New booking request",
       html: `
-        <h2>New Booking Request</h2>
+        <h2>New booking request</h2>
+
+        <p><strong>Client:</strong> ${customer_email}</p>
         <p><strong>Service:</strong> ${service}</p>
         <p><strong>Date:</strong> ${preferred_date}</p>
         <p><strong>Time:</strong> ${preferred_time}</p>
-        <p><strong>Client email:</strong> ${customer_email}</p>
+
+        <p>
+          <a href="${confirmUrl}"
+             style="margin-right:10px;
+                    display:inline-block;padding:10px 14px;
+                    background:#16a34a;color:white;
+                    text-decoration:none;border-radius:6px;">
+            Confirm
+          </a>
+
+          <a href="${rescheduleUrl}"
+             style="display:inline-block;padding:10px 14px;
+                    background:#f59e0b;color:white;
+                    text-decoration:none;border-radius:6px;">
+            Modify time
+          </a>
+        </p>
       `,
-      attachments: [calendarAttachment],
     });
 
     /* =====================
-       CUSTOMER CONFIRMATION
+       CUSTOMER EMAIL
     ===================== */
     await resend.emails.send({
       from: "Booking <booking@simplebookme.com>",
       to: customer_email,
       replyTo:
-        customer.email.replyTo ??
-        customer.email.bookingNotifications,
-      subject: `Your booking request – ${customer.businessName}`,
+        customer.email.replyTo ?? providerEmail,
+      subject: `Confirm your booking – ${customer.businessName}`,
       html: `
-        <h2>Booking Request Received</h2>
-        <p>Your request has been sent to <strong>${customer.businessName}</strong>.</p>
+        <h2>Confirm your booking</h2>
+
         <p><strong>Service:</strong> ${service}</p>
         <p><strong>Date:</strong> ${preferred_date}</p>
         <p><strong>Time:</strong> ${preferred_time}</p>
-        <p>The calendar invite is attached.</p>
+
+        <p>
+          <a href="${confirmUrl}"
+             style="display:inline-block;padding:12px 18px;
+                    background:#4f46e5;color:white;
+                    text-decoration:none;border-radius:6px;">
+            Confirm appointment
+          </a>
+        </p>
+
+        <p style="margin-top:16px;font-size:12px;color:#666;">
+          If you didn’t request this booking, you can ignore this email.
+        </p>
       `,
       attachments: [calendarAttachment],
     });
 
     return Response.json({ success: true });
   } catch (err) {
-    console.error(err);
+    console.error("Send booking error:", err);
     return Response.json(
       { error: "Failed to send booking" },
       { status: 500 }
