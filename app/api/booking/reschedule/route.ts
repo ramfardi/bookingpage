@@ -1,4 +1,4 @@
-import { verifyToken, signToken } from "@/app/lib/bookingTokens";
+import { verifyToken, signToken } from "@/lib/bookingTokens";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
