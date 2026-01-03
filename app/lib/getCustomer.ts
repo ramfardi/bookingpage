@@ -1,16 +1,21 @@
 import { CUSTOMER_CONFIG } from "./customerConfig";
 
-export function getCustomerConfigFromHost(hostname: string) {
-  // localhost or root domain → default
-  if (
-    hostname === "localhost" ||
-    hostname.split(".").length < 3
-  ) {
-    return CUSTOMER_CONFIG["vida"];
+export function getCustomerConfigFromHost(host: string) {
+  const parts = host.split(".");
+  const subdomain = parts.length > 2 ? parts[0] : null;
+
+  if (subdomain && CUSTOMER_CONFIG[subdomain]) {
+    return {
+      key: subdomain,
+      config: CUSTOMER_CONFIG[subdomain],
+    };
   }
 
-  const subdomain = hostname.split(".")[0];
-
-  return CUSTOMER_CONFIG[subdomain] || CUSTOMER_CONFIG["vida"];
+  // Fallback for root domain (default customer)
+  return {
+    key: "vida", // ← choose your default
+    config: CUSTOMER_CONFIG["vida"],
+  };
 }
+
 

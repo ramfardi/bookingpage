@@ -5,16 +5,20 @@ import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import { CustomerConfig } from "@/app/lib/customerConfig";
 
 export default function BookingPage() {
-  const [customer, setCustomer] = useState<CustomerConfig | null>(null);
+
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [customerKey, setCustomerKey] = useState<string | null>(null);
+	const [customer, setCustomer] = useState<CustomerConfig | null>(null);
 
   // Load customer config from subdomain
-  useEffect(() => {
-    const hostname = window.location.hostname;
-    const config = getCustomerConfigFromHost(hostname);
-    setCustomer(config);
-  }, []);
+	useEffect(() => {
+	  const hostname = window.location.hostname;
+	  const result = getCustomerConfigFromHost(hostname);
+
+	  setCustomerKey(result.key);
+	  setCustomer(result.config);
+	}, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -27,21 +31,26 @@ export default function BookingPage() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    //const payload = {
-    //  businessName: customer.businessName,
-    //  service: formData.get("service"),
-    //  preferred_date: formData.get("preferred_date"),
-    //  preferred_time: formData.get("preferred_time"),
-    //  customer_email: formData.get("email"),
-    //};
+    const payload = {
+      businessName: customer.businessName,
+      service: formData.get("service"),
+      preferred_date: formData.get("preferred_date"),
+      preferred_time: formData.get("preferred_time"),
+      customer_email: formData.get("email"),
+    };
 	
-	const payload = {
-	  customerKey: "vida", // 🔴 REQUIRED
-	  service: formData.get("service"),
-	  preferred_date: formData.get("preferred_date"),
-	  preferred_time: formData.get("preferred_time"),
-	  customer_email: formData.get("email"),
-	};
+	if (!customerKey) {
+		alert("Booking not available.");
+		return;
+	}
+	
+	//const payload = {
+	//  customerKey: "vida", // 🔴 REQUIRED
+	//  service: formData.get("service"),
+	//  preferred_date: formData.get("preferred_date"),
+	//  preferred_time: formData.get("preferred_time"),
+	//  customer_email: formData.get("email"),
+	//};
 
     try {
       // ===============================
