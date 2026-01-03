@@ -1,5 +1,5 @@
 import { verifyToken } from "@/app/lib/bookingTokens";
-import { createICS } from "@/lib/calendar";
+import { createICS } from "@/app/lib/calendar";
 import { Resend } from "resend";
 import { CUSTOMER_CONFIG } from "@/app/lib/customerConfig";
 
