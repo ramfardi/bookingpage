@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { CUSTOMER_CONFIG } from "@/app/lib/customerConfig";
+import crypto from "crypto";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -29,7 +30,12 @@ function isRateLimited(ip: string, limit = 3, windowMs = 10 * 60 * 1000) {
 /* =====================
    Calendar (.ics)
 ===================== */
-function createICS(title: string, description: string, start: Date) {
+function createICS(
+  uid: string,
+  title: string,
+  description: string,
+  start: Date
+) {
   const end = new Date(start.getTime() + 60 * 60 * 1000);
 
   const format = (d: Date) =>
@@ -40,7 +46,7 @@ BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//SimpleBookMe//EN
 BEGIN:VEVENT
-UID:${crypto.randomUUID()}
+UID:${uid}
 DTSTAMP:${format(new Date())}
 DTSTART:${format(start)}
 DTEND:${format(end)}
@@ -102,50 +108,69 @@ export async function POST(req: Request) {
       );
     }
 
-    /* Provider email */
+    /* =====================
+       Create calendar once
+    ===================== */
+    const startDate = new Date(`${preferred_date}T${preferred_time}`);
+
+    // Stable UID so future updates replace the event
+    const eventUID = `booking-${crypto
+      .createHash("sha1")
+      .update(
+        `${customerKey}-${customer_email}-${preferred_date}-${preferred_time}`
+      )
+      .digest("hex")}`;
+
+    const ics = createICS(
+      eventUID,
+      `Booking with ${customer.businessName}`,
+      `Service: ${service}`,
+      startDate
+    );
+
+    const calendarAttachment = {
+      filename: "booking.ics",
+      content: Buffer.from(ics).toString("base64"),
+    };
+
+    /* =====================
+       PROVIDER EMAIL
+    ===================== */
     await resend.emails.send({
       from: "Booking <booking@simplebookme.com>",
       to: customer.email.bookingNotifications,
       replyTo: customer_email,
       subject: `New booking – ${customer.businessName}`,
       html: `
-        <h2>New Booking</h2>
+        <h2>New Booking Request</h2>
         <p><strong>Service:</strong> ${service}</p>
         <p><strong>Date:</strong> ${preferred_date}</p>
         <p><strong>Time:</strong> ${preferred_time}</p>
-        <p><strong>Client:</strong> ${customer_email}</p>
+        <p><strong>Client email:</strong> ${customer_email}</p>
       `,
+      attachments: [calendarAttachment],
     });
 
-    /* Client confirmation + calendar */
-    const startDate = new Date(`${preferred_date}T${preferred_time}`);
-
-    const ics = createICS(
-      `Booking with ${customer.businessName}`,
-      `Service: ${service}`,
-      startDate
-    );
-	
-	const calendarAttachment = {
-  filename: "booking.ics",
-  content: Buffer.from(ics).toString("base64"),
-};
-
-	await resend.emails.send({
-	  from: "Booking <booking@simplebookme.com>",
-	  to: customer.email.bookingNotifications,
-	  replyTo: customer_email,
-	  subject: `New booking – ${customer.businessName}`,
-	  html: `
-		<h2>New Booking</h2>
-		<p><strong>Service:</strong> ${service}</p>
-		<p><strong>Date:</strong> ${preferred_date}</p>
-		<p><strong>Time:</strong> ${preferred_time}</p>
-		<p><strong>Client:</strong> ${customer_email}</p>
-	  `,
-	  attachments: [calendarAttachment], // ✅ ADD THIS
-	});
-
+    /* =====================
+       CUSTOMER CONFIRMATION
+    ===================== */
+    await resend.emails.send({
+      from: "Booking <booking@simplebookme.com>",
+      to: customer_email,
+      replyTo:
+        customer.email.replyTo ??
+        customer.email.bookingNotifications,
+      subject: `Your booking request – ${customer.businessName}`,
+      html: `
+        <h2>Booking Request Received</h2>
+        <p>Your request has been sent to <strong>${customer.businessName}</strong>.</p>
+        <p><strong>Service:</strong> ${service}</p>
+        <p><strong>Date:</strong> ${preferred_date}</p>
+        <p><strong>Time:</strong> ${preferred_time}</p>
+        <p>The calendar invite is attached.</p>
+      `,
+      attachments: [calendarAttachment],
+    });
 
     return Response.json({ success: true });
   } catch (err) {
