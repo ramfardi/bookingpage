@@ -120,16 +120,16 @@ export default function Home() {
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 				  {[
 					{
-					  title: "Matching Score",
-					  desc: "Instantly see how well a resume fits a job posting.",
+					  title: "Use External booking if you wish",
+					  desc: "You can use external booking systems like like Vagaro, Fresha,...",
 					},
 					{
-					  title: "Skill Coverage",
-					  desc: "See the short list of gaps and strengths for a specific role.",
+					  title: "Email based Navtive booking",
+					  desc: "Native booking system is email based with cofirmation/modification option and Calander .ics file",
 					},
 					{
-					  title: "Recruiter Insights",
-					  desc: "Concise AI-generated insights to guide screening and interviews.",
+					  title: "No monthly fee",
+					  desc: "Setup and forget, no monthly fee",
 					},
 				  ].map((f) => (
 					<motion.div
@@ -151,7 +151,7 @@ export default function Home() {
 			</section>
 
 			<footer className="bg-white border-t py-12 text-center text-sm text-gray-500">
-			  © {new Date().getFullYear()} JobMatchAI — All rights reserved.
+			  © {new Date().getFullYear()} SimpleBookMe — All rights reserved.
 			</footer>
 		  </>
 		)}
