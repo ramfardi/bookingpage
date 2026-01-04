@@ -8,6 +8,7 @@ import { CustomerConfig } from "@/app/lib/customerConfig";
 import { LandingConfig } from "@/app/lib/customerConfig";
 
 import { useRouter } from "next/navigation";
+const [mode, setMode] = useState<"sales" | "client">("sales");
 
 export default function Home() {
 
@@ -25,8 +26,9 @@ useEffect(() => {
 
   setCustomer(result.config);
   setCustomerKey(result.key);
-  setMode(result.mode);
+  setMode(result.mode); // 👈 THIS WAS MISSING
 }, []);
+
 
 
   // ⛔ Prevent hydration mismatch

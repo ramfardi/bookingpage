@@ -5,6 +5,7 @@ import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import { CustomerConfig } from "@/app/lib/customerConfig";
 import { LandingConfig } from "@/app/lib/customerConfig";
 
+const [mode, setMode] = useState<"sales" | "client">("sales");
 
 export default function AboutPage() {
 const [customer, setCustomer] = useState<
@@ -19,7 +20,9 @@ useEffect(() => {
 
   setCustomer(result.config);
   setCustomerKey(result.key);
+  setMode(result.mode); // 👈 THIS WAS MISSING
 }, []);
+
 
 
   if (!customer) return null;
