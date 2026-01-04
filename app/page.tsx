@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import { CustomerConfig } from "@/app/lib/customerConfig";
+import { LandingConfig } from "@/app/lib/defaultLandingConfig";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
