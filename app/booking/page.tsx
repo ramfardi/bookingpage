@@ -51,15 +51,20 @@ export default function BookingPage() {
         throw new Error("Booking failed");
       }
 
-	if (
-	  mode === "client" &&
-	  (customer as CustomerConfig).deposit?.enabled &&
-	  (customer as CustomerConfig).deposit?.stripePaymentLink
-	) {
-	  window.location.href = (customer as CustomerConfig).deposit.stripePaymentLink;
-	} else {
-	  setSubmitted(true);
-	}
+		if (mode !== "client") {
+		  setSubmitted(true);
+		  return;
+		}
+
+		const customerConfig = customer as CustomerConfig;
+		const deposit = customerConfig.deposit;
+
+		if (deposit?.enabled && deposit.stripePaymentLink) {
+		  window.location.href = deposit.stripePaymentLink;
+		} else {
+		  setSubmitted(true);
+		}
+
 
     } catch {
       alert("Something went wrong. Please try again.");
