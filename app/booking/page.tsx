@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import { CustomerConfig, LandingConfig } from "@/app/lib/customerConfig";
+const [mode, setMode] = useState<"sales" | "client">("sales");
 
 
 export default function BookingPage() {
@@ -14,13 +15,12 @@ export default function BookingPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const hostname = window.location.hostname;
-    const result = getCustomerConfigFromHost(hostname);
+	useEffect(() => {
+	  const result = getCustomerConfigFromHost(window.location.hostname);
+	  setCustomer(result.config);
+	  setMode(result.mode);
+	}, []);
 
-    setCustomer(result.config);
-    setCustomerKey(result.key);
-  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -51,11 +51,16 @@ export default function BookingPage() {
         throw new Error("Booking failed");
       }
 
-      if (customer.deposit?.enabled && customer.deposit.stripePaymentLink) {
-        window.location.href = customer.deposit.stripePaymentLink;
-      } else {
-        setSubmitted(true);
-      }
+	if (
+	  mode === "client" &&
+	  (customer as CustomerConfig).deposit?.enabled &&
+	  (customer as CustomerConfig).deposit?.stripePaymentLink
+	) {
+	  window.location.href = (customer as CustomerConfig).deposit.stripePaymentLink;
+	} else {
+	  setSubmitted(true);
+	}
+
     } catch {
       alert("Something went wrong. Please try again.");
     } finally {
