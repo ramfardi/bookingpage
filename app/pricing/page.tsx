@@ -2,32 +2,38 @@
 
 import { useEffect, useState } from "react";
 import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
-import { CustomerConfig } from "@/app/lib/customerConfig";
-import { LandingConfig } from "@/app/lib/customerConfig";
-const [mode, setMode] = useState<"sales" | "client">("sales");
-
+import { CustomerConfig, LandingConfig } from "@/app/lib/customerConfig";
 
 export default function PricingPage() {
-const [customer, setCustomer] = useState<
-  CustomerConfig | LandingConfig | null
->(null);
+  const [customer, setCustomer] = useState<
+    CustomerConfig | LandingConfig | null
+  >(null);
 
-const [customerKey, setCustomerKey] = useState<string | null>(null);
+  const [customerKey, setCustomerKey] = useState<string | null>(null);
+  const [mode, setMode] = useState<"sales" | "client">("sales");
 
-useEffect(() => {
-  const hostname = window.location.hostname;
-  const result = getCustomerConfigFromHost(hostname);
+  useEffect(() => {
+    const hostname = window.location.hostname;
+    const result = getCustomerConfigFromHost(hostname);
 
-  setCustomer(result.config);
-  setCustomerKey(result.key);
-  setMode(result.mode); // 👈 THIS WAS MISSING
-}, []);
+    setCustomer(result.config);
+    setCustomerKey(result.key);
+    setMode(result.mode);
+  }, []);
 
+  // Prevent hydration mismatch
+  if (!customer) {
+    return null;
+  }
 
+  // Pricing page is CLIENT-ONLY
+  if (mode !== "client") {
+    return null; // or redirect("/")
+  }
 
-  if (!customer) return null;
-
-  const { pricing } = customer;
+  // Narrow once — safe below
+  const customerConfig = customer as CustomerConfig;
+  const { pricing } = customerConfig;
 
   return (
     <main className="min-h-screen px-6 py-24 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
@@ -46,8 +52,8 @@ useEffect(() => {
               <p className="mt-2 text-gray-600">{plan.description}</p>
 
               <ul className="mt-4 space-y-2 text-sm">
-                {plan.features.map((f) => (
-                  <li key={f}>• {f}</li>
+                {plan.features.map((feature) => (
+                  <li key={feature}>• {feature}</li>
                 ))}
               </ul>
             </div>
