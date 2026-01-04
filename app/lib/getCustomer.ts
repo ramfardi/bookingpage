@@ -1,5 +1,5 @@
 import { defaultLandingConfig } from "./defaultLandingConfig";
-import { customerConfigs } from "./customerConfigs"; // map of clients
+import { customerConfigs } from "./customerConfig"; // map of clients
 
 export function getCustomerConfigFromHost(hostname: string) {
   // Normalize
