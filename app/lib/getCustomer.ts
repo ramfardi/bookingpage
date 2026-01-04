@@ -1,5 +1,5 @@
 import { defaultLandingConfig } from "./defaultLandingConfig";
-import { customerConfig } from "./customerConfig"; // map of clients
+import { CustomerConfig } from "./customerConfig"; // map of clients
 
 export function getCustomerConfigFromHost(hostname: string) {
   // Normalize
@@ -30,11 +30,11 @@ export function getCustomerConfigFromHost(hostname: string) {
   const subdomain = parts[0];
 
   // Client found
-  if (customerConfig[subdomain]) {
+  if (CustomerConfig[subdomain]) {
     return {
       mode: "client" as const,
       key: subdomain,
-      config: customerConfig[subdomain],
+      config: CustomerConfig[subdomain],
     };
   }
 
