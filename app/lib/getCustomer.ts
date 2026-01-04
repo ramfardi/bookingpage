@@ -8,8 +8,8 @@ export function getCustomerConfigFromHost(hostname: string): {
 } {
   // root domain → SALES LANDING
   if (
-    hostname === "yourapp.com" ||
-    hostname === "www.yourapp.com" ||
+    hostname === "simplebookme.com" ||
+    hostname === "www.simplebookme.com" ||
     hostname.includes("localhost")
   ) {
     return {
@@ -23,7 +23,8 @@ export function getCustomerConfigFromHost(hostname: string): {
   const subdomain = hostname.split(".")[0];
 
   // ⚠️ in prod this comes from Supabase / middleware
-  const customerConfig = /* fetched config */;
+  //const customerConfig = /* fetched config */;
+  const customerConfig: CustomerConfig = defaultLandingConfig;
 
   return {
     config: customerConfig,
