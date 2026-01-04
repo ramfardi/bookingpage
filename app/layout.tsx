@@ -1,6 +1,6 @@
-import './globals.css';
-import Navbar from '@/components/Navbar';
-import { Providers } from './providers';
+import "./globals.css";
+import Navbar from "@/components/Navbar";
+import { Providers } from "./providers";
 
 export default function RootLayout({
   children,
@@ -12,7 +12,10 @@ export default function RootLayout({
       <body className="bg-gradient-to-br from-indigo-50 via-white to-purple-50">
         <Providers>
           <Navbar />
-          {children}
+          {/* Offset for fixed navbar */}
+          <main className="pt-16">
+            {children}
+          </main>
         </Providers>
       </body>
     </html>
