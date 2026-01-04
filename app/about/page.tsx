@@ -86,9 +86,13 @@ useEffect(() => {
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t py-8 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} {customer.businessName}
-      </footer>
+	<footer className="border-t py-8 text-center text-sm text-gray-500">
+	  © {new Date().getFullYear()}{" "}
+	  {mode === "client"
+		? (customer as CustomerConfig).businessName
+		: "Your Company"}
+	</footer>
+
     </main>
   );
 }
