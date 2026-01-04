@@ -4,58 +4,56 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
-import { CustomerConfig } from "@/app/lib/customerConfig";
-import { LandingConfig } from "@/app/lib/customerConfig";
-
+import { CustomerConfig, LandingConfig } from "@/app/lib/customerConfig";
 import { useRouter } from "next/navigation";
-const [mode, setMode] = useState<"sales" | "client">("sales");
 
 export default function Home() {
-
   const router = useRouter();
 
-const [customer, setCustomer] = useState<
-  CustomerConfig | LandingConfig | null
->(null);
-const [customerKey, setCustomerKey] = useState<string | null>(null);
-const [mode, setMode] = useState<"sales" | "client">("sales");
+  const [customer, setCustomer] = useState<
+    CustomerConfig | LandingConfig | null
+  >(null);
 
-useEffect(() => {
-  const hostname = window.location.hostname;
-  const result = getCustomerConfigFromHost(hostname);
+  const [customerKey, setCustomerKey] = useState<string | null>(null);
+  const [mode, setMode] = useState<"sales" | "client">("sales");
 
-  setCustomer(result.config);
-  setCustomerKey(result.key);
-  setMode(result.mode); // 👈 THIS WAS MISSING
-}, []);
+  useEffect(() => {
+    const hostname = window.location.hostname;
+    const result = getCustomerConfigFromHost(hostname);
 
+    setCustomer(result.config);
+    setCustomerKey(result.key);
+    setMode(result.mode);
+  }, []);
 
-
-  // ⛔ Prevent hydration mismatch
+  // Prevent hydration mismatch
   if (!customer) {
-    return null; // or a loader
+    return null;
   }
 
   const { landing } = customer;
-  
-function handleBookAppointment() {
-  if (!customer) return;
 
-  const booking = customer.booking;
+  function handleBookAppointment() {
+    if (mode !== "client") {
+      router.push("/setup");
+      return;
+    }
 
-  if (booking?.is_external && booking.bookingLink) {
-    window.location.href = booking.bookingLink;
-    return;
+    // Narrow once — safe below
+    const customerConfig = customer as CustomerConfig;
+    const booking = customerConfig.booking;
+
+    if (booking?.is_external && booking.bookingLink) {
+      window.location.href = booking.bookingLink;
+      return;
+    }
+
+    // Default → internal booking page
+    router.push("/booking");
   }
-
-  // Default → internal booking page
-  router.push("/booking");
-}
-
 
   return (
     <main className="min-h-screen w-full flex flex-col">
-
       {/* HERO */}
       <section
         className="relative min-h-[90vh] flex items-center justify-center text-center text-white"
@@ -83,28 +81,28 @@ function handleBookAppointment() {
           <p className="mt-6 text-lg opacity-90">
             {landing.subheader1}
           </p>
+
           <p className="mt-2 text-base opacity-80">
             {landing.subheader2}
           </p>
 
-		<div className="mt-10 flex justify-center">
-		{mode === "client" ? (
-		  <button
-			onClick={handleBookAppointment}
-			className="rounded-xl bg-white text-black px-8 py-4 font-semibold"
-		  >
-			Book appointment
-		  </button>
-		) : (
-		  <button
-			onClick={() => router.push("/setup")}
-			className="rounded-xl bg-indigo-600 text-white px-8 py-4 font-semibold"
-		  >
-			Create your booking site
-		  </button>
-		)}
-
-		</div>
+          <div className="mt-10 flex justify-center">
+            {mode === "client" ? (
+              <button
+                onClick={handleBookAppointment}
+                className="rounded-xl bg-white text-black px-8 py-4 font-semibold"
+              >
+                Book appointment
+              </button>
+            ) : (
+              <button
+                onClick={() => router.push("/setup")}
+                className="rounded-xl bg-indigo-600 text-white px-8 py-4 font-semibold"
+              >
+                Create your booking site
+              </button>
+            )}
+          </div>
         </motion.div>
       </section>
     </main>
