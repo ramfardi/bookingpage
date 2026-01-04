@@ -13,6 +13,7 @@ export default function Home() {
 
 const [customer, setCustomer] = useState<CustomerConfig | null>(null);
 const [customerKey, setCustomerKey] = useState<string | null>(null);
+const [mode, setMode] = useState<"sales" | "client">("sales");
 
 useEffect(() => {
   const hostname = window.location.hostname;
@@ -20,6 +21,7 @@ useEffect(() => {
 
   setCustomer(result.config);
   setCustomerKey(result.key);
+  setMode(result.mode);
 }, []);
 
 
@@ -80,12 +82,22 @@ function handleBookAppointment() {
           </p>
 
 		<div className="mt-10 flex justify-center">
+		{mode === "client" ? (
 		  <button
 			onClick={handleBookAppointment}
-			className="inline-block rounded-xl bg-white text-black px-8 py-4 font-semibold hover:bg-gray-100 transition"
+			className="rounded-xl bg-white text-black px-8 py-4 font-semibold"
 		  >
 			Book appointment
 		  </button>
+		) : (
+		  <button
+			onClick={() => router.push("/setup")}
+			className="rounded-xl bg-indigo-600 text-white px-8 py-4 font-semibold"
+		  >
+			Create your booking site
+		  </button>
+		)}
+
 		</div>
         </motion.div>
       </section>

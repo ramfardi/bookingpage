@@ -1,20 +1,34 @@
-import { CUSTOMER_CONFIG } from "./customerConfig";
+import { defaultLandingConfig } from "./defaultLandingConfig";
+import { CustomerConfig } from "./customerConfig";
 
-export function getCustomerConfigFromHost(host: string) {
-  const parts = host.split(".");
-  const subdomain = parts.length > 2 ? parts[0] : null;
-
-  if (subdomain && CUSTOMER_CONFIG[subdomain]) {
+export function getCustomerConfigFromHost(hostname: string): {
+  config: CustomerConfig;
+  mode: "sales" | "client";
+  key: string | null;
+} {
+  // root domain → SALES LANDING
+  if (
+    hostname === "yourapp.com" ||
+    hostname === "www.yourapp.com" ||
+    hostname.includes("localhost")
+  ) {
     return {
-      key: subdomain,
-      config: CUSTOMER_CONFIG[subdomain],
+      config: defaultLandingConfig,
+      mode: "sales",
+      key: null
     };
   }
 
-  // Fallback for root domain (default customer)
+  // subdomain → CLIENT SITE
+  const subdomain = hostname.split(".")[0];
+
+  // ⚠️ in prod this comes from Supabase / middleware
+  const customerConfig = /* fetched config */;
+
   return {
-    key: "vida", // ← choose your default
-    config: CUSTOMER_CONFIG["vida"],
+    config: customerConfig,
+    mode: "client",
+    key: subdomain
   };
 }
 
