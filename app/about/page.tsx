@@ -5,7 +5,6 @@ import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import { CustomerConfig } from "@/app/lib/customerConfig";
 import { LandingConfig } from "@/app/lib/customerConfig";
 
-const [mode, setMode] = useState<"sales" | "client">("sales");
 
 export default function AboutPage() {
 const [customer, setCustomer] = useState<
@@ -13,7 +12,7 @@ const [customer, setCustomer] = useState<
 >(null);
 
 const [customerKey, setCustomerKey] = useState<string | null>(null);
-
+const [mode, setMode] = useState<"sales" | "client">("sales");
 useEffect(() => {
   const hostname = window.location.hostname;
   const result = getCustomerConfigFromHost(hostname);
