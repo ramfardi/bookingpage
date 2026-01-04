@@ -1,12 +1,12 @@
 import { defaultLandingConfig } from "./defaultLandingConfig";
-import { CustomerConfig } from "./customerConfig";
+import { CUSTOMER_CONFIG } from "./customerConfig";
 
 export function getCustomerConfigFromHost(hostname: string) {
   const cleanHost = hostname
     .replace(/^www\./, "")
     .split(":")[0];
 
-  // Root domain → sales
+  // Root domain → SALES
   if (cleanHost === "simplebookme.com") {
     return {
       mode: "sales" as const,
@@ -27,16 +27,16 @@ export function getCustomerConfigFromHost(hostname: string) {
 
   const subdomain = parts[0];
 
-  // Client found
-  if (CustomerConfig[subdomain]) {
+  // ✅ Client found
+  if (CUSTOMER_CONFIG[subdomain]) {
     return {
       mode: "client" as const,
       key: subdomain,
-      config: CustomerConfig[subdomain],
+      config: CUSTOMER_CONFIG[subdomain],
     };
   }
 
-  // Fallback → sales
+  // Fallback → SALES
   return {
     mode: "sales" as const,
     key: null,

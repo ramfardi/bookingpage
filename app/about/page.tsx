@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
-import { CustomerConfig } from "@/app/lib/customerConfig";
-import { LandingConfig } from "@/app/lib/customerConfig";
+import type { CustomerConfig, LandingConfig } from "@/app/lib/customerConfig";
+
 
 
 export default function AboutPage() {
