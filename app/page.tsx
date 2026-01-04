@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
@@ -39,7 +38,6 @@ export default function Home() {
       return;
     }
 
-    // Narrow once — safe below
     const customerConfig = customer as CustomerConfig;
     const booking = customerConfig.booking;
 
@@ -48,7 +46,6 @@ export default function Home() {
       return;
     }
 
-    // Default → internal booking page
     router.push("/booking");
   }
 
@@ -63,7 +60,8 @@ export default function Home() {
           backgroundPosition: "center",
         }}
       >
-        <div className="absolute inset-0 bg-black/50" />
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" />
 
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -73,9 +71,7 @@ export default function Home() {
         >
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">
             {landing.header1}{" "}
-            <span className="text-indigo-400">
-              {landing.header2}
-            </span>
+            <span className="text-indigo-400">{landing.header2}</span>
           </h1>
 
           <p className="mt-6 text-lg opacity-90">
