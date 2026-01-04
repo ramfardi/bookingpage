@@ -24,7 +24,12 @@ useEffect(() => {
 
   if (!customer) return null;
 
-  const { about } = customer;
+	  if (mode !== "client") {
+	  return null; // or render sales/about copy
+	}
+
+	const { about } = customer as CustomerConfig;
+
 
   return (
     <main className="min-h-screen w-full">
