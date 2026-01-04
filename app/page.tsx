@@ -101,6 +101,46 @@ export default function Home() {
           </div>
         </motion.div>
       </section>
+	        {/* FEATURES */}
+      <section className="w-full flex justify-center pb-24">
+        <div className="grid w-full max-w-6xl grid-cols-1 md:grid-cols-3 gap-8 px-8">
+          {[
+            {
+              title: 'Matching Score',
+              desc: 'Instantly see how well a resume fits a job posting.',
+            },
+            {
+              title: 'Skill Coverage',
+              desc: 'See the short list of gaps/strengths for a specific role.',
+            },
+            {
+              title: 'Recruiter Insights',
+              desc: 'Concise AI-generated insights to guide screening, interviews, and shortlisting decisions.',
+            },
+          ].map((f) => (
+            <motion.div
+              key={f.title}
+              whileHover={{ y: -8, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+              className="rounded-2xl bg-white p-8 shadow-md border hover:shadow-xl"
+            >
+              <h3 className="text-xl font-semibold text-gray-900">
+                {f.title}
+              </h3>
+              <p className="mt-3 text-gray-600">
+                {f.desc}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+	  
+	  {/* FOOTER */}
+      <footer className="border-t py-8 text-center text-sm text-gray-500">
+        © {new Date().getFullYear()} JobMatchAI - All rights reserved.
+      </footer>
+	  
+	  
     </main>
   );
 }
