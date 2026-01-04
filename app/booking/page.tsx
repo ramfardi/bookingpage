@@ -5,7 +5,10 @@ import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import { CustomerConfig } from "@/app/lib/customerConfig";
 
 export default function BookingPage() {
-  const [customer, setCustomer] = useState<CustomerConfig | null>(null);
+	const [customer, setCustomer] = useState<
+	  CustomerConfig | LandingConfig | null
+	>(null);
+
   const [customerKey, setCustomerKey] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
