@@ -49,6 +49,15 @@ export type CustomerConfig = {
   };
 };
 
+/**
+ * Used ONLY for the main sales landing page
+ * (no booking, no services, no email settings)
+ */
+export type LandingConfig = Pick<
+  CustomerConfig,
+  "heroImage" | "landing"
+>;
+
 export const CUSTOMER_CONFIG: Record<string, CustomerConfig> = {
   // =============================
   // Hairdresser example

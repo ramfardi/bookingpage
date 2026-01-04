@@ -11,7 +11,9 @@ export default function Home() {
 
   const router = useRouter();
 
-const [customer, setCustomer] = useState<CustomerConfig | null>(null);
+const [customer, setCustomer] = useState<
+  CustomerConfig | LandingConfig | null
+>(null);
 const [customerKey, setCustomerKey] = useState<string | null>(null);
 const [mode, setMode] = useState<"sales" | "client">("sales");
 

@@ -1,12 +1,11 @@
+import { CustomerConfig, LandingConfig } from "./customerConfig";
 import { defaultLandingConfig } from "./defaultLandingConfig";
-import { CustomerConfig } from "./customerConfig";
 
 export function getCustomerConfigFromHost(hostname: string): {
-  config: CustomerConfig;
+  config: CustomerConfig | LandingConfig;
   mode: "sales" | "client";
   key: string | null;
 } {
-  // root domain → SALES LANDING
   if (
     hostname === "simplebookme.com" ||
     hostname === "www.simplebookme.com" ||
@@ -15,22 +14,17 @@ export function getCustomerConfigFromHost(hostname: string): {
     return {
       config: defaultLandingConfig,
       mode: "sales",
-      key: null
+      key: null,
     };
   }
 
-  // subdomain → CLIENT SITE
-  const subdomain = hostname.split(".")[0];
-
-  // ⚠️ in prod this comes from Supabase / middleware
-  //const customerConfig = /* fetched config */;
-  const customerConfig: CustomerConfig = defaultLandingConfig;
-
+  // TEMP fallback
   return {
-    config: customerConfig,
+    config: defaultLandingConfig as CustomerConfig,
     mode: "client",
-    key: subdomain
+    key: hostname.split(".")[0],
   };
 }
+
 
 
