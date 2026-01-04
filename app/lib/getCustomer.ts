@@ -1,30 +1,47 @@
-import { CustomerConfig, LandingConfig } from "./customerConfig";
 import { defaultLandingConfig } from "./defaultLandingConfig";
+import { customerConfigs } from "./customerConfigs"; // map of clients
 
-export function getCustomerConfigFromHost(hostname: string): {
-  config: CustomerConfig | LandingConfig;
-  mode: "sales" | "client";
-  key: string | null;
-} {
-  if (
-    hostname === "simplebookme.com" ||
-    hostname === "www.simplebookme.com" ||
-    hostname.includes("localhost")
-  ) {
+export function getCustomerConfigFromHost(hostname: string) {
+  // Normalize
+  const cleanHost = hostname
+    .replace("www.", "")
+    .split(":")[0]; // remove port
+
+  // Root domain → SALES
+  if (cleanHost === "simplebookme.com") {
     return {
-      config: defaultLandingConfig,
-      mode: "sales",
+      mode: "sales" as const,
       key: null,
+      config: defaultLandingConfig,
     };
   }
 
-  // TEMP fallback
+  // Subdomain logic
+  const parts = cleanHost.split(".");
+  if (parts.length < 3) {
+    // e.g. localhost, unknown domain
+    return {
+      mode: "sales" as const,
+      key: null,
+      config: defaultLandingConfig,
+    };
+  }
+
+  const subdomain = parts[0];
+
+  // Client found
+  if (customerConfigs[subdomain]) {
+    return {
+      mode: "client" as const,
+      key: subdomain,
+      config: customerConfigs[subdomain],
+    };
+  }
+
+  // Fallback → sales
   return {
-    config: defaultLandingConfig as CustomerConfig,
-    mode: "client",
-    key: hostname.split(".")[0],
+    mode: "sales" as const,
+    key: null,
+    config: defaultLandingConfig,
   };
 }
-
-
-
