@@ -1,7 +1,7 @@
 import { LandingConfig } from "./customerConfig";
 
 export const defaultLandingConfig: LandingConfig = {
-  heroImage: "/public/images/hero-default.png",
+  heroImage: "/images/hero-default.png",
   landing: {
     header1: "Create your",
     header2: "booking website in minutes",
