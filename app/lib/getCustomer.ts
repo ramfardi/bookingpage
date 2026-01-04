@@ -1,13 +1,12 @@
 import { defaultLandingConfig } from "./defaultLandingConfig";
-import { CustomerConfig } from "./customerConfig"; // map of clients
+import { CustomerConfig } from "./customerConfig";
 
 export function getCustomerConfigFromHost(hostname: string) {
-  // Normalize
   const cleanHost = hostname
-    .replace("www.", "")
-    .split(":")[0]; // remove port
+    .replace(/^www\./, "")
+    .split(":")[0];
 
-  // Root domain → SALES
+  // Root domain → sales
   if (cleanHost === "simplebookme.com") {
     return {
       mode: "sales" as const,
@@ -16,10 +15,9 @@ export function getCustomerConfigFromHost(hostname: string) {
     };
   }
 
-  // Subdomain logic
   const parts = cleanHost.split(".");
   if (parts.length < 3) {
-    // e.g. localhost, unknown domain
+    // localhost, preview URLs, unknown domains
     return {
       mode: "sales" as const,
       key: null,
