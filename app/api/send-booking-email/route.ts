@@ -42,7 +42,6 @@ function createICS(
   start: Date
 ) {
   const end = new Date(start.getTime() + 60 * 60 * 1000);
-
   const format = (d: Date) =>
     d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
 
@@ -67,12 +66,12 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const {
-      customerKey, // this IS the siteId
+      customerKey, // siteId
       service,
       preferred_date,
       preferred_time,
       customer_email,
-      company, // honeypot
+      company,
     } = body;
 
     if (company) return Response.json({ success: true });
@@ -84,19 +83,10 @@ export async function POST(req: Request) {
       return Response.json({ error: "Too many requests" }, { status: 429 });
     }
 
-    if (
-      !customerKey ||
-      !service ||
-      !preferred_date ||
-      !preferred_time ||
-      !customer_email
-    ) {
+    if (!customerKey || !service || !preferred_date || !preferred_time || !customer_email) {
       return Response.json({ error: "Invalid booking request" }, { status: 400 });
     }
 
-    /* =====================
-       Fetch site from Supabase
-    ===================== */
     const { data: site, error } = await supabase
       .from("sites")
       .select("data")
@@ -118,22 +108,13 @@ export async function POST(req: Request) {
 
     const providerEmail = customer.email.bookingNotifications;
 
-    /* =====================
-       Stable event UID
-    ===================== */
     const eventUID = `booking-${crypto
       .createHash("sha1")
-      .update(
-        `${customerKey}-${customer_email}-${preferred_date}-${preferred_time}`
-      )
+      .update(`${customerKey}-${customer_email}-${preferred_date}-${preferred_time}`)
       .digest("hex")}`;
 
-    /* =====================
-       🔥 SIGN TOKEN (FIX)
-       MUST USE siteId
-    ===================== */
     const token = signToken({
-      siteId: customerKey, // 🔥 FIXED
+      siteId: customerKey,
       service,
       preferred_date,
       preferred_time,
@@ -141,14 +122,15 @@ export async function POST(req: Request) {
       eventUID,
     });
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://simplebookme.com";
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BASE_URL ?? "https://simplebookme.com";
 
     const confirmUrl =
       `${baseUrl}/api/booking/confirm?token=${encodeURIComponent(token)}`;
 
-    /* =====================
-       Calendar attachment
-    ===================== */
+    const rescheduleUrl =
+      `${baseUrl}/api/booking/reschedule?token=${encodeURIComponent(token)}`;
+
     const ics = createICS(
       eventUID,
       `Booking with ${customer.businessName}`,
@@ -162,7 +144,7 @@ export async function POST(req: Request) {
     };
 
     /* =====================
-       PROVIDER EMAIL
+       PROVIDER EMAIL (CONFIRM + MODIFY)
     ===================== */
     await resend.emails.send({
       from: "Booking <booking@simplebookme.com>",
@@ -176,34 +158,37 @@ export async function POST(req: Request) {
         <p><strong>Time:</strong> ${preferred_time}</p>
         <p>
           <a href="${confirmUrl}"
-             style="padding:10px 14px;background:#16a34a;
-                    color:white;text-decoration:none;border-radius:6px;">
+             style="margin-right:8px;padding:10px 14px;
+                    background:#16a34a;color:white;
+                    text-decoration:none;border-radius:6px;">
             Confirm
+          </a>
+
+          <a href="${rescheduleUrl}"
+             style="padding:10px 14px;
+                    background:#f59e0b;color:white;
+                    text-decoration:none;border-radius:6px;">
+            Modify time
           </a>
         </p>
       `,
     });
 
     /* =====================
-       CUSTOMER EMAIL
+       CLIENT EMAIL (NO CONFIRM)
     ===================== */
     await resend.emails.send({
       from: "Booking <booking@simplebookme.com>",
       to: customer_email,
       replyTo: customer.email.replyTo ?? providerEmail,
-      subject: `Confirm your booking – ${customer.businessName}`,
+      subject: `Booking request received – ${customer.businessName}`,
       html: `
-        <h2>Confirm your booking</h2>
+        <h2>Booking request received</h2>
+        <p>Your request has been sent to <strong>${customer.businessName}</strong>.</p>
         <p><strong>Service:</strong> ${service}</p>
         <p><strong>Date:</strong> ${preferred_date}</p>
         <p><strong>Time:</strong> ${preferred_time}</p>
-        <p>
-          <a href="${confirmUrl}"
-             style="padding:12px 18px;background:#4f46e5;
-                    color:white;text-decoration:none;border-radius:6px;">
-            Confirm appointment
-          </a>
-        </p>
+        <p>You will receive a confirmation once the provider approves it.</p>
       `,
       attachments: [calendarAttachment],
     });
