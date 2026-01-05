@@ -11,6 +11,7 @@ export default function SetupPage() {
   const [form, setForm] = useState({
     businessName: "",
     email: "",
+    subdomain: "",
   });
 
   async function handleContinue() {
@@ -21,6 +22,9 @@ export default function SetupPage() {
       templateId,
       ...template.defaultData,
       businessName: form.businessName,
+
+      subdomain: form.subdomain.toLowerCase(), // 👈 store subdomain
+
       email: {
         bookingNotifications: form.email,
         replyTo: form.email,
@@ -38,8 +42,9 @@ export default function SetupPage() {
     });
 
     const { siteId } = await res.json();
-    window.location.href = `/site/${siteId}`;
 
+    // 👇 preview stays siteId-based
+    window.location.href = `/site/${siteId}`;
   }
 
   return (
@@ -73,6 +78,20 @@ export default function SetupPage() {
           setForm({ ...form, email: e.target.value })
         }
       />
+
+      <div>
+        <input
+          className="w-full border p-2"
+          placeholder="yourbusiness"
+          onChange={(e) =>
+            setForm({ ...form, subdomain: e.target.value })
+          }
+        />
+        <p className="text-sm text-gray-500 mt-1">
+          Your site will be live at:{" "}
+          <b>{form.subdomain || "yourbusiness"}.simplebookme.com</b>
+        </p>
+      </div>
 
       <button
         className="w-full bg-black text-white py-3"

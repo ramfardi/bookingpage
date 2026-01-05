@@ -13,6 +13,8 @@ export type CustomerConfig = {
   templateId: "hairsalon" | "cleaning";
 
   businessName: string;
+  
+  subdomain?: string; // 👈 ADD THIS
 
   services: string[];
 

@@ -11,6 +11,8 @@ const SALES_CONFIG: LandingConfig = {
   },
 };
 
+const MAIN_DOMAIN = "yourdomain.com";
+
 export async function getCustomerConfigFromHost(
   hostname: string
 ): Promise<{
@@ -18,7 +20,9 @@ export async function getCustomerConfigFromHost(
   key: string | null;
   config: LandingConfig | CustomerConfig;
 }> {
-  // ✅ PATH-BASED (authoritative)
+  /* --------------------------------------------------
+   * 1️⃣ PATH-BASED PREVIEW (authoritative)
+   * -------------------------------------------------- */
   if (typeof window !== "undefined") {
     const match = window.location.pathname.match(/^\/site\/([^/]+)/);
 
@@ -28,6 +32,7 @@ export async function getCustomerConfigFromHost(
       const res = await fetch(`/api/site/${siteId}`);
       if (res.ok) {
         const site = (await res.json()) as CustomerConfig;
+
         return {
           mode: "client",
           key: siteId,
@@ -37,23 +42,44 @@ export async function getCustomerConfigFromHost(
     }
   }
 
-  // ✅ SUBDOMAIN (future only — safe fallback)
-  const parts = hostname.split(".");
-  const subdomain = parts.length > 2 ? parts[0] : null;
+  /* --------------------------------------------------
+   * 2️⃣ SUBDOMAIN (robust)
+   * -------------------------------------------------- */
+  const cleanHost = hostname
+    .replace(":3000", "")
+    .replace("www.", "");
 
-  if (subdomain) {
+  let subdomain: string | null = null;
+
+  // localhost: client.localhost
+  if (cleanHost.endsWith("localhost")) {
+    subdomain = cleanHost.split(".")[0];
+  }
+
+  // production: client.yourdomain.com
+  if (cleanHost.endsWith(MAIN_DOMAIN)) {
+    const parts = cleanHost.split(".");
+    if (parts.length > 2) {
+      subdomain = parts[0];
+    }
+  }
+
+  if (subdomain && subdomain !== "localhost") {
     const res = await fetch(`/api/site/${subdomain}`);
     if (res.ok) {
       const site = (await res.json()) as CustomerConfig;
+
       return {
         mode: "client",
-        key: subdomain,
+        key: site.siteId ?? subdomain,
         config: site,
       };
     }
   }
 
-  // ✅ SALES FALLBACK
+  /* --------------------------------------------------
+   * 3️⃣ SALES FALLBACK
+   * -------------------------------------------------- */
   return {
     mode: "sales",
     key: null,

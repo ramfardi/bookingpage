@@ -7,6 +7,7 @@ export async function POST(req: Request) {
 
   const { error } = await supabaseServer.from("sites").insert({
     site_id: site.siteId,
+	subdomain: site.subdomain,
     data: site,
   });
 
