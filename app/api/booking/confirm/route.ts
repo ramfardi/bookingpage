@@ -1,14 +1,13 @@
 export const runtime = "nodejs";
-import type { CustomerConfig } from "@/app/lib/customerConfig";
 
+import type { CustomerConfig } from "@/app/lib/customerConfig";
 import { verifyToken } from "@/app/lib/bookingTokens";
 import { createICS } from "@/app/lib/calendar";
 import { Resend } from "resend";
 import { getSupabase } from "@/app/lib/supabase";
+
 const supabase = getSupabase();
-
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function GET(req: Request) {
   try {
@@ -18,35 +17,27 @@ export async function GET(req: Request) {
     }
 
     const data = verifyToken(token);
-	const { siteId } = data;
+    const { siteId } = data;
 
-	if (!siteId) {
-	  return new Response("Invalid token", { status: 400 });
-	}
-
-	const { data: site, error } = await supabase
-	  .from("sites")
-	  .select("data")
-	  .eq("site_id", siteId)
-	  .single();
-
-	if (error || !site) {
-	  return new Response("Invalid customer", { status: 404 });
-	}
-
-	const customer = site.data as CustomerConfig;
-
-
-
-    if (!customer) {
-      return new Response("Invalid customer", { status: 400 });
+    if (!siteId) {
+      return new Response("Invalid token", { status: 400 });
     }
+
+    const { data: site, error } = await supabase
+      .from("sites")
+      .select("data")
+      .eq("site_id", siteId)
+      .single();
+
+    if (error || !site) {
+      return new Response("Invalid customer", { status: 404 });
+    }
+
+    const customer = site.data as CustomerConfig;
 
     if (!customer.email?.bookingNotifications) {
       return new Response("Provider email not configured", { status: 400 });
     }
-
-    const providerEmail = customer.email.bookingNotifications;
 
     const start = new Date(
       `${data.preferred_date}T${data.preferred_time}`
@@ -64,9 +55,7 @@ export async function GET(req: Request) {
       content: Buffer.from(ics).toString("base64"),
     };
 
-    /* ======================
-       Email → CLIENT
-    ====================== */
+    /* CLIENT EMAIL */
     await resend.emails.send({
       from: "Booking <booking@simplebookme.com>",
       to: data.customer_email,
@@ -77,17 +66,14 @@ export async function GET(req: Request) {
         <p><strong>Service:</strong> ${data.service}</p>
         <p><strong>Date:</strong> ${data.preferred_date}</p>
         <p><strong>Time:</strong> ${data.preferred_time}</p>
-        <p>The calendar file is attached.</p>
       `,
       attachments: [attachment],
     });
 
-    /* ======================
-       Email → PROVIDER
-    ====================== */
+    /* PROVIDER EMAIL */
     await resend.emails.send({
       from: "Booking <booking@simplebookme.com>",
-      to: providerEmail,
+      to: customer.email.bookingNotifications,
       subject: "Appointment confirmed",
       html: `
         <h2>Appointment Confirmed</h2>

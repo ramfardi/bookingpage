@@ -3,7 +3,7 @@ export const runtime = "nodejs";
 import { verifyToken, signToken } from "@/app/lib/bookingTokens";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
 /* ======================
    GET – Show reschedule form
@@ -16,7 +16,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    verifyToken(token); // validate token only
+    verifyToken(token);
   } catch {
     return new Response("Invalid or expired link", { status: 400 });
   }
@@ -52,6 +52,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const form = await req.formData();
+
     const token = form.get("token")?.toString();
     const date = form.get("date")?.toString();
     const time = form.get("time")?.toString();
@@ -62,13 +63,22 @@ export async function POST(req: Request) {
 
     const data = verifyToken(token);
 
+    // 🔐 Ensure required fields exist
+    if (!data.siteId || !data.customer_email) {
+      return new Response("Invalid token", { status: 400 });
+    }
+
+    // 🔁 Re-sign token with updated time
     const newToken = signToken({
       ...data,
       preferred_date: date,
       preferred_time: time,
     });
 
-    const confirmUrl = `https://simplebookme.com/api/booking/confirm?token=${newToken}`;
+    const confirmUrl =
+      `https://simplebookme.com/api/booking/confirm?token=${encodeURIComponent(
+        newToken
+      )}`;
 
     await resend.emails.send({
       from: "Booking <booking@simplebookme.com>",
@@ -92,7 +102,9 @@ export async function POST(req: Request) {
             Accept new time
           </a>
         </p>
-        <p>If this link expires, please request another proposal.</p>
+        <p style="font-size:12px;color:#666;">
+          If this link expires, please request another proposal.
+        </p>
       `,
     });
 
