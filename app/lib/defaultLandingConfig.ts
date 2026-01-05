@@ -1,4 +1,5 @@
-import { LandingConfig } from "./customerConfig";
+import type { LandingConfig } from "./landingConfig";
+
 
 export const defaultLandingConfig: LandingConfig = {
   heroImage: "/images/hero-default.png",
