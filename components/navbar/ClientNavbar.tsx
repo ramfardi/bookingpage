@@ -8,12 +8,18 @@ export default function ClientNavbar() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  // Extract siteId from /site/[siteId]/...
-  const siteId = pathname.split("/")[2];
-  const base = siteId ? `/site/${siteId}` : "";
+  // Detect preview mode: /site/[siteId]/...
+  const isPreview = pathname.startsWith("/site/");
+  const siteId = isPreview ? pathname.split("/")[2] : null;
+
+  // Base path:
+  // - preview → /site/{siteId}
+  // - subdomain → ""
+  const base = isPreview && siteId ? `/site/${siteId}` : "";
 
   return (
-    <nav className="w-full border-b bg-white">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur border-b">
+
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link href={base || "/"} className="text-xl font-extrabold text-gray-900">
@@ -56,8 +62,9 @@ export default function ClientNavbar() {
       </div>
 
       {/* Mobile dropdown */}
-      {open && (
-        <div className="md:hidden border-t bg-white px-4 py-4 flex flex-col gap-4">
+	{open && (
+	  <div className="md:hidden absolute top-full left-0 right-0 bg-white border-t shadow-lg px-4 py-4 flex flex-col gap-4">
+
           <Link
             href={`${base}/about`}
             className="py-3 text-base font-medium"

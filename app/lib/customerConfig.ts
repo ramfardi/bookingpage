@@ -15,6 +15,15 @@ export type CustomerConfig = {
   businessName: string;
   
   subdomain?: string; // 👈 ADD THIS
+  
+    heroImage: string;
+
+  landing: {
+    header1: string;
+    header2: string;
+    subheader1: string;
+    subheader2: string;
+  };
 
   services: string[];
 

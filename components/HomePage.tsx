@@ -35,10 +35,7 @@ export default function HomePage() {
     return null;
   }
 
-  const landing =
-    mode === "sales"
-      ? (customer as LandingConfig).landing
-      : undefined;
+  const landing = customer.landing;
 
   function handleBookAppointment() {
     if (mode !== "client") {
@@ -62,13 +59,13 @@ export default function HomePage() {
     <main className="min-h-screen w-full flex flex-col">
       {/* HERO */}
       <section
-        className="relative min-h-[90vh] flex items-center justify-center text-center text-white"
+        className="relative min-h-[90vh] pt-20 flex items-center justify-center text-center text-white"
         style={{
-          backgroundImage: `url(${
-            mode === "sales"
-              ? (customer as LandingConfig).heroImage
-              : "/images/hero-default.png"
-          })`,
+		backgroundImage: `url(${
+		  mode === "sales"
+			? (customer as LandingConfig).heroImage
+			: (customer as CustomerConfig).heroImage
+		})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}

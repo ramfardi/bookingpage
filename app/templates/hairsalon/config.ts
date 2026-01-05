@@ -6,6 +6,7 @@ export const templateConfig = {
 
   editableFields: {
     businessName: true,
+	landing: true,
     services: true,
     pricing: true,
     deposit: true,
