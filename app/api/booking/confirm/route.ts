@@ -17,12 +17,22 @@ export async function GET(req: Request) {
     }
 
     const data = verifyToken(token);
-    const { siteId } = data;
+    const {
+      siteId,
+      service,
+      preferred_date,
+      preferred_time,
+      customer_email,
+      eventUID,
+    } = data;
 
     if (!siteId) {
       return new Response("Invalid token", { status: 400 });
     }
 
+    /* =====================
+       Fetch site config
+    ===================== */
     const { data: site, error } = await supabase
       .from("sites")
       .select("data")
@@ -39,14 +49,15 @@ export async function GET(req: Request) {
       return new Response("Provider email not configured", { status: 400 });
     }
 
-    const start = new Date(
-      `${data.preferred_date}T${data.preferred_time}`
-    );
+    /* =====================
+       Calendar (.ics)
+    ===================== */
+    const start = new Date(`${preferred_date}T${preferred_time}`);
 
     const ics = createICS({
-      uid: data.eventUID,
+      uid: eventUID,
       title: `Booking with ${customer.businessName}`,
-      description: `Service: ${data.service}`,
+      description: `Service: ${service}`,
       start,
     });
 
@@ -55,32 +66,69 @@ export async function GET(req: Request) {
       content: Buffer.from(ics).toString("base64"),
     };
 
-    /* CLIENT EMAIL */
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BASE_URL ?? "https://simplebookme.com";
+
+    const rescheduleUrl =
+      `${baseUrl}/api/booking/reschedule?token=${encodeURIComponent(token)}`;
+
+    /* =====================
+       EMAIL → CLIENT
+       (CONFIRM + MODIFY)
+    ===================== */
     await resend.emails.send({
       from: "Booking <booking@simplebookme.com>",
-      to: data.customer_email,
+      to: customer_email,
       subject: "Your appointment is confirmed",
       html: `
         <h2>Appointment Confirmed</h2>
+
         <p><strong>Business:</strong> ${customer.businessName}</p>
-        <p><strong>Service:</strong> ${data.service}</p>
-        <p><strong>Date:</strong> ${data.preferred_date}</p>
-        <p><strong>Time:</strong> ${data.preferred_time}</p>
+        <p><strong>Service:</strong> ${service}</p>
+        <p><strong>Date:</strong> ${preferred_date}</p>
+        <p><strong>Time:</strong> ${preferred_time}</p>
+
+        <p style="margin-top:20px;">
+          If you need to change the appointment time, you can request a modification:
+        </p>
+
+        <p>
+          <a href="${rescheduleUrl}"
+             style="
+               display:inline-block;
+               padding:12px 18px;
+               background:#f59e0b;
+               color:white;
+               text-decoration:none;
+               border-radius:6px;
+               font-weight:600;
+             ">
+            Modify appointment
+          </a>
+        </p>
+
+        <p style="margin-top:16px;font-size:12px;color:#666;">
+          This request will be sent to the business for approval.
+        </p>
       `,
       attachments: [attachment],
     });
 
-    /* PROVIDER EMAIL */
+    /* =====================
+       EMAIL → PROVIDER
+       (NO MODIFY BUTTON)
+    ===================== */
     await resend.emails.send({
       from: "Booking <booking@simplebookme.com>",
       to: customer.email.bookingNotifications,
       subject: "Appointment confirmed",
       html: `
         <h2>Appointment Confirmed</h2>
-        <p><strong>Client:</strong> ${data.customer_email}</p>
-        <p><strong>Service:</strong> ${data.service}</p>
-        <p><strong>Date:</strong> ${data.preferred_date}</p>
-        <p><strong>Time:</strong> ${data.preferred_time}</p>
+
+        <p><strong>Client:</strong> ${customer_email}</p>
+        <p><strong>Service:</strong> ${service}</p>
+        <p><strong>Date:</strong> ${preferred_date}</p>
+        <p><strong>Time:</strong> ${preferred_time}</p>
       `,
       attachments: [attachment],
     });
