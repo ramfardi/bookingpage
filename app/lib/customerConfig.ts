@@ -1,10 +1,16 @@
 // app/lib/customerConfig.ts
 
-export type PricingPlan = {
-  name: string;
-  price: string;
-  description?: string;
-  features: string[];
+export type PricingRow = {
+  id: string;          // stable key for React & future edits
+  name: string;        // service name (e.g. "Haircut")
+  price: string;       // string on purpose: "$60", "From $80", etc.
+  includes?: string;   // optional description
+};
+
+export type PricingSection = {
+  title: string;       // e.g. "Our Services & Pricing"
+  subtitle?: string;   // optional helper text
+  rows: PricingRow[];  // table rows
 };
 
 export type CustomerConfig = {
@@ -27,11 +33,7 @@ export type CustomerConfig = {
 
   services: string[];
 
-  pricing: {
-    title: string;
-    subtitle?: string;
-    plans: PricingPlan[];
-  };
+	pricing: PricingSection;
 
   deposit: {
     enabled: boolean;
