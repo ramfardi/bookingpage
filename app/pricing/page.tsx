@@ -25,61 +25,67 @@ export default function PricingPage() {
   }, []);
 
   // Prevent hydration mismatch
-  if (!customer) {
-    return null;
-  }
+  if (!customer) return null;
 
   // Pricing page is CLIENT-ONLY
-  if (mode !== "client") {
-    return null; // or router.push("/")
-  }
+  if (mode !== "client") return null;
 
-  // Safe narrowing
   const customerConfig = customer as CustomerConfig;
-  const { pricing } = customerConfig;
+  const pricing = customerConfig.pricing;
+
+  // Extra safety (important)
+  if (!pricing || !pricing.rows || pricing.rows.length === 0) {
+    return (
+      <main className="min-h-screen px-6 py-24 text-center">
+        <h1 className="text-3xl font-bold">Pricing</h1>
+        <p className="mt-4 text-gray-500">
+          Pricing information will be available soon.
+        </p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen px-6 py-24 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <div className="max-w-5xl mx-auto text-center">
-        <h1 className="text-4xl font-bold">
-          {pricing.title}
-        </h1>
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold">
+            {pricing.title}
+          </h1>
 
-        {pricing.subtitle && (
-          <p className="mt-3 text-gray-600">
-            {pricing.subtitle}
-          </p>
-        )}
+          {pricing.subtitle && (
+            <p className="mt-3 text-gray-600">
+              {pricing.subtitle}
+            </p>
+          )}
+        </div>
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-          {pricing.plans.map((plan) => (
-            <div
-              key={plan.name}
-              className="bg-white rounded-2xl shadow-md p-8 text-left"
-            >
-              <h3 className="text-xl font-semibold">
-                {plan.name}
-              </h3>
+        <div className="mt-12 overflow-x-auto">
+          <table className="w-full border rounded-xl bg-white shadow-md overflow-hidden">
+            <thead className="bg-gray-50 text-left">
+              <tr>
+                <th className="p-4">Service</th>
+                <th className="p-4 w-32">Price</th>
+                <th className="p-4">Includes</th>
+              </tr>
+            </thead>
 
-              <p className="text-3xl font-bold mt-2">
-                {plan.price}
-              </p>
-
-              {plan.description && (
-                <p className="mt-2 text-gray-600">
-                  {plan.description}
-                </p>
-              )}
-
-              <ul className="mt-4 space-y-2 text-sm">
-                {plan.features.map((feature) => (
-                  <li key={feature}>
-                    • {feature}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+            <tbody>
+              {pricing.rows.map((row) => (
+                <tr key={row.id} className="border-t">
+                  <td className="p-4 font-medium">
+                    {row.name}
+                  </td>
+                  <td className="p-4 whitespace-nowrap">
+                    {row.price}
+                  </td>
+                  <td className="p-4 text-gray-600">
+                    {row.includes || "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </main>
