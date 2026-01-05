@@ -155,7 +155,7 @@ const customer = site.data as CustomerConfig;
     });
 
     const confirmUrl =
-      `https://simplebookme.com/api/booking/confirm?token=${token}`;
+      `https://simplebookme.com/api/booking/confirm?token=${encodeURIComponent(token)}`;
 
     const rescheduleUrl =
       `https://simplebookme.com/api/booking/reschedule?token=${token}`;
