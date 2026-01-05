@@ -3,7 +3,9 @@ export const runtime = "nodejs";
 import { Resend } from "resend";
 import { signToken } from "@/app/lib/bookingTokens";
 import crypto from "crypto";
-import { supabase } from "@/app/lib/supabase";
+import { getSupabase } from "@/app/lib/supabase";
+const supabase = getSupabase();
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 /* =====================

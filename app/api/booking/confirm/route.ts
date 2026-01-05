@@ -3,7 +3,9 @@ export const runtime = "nodejs";
 import { verifyToken } from "@/app/lib/bookingTokens";
 import { createICS } from "@/app/lib/calendar";
 import { Resend } from "resend";
-import { supabase } from "@/app/lib/supabase";
+import { getSupabase } from "@/app/lib/supabase";
+const supabase = getSupabase();
+
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 

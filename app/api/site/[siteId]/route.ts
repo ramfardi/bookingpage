@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/app/lib/supabase";
+import { getSupabase } from "@/app/lib/supabase";
+const supabase = getSupabase();
 
 export async function GET(
   _request: Request,
