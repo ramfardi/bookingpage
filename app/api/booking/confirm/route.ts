@@ -1,4 +1,5 @@
 export const runtime = "nodejs";
+import type { CustomerConfig } from "@/app/lib/customerConfig";
 
 import { verifyToken } from "@/app/lib/bookingTokens";
 import { createICS } from "@/app/lib/calendar";

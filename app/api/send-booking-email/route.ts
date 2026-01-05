@@ -1,4 +1,5 @@
 export const runtime = "nodejs";
+import type { CustomerConfig } from "@/app/lib/customerConfig";
 
 import { Resend } from "resend";
 import { signToken } from "@/app/lib/bookingTokens";
