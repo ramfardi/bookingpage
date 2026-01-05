@@ -1,45 +1,62 @@
-import { defaultLandingConfig } from "./defaultLandingConfig";
-import { CUSTOMER_CONFIG } from "./customerConfig";
+import type { LandingConfig } from "./landingConfig";
+import type { CustomerConfig } from "./customerConfig";
 
-export function getCustomerConfigFromHost(hostname: string) {
-  const cleanHost = hostname
-    .replace(/^www\./, "")
-    .split(":")[0];
+const SALES_CONFIG: LandingConfig = {
+  heroImage: "/images/hero-default.png",
+  landing: {
+    header1: "Simple",
+    header2: "Booking",
+    subheader1: "Create a booking website in minutes",
+    subheader2: "No setup. No hassle.",
+  },
+};
 
-  // Root domain → SALES
-  if (cleanHost === "simplebookme.com") {
-    return {
-      mode: "sales" as const,
-      key: null,
-      config: defaultLandingConfig,
-    };
+export async function getCustomerConfigFromHost(
+  hostname: string
+): Promise<{
+  mode: "sales" | "client";
+  key: string | null;
+  config: LandingConfig | CustomerConfig;
+}> {
+  // ✅ PATH-BASED (authoritative)
+  if (typeof window !== "undefined") {
+    const match = window.location.pathname.match(/^\/site\/([^/]+)/);
+
+    if (match) {
+      const siteId = match[1];
+
+      const res = await fetch(`/api/site/${siteId}`);
+      if (res.ok) {
+        const site = (await res.json()) as CustomerConfig;
+        return {
+          mode: "client",
+          key: siteId,
+          config: site,
+        };
+      }
+    }
   }
 
-  const parts = cleanHost.split(".");
-  if (parts.length < 3) {
-    // localhost, preview URLs, unknown domains
-    return {
-      mode: "sales" as const,
-      key: null,
-      config: defaultLandingConfig,
-    };
+  // ✅ SUBDOMAIN (future only — safe fallback)
+  const parts = hostname.split(".");
+  const subdomain = parts.length > 2 ? parts[0] : null;
+
+  if (subdomain) {
+    const res = await fetch(`/api/site/${subdomain}`);
+    if (res.ok) {
+      const site = (await res.json()) as CustomerConfig;
+      return {
+        mode: "client",
+        key: subdomain,
+        config: site,
+      };
+    }
   }
 
-  const subdomain = parts[0];
-
-  // ✅ Client found
-  if (CUSTOMER_CONFIG[subdomain]) {
-    return {
-      mode: "client" as const,
-      key: subdomain,
-      config: CUSTOMER_CONFIG[subdomain],
-    };
-  }
-
-  // Fallback → SALES
+  // ✅ SALES FALLBACK
   return {
-    mode: "sales" as const,
+    mode: "sales",
     key: null,
-    config: defaultLandingConfig,
+    config: SALES_CONFIG,
   };
 }

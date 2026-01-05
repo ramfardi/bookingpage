@@ -1,10 +1,9 @@
 export const runtime = "nodejs";
 
 import { Resend } from "resend";
-import { CUSTOMER_CONFIG } from "@/app/lib/customerConfig";
 import { signToken } from "@/app/lib/bookingTokens";
 import crypto from "crypto";
-
+import { supabase } from "@/app/lib/supabase";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 /* =====================
@@ -102,7 +101,22 @@ export async function POST(req: Request) {
       );
     }
 
-    const customer = CUSTOMER_CONFIG[customerKey];
+    // Fetch site config from Supabase
+	const { data: site, error } = await supabase
+	  .from("sites")
+	  .select("data")
+	  .eq("site_id", customerKey)
+	  .single();
+
+	if (error || !site) {
+	  return Response.json(
+		{ error: "Site not found" },
+		{ status: 404 }
+	  );
+	}
+
+const customer = site.data as CustomerConfig;
+
 
     if (!customer?.email?.bookingNotifications) {
       return Response.json(

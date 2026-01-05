@@ -1,19 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
+import { usePathname } from "next/navigation";
 import SalesNavbar from "./SalesNavbar";
 import ClientNavbar from "./ClientNavbar";
 
 export default function Navbar() {
-  const [mode, setMode] = useState<"sales" | "client" | null>(null);
+  const pathname = usePathname();
 
-  useEffect(() => {
-    const { mode } = getCustomerConfigFromHost(window.location.hostname);
-    setMode(mode);
-  }, []);
+  // Client pages are always under /site/[siteId]
+  const isClientSite = pathname.startsWith("/site/");
 
-  if (!mode) return null;
-
-  return mode === "sales" ? <SalesNavbar /> : <ClientNavbar />;
+  return isClientSite ? <ClientNavbar /> : <SalesNavbar />;
 }

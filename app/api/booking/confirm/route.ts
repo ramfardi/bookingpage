@@ -3,7 +3,7 @@ export const runtime = "nodejs";
 import { verifyToken } from "@/app/lib/bookingTokens";
 import { createICS } from "@/app/lib/calendar";
 import { Resend } from "resend";
-import { CUSTOMER_CONFIG } from "@/app/lib/customerConfig";
+import { supabase } from "@/app/lib/supabase";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -15,7 +15,25 @@ export async function GET(req: Request) {
     }
 
     const data = verifyToken(token);
-    const customer = CUSTOMER_CONFIG[data.customerKey];
+	const { siteId } = data;
+
+	if (!siteId) {
+	  return new Response("Invalid token", { status: 400 });
+	}
+
+	const { data: site, error } = await supabase
+	  .from("sites")
+	  .select("data")
+	  .eq("site_id", siteId)
+	  .single();
+
+	if (error || !site) {
+	  return new Response("Invalid customer", { status: 404 });
+	}
+
+	const customer = site.data as CustomerConfig;
+
+
 
     if (!customer) {
       return new Response("Invalid customer", { status: 400 });

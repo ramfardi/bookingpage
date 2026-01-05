@@ -2,45 +2,46 @@
 
 import { useEffect, useState } from "react";
 import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
-import type { CustomerConfig, LandingConfig } from "@/app/lib/customerConfig";
-
-
+import type { CustomerConfig } from "@/app/lib/customerConfig";
+import type { LandingConfig } from "@/app/lib/landingConfig";
 
 export default function AboutPage() {
-const [customer, setCustomer] = useState<
-  CustomerConfig | LandingConfig | null
->(null);
+  const [customer, setCustomer] = useState<
+    CustomerConfig | LandingConfig | null
+  >(null);
 
-const [customerKey, setCustomerKey] = useState<string | null>(null);
-const [mode, setMode] = useState<"sales" | "client">("sales");
-useEffect(() => {
-  const hostname = window.location.hostname;
-  const result = getCustomerConfigFromHost(hostname);
+  const [mode, setMode] = useState<"sales" | "client">("sales");
 
-  setCustomer(result.config);
-  setCustomerKey(result.key);
-  setMode(result.mode); // 👈 THIS WAS MISSING
-}, []);
+  useEffect(() => {
+    async function load() {
+      const hostname = window.location.hostname;
+      const result = await getCustomerConfigFromHost(hostname);
 
+      setCustomer(result.config);
+      setMode(result.mode);
+    }
 
+    load();
+  }, []);
 
+  // Prevent hydration mismatch
   if (!customer) return null;
 
-	  if (mode !== "client") {
-	  return null; // or render sales/about copy
-	}
+  // About page is CLIENT-ONLY
+  if (mode !== "client") {
+    return null; // or render sales/about copy
+  }
 
-	const { about } = customer as CustomerConfig;
-
+  const customerConfig = customer as CustomerConfig;
+  const { about } = customerConfig;
 
   return (
     <main className="min-h-screen w-full">
-
-      {/* HERO (reuse landing image) */}
+      {/* HERO */}
       <section
         className="relative min-h-[55vh] flex items-center justify-center text-center text-white"
         style={{
-          backgroundImage: `url(${customer.heroImage})`,
+          backgroundImage: `url(/images/hero-default.png)`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -58,7 +59,6 @@ useEffect(() => {
       {/* CONTENT */}
       <section className="py-20 px-6 bg-white">
         <div className="max-w-3xl mx-auto">
-
           {/* Description */}
           <p className="text-lg text-gray-700 leading-relaxed">
             {about.description}
@@ -76,22 +76,13 @@ useEffect(() => {
               </div>
             ))}
           </div>
-
-          {/* CTA */}
-          <div className="mt-16 text-center">
-
-          </div>
         </div>
       </section>
 
       {/* FOOTER */}
-	<footer className="border-t py-8 text-center text-sm text-gray-500">
-	  © {new Date().getFullYear()}{" "}
-	  {mode === "client"
-		? (customer as CustomerConfig).businessName
-		: "Your Company"}
-	</footer>
-
+      <footer className="border-t py-8 text-center text-sm text-gray-500">
+        © {new Date().getFullYear()} {customerConfig.businessName}
+      </footer>
     </main>
   );
 }
