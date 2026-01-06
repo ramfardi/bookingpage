@@ -71,7 +71,14 @@ export default function SetupPage() {
 
   /* ---------------- BOOKING ---------------- */
 
-  const [booking, setBooking] = useState(template.defaultData.booking);
+  const [booking, setBooking] = useState<{
+  mode: "internal" | "external";
+  externalBookingUrl?: string;
+}>({
+  mode: template.defaultData.booking.mode,
+  externalBookingUrl: template.defaultData.booking.externalBookingUrl,
+});
+
   const [deposit, setDeposit] = useState(template.defaultData.deposit);
 
   /* ---------------- RESET ON TEMPLATE CHANGE ---------------- */
@@ -479,10 +486,13 @@ export default function SetupPage() {
       <input
         type="radio"
         name="booking"
-        checked={booking.mode === "internal"}
-        onChange={() =>
-          setBooking({ mode: "internal" })
-        }
+		onChange={() =>
+		  setBooking({
+			mode: "external",
+			externalBookingUrl: booking.externalBookingUrl ?? "",
+		  })
+		}
+
       />
       <span>
         Built-in booking system (email-based)
@@ -495,12 +505,20 @@ export default function SetupPage() {
         type="radio"
         name="booking"
         checked={booking.mode === "external"}
-        onChange={() =>
-          setBooking({
-            mode: "external",
-            externalBookingUrl: "",
-          })
-        }
+		{booking.mode === "external" && (
+		  <input
+			className="w-full border p-3 rounded-md"
+			placeholder="https://your-booking-platform.com"
+			value={booking.externalBookingUrl ?? ""}
+			onChange={(e) =>
+			  setBooking({
+				...booking,
+				externalBookingUrl: e.target.value,
+			  })
+			}
+		  />
+		)}
+
       />
       <span>
         External booking link (Vagaro, Fresha, Calendly, etc.)
