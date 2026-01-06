@@ -1,13 +1,9 @@
-// templates/index.ts
-
-import { templateConfig as hairConfig } from "./hairsalon/config";
-// app/templates/index.ts
-
-import { defaultData as hair } from "./hairsalon/defaultData";
-import { defaultData as cleaning } from "./cleaning/defaultData";
+import { hairsalon } from "./hairsalon";
+import { cleaning } from "./cleaning";
 
 export const templates = {
-  hairsalon: { defaultData: hair },
-  cleaning: { defaultData: cleaning },
+  hairsalon,
+  cleaning,
 };
+
 

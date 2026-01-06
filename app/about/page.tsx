@@ -24,16 +24,10 @@ export default function AboutPage() {
     load();
   }, []);
 
-  // Prevent hydration mismatch
-  if (!customer) return null;
-
-  // About page is CLIENT-ONLY
-  if (mode !== "client") {
-    return null; // or render sales/about copy
-  }
+  if (!customer || mode !== "client") return null;
 
   const customerConfig = customer as CustomerConfig;
-  const { about } = customerConfig;
+  const { about, heroImage, businessName } = customerConfig;
 
   return (
     <main className="min-h-screen w-full">
@@ -41,12 +35,11 @@ export default function AboutPage() {
       <section
         className="relative min-h-[55vh] flex items-center justify-center text-center text-white"
         style={{
-          backgroundImage: `url(/images/hero-default.png)`,
+          backgroundImage: `url(${heroImage || "/images/hero-default.png"})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
-        {/* Overlay */}
         <div className="absolute inset-0 bg-black/55" />
 
         <div className="relative z-10 px-6 max-w-3xl">
@@ -58,30 +51,52 @@ export default function AboutPage() {
 
       {/* CONTENT */}
       <section className="py-20 px-6 bg-white">
-        <div className="max-w-3xl mx-auto">
-          {/* Description */}
+        <div className="max-w-3xl mx-auto space-y-16">
+          {/* DESCRIPTION */}
           <p className="text-lg text-gray-700 leading-relaxed">
             {about.description}
           </p>
 
-          {/* Highlights */}
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {about.highlights.map((item) => (
-              <div
-                key={item}
-                className="flex items-start gap-3 bg-gray-50 rounded-xl p-5"
-              >
-                <span className="text-indigo-600 text-lg">✔</span>
-                <span className="text-gray-800">{item}</span>
+          {/* HIGHLIGHTS */}
+          {about.highlights?.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {about.highlights.map((item) => (
+                <div
+                  key={item}
+                  className="flex items-start gap-3 bg-gray-50 rounded-xl p-5"
+                >
+                  <span className="text-indigo-600 text-lg">✔</span>
+                  <span className="text-gray-800">{item}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* SAMPLE WORK / GALLERY */}
+          {about.gallery && about.gallery.length > 0 && (
+            <div>
+              <h2 className="text-2xl font-semibold mb-6">
+                Sample Work
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {about.gallery.map((img) => (
+                  <img
+                    key={img}
+                    src={img}
+                    alt="Sample work"
+                    className="rounded-xl object-cover w-full h-56"
+                  />
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
       </section>
 
       {/* FOOTER */}
       <footer className="border-t py-8 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} {customerConfig.businessName}
+        © {new Date().getFullYear()} {businessName}
       </footer>
     </main>
   );

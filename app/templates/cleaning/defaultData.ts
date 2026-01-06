@@ -3,42 +3,52 @@
 export const defaultData = {
   businessName: "Cleaning Service",
 
-  services: ["Home Cleaning", "Deep Cleaning"],
-  
-	landing: {
-	  header1: "Spotless",
-	  header2: "Spaces",
-	  subheader1: "Reliable home and office cleaning you can trust",
-	  subheader2: "Book a professional clean in minutes — simple and hassle-free.",
-	},
+  heroImage: "/images/cleaning.jpg",
 
-	
-	heroImage: "/images/cleaning.jpg",
+  landing: {
+    header1: "Professional",
+    header2: "Cleaning",
+    subheader1:
+      "Reliable home and office cleaning services you can trust",
+    subheader2:
+      "Book a cleaner in minutes with flexible scheduling",
+  },
+
+  about: {
+    title: "About Our Cleaning Service",
+    description:
+      "We provide high-quality residential and commercial cleaning using eco-friendly products and trained professionals.",
+    highlights: [
+      "Fully insured",
+      "Eco-friendly products",
+      "Trusted & background-checked staff",
+    ],
+  },
+
+  services: [
+    "Standard Home Cleaning",
+    "Deep Cleaning",
+    "Move-in / Move-out Cleaning",
+    "Office Cleaning",
+    "Post-Construction Cleaning",
+    "Airbnb Cleaning",
+  ],
 
   pricing: {
-    title: "Pricing",
-    plans: [
-      {
-        name: "Standard Cleaning",
-        price: "$80",
-        features: ["Kitchen", "Bathroom"],
-      },
-    ],
+    title: "Cleaning Prices",
+    subtitle: "Simple and transparent pricing",
+  },
+
+  booking: {
+    mode: "internal", // internal | external
+    externalBookingUrl: "",
   },
 
   deposit: {
     enabled: false,
-  },
-
-  booking: {
-    is_external: false,
+    amount: "",
+    stripeProductId: "",
   },
 
   email: {},
-
-  about: {
-    title: "About Us",
-    description: "Professional cleaning services.",
-    highlights: ["Eco friendly"],
-  },
 };
