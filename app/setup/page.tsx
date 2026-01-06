@@ -499,54 +499,38 @@ export default function SetupPage() {
       </span>
     </label>
 
-    {/* EXTERNAL */}
-    <label className="flex items-center gap-3">
-      <input
-        type="radio"
-        name="booking"
-        checked={booking.mode === "external"}
-		{booking.mode === "external" && (
-		  <input
-			className="w-full border p-3 rounded-md"
-			placeholder="https://your-booking-platform.com"
-			value={booking.externalBookingUrl ?? ""}
-			onChange={(e) =>
-			  setBooking({
-				...booking,
-				externalBookingUrl: e.target.value,
-			  })
-			}
-		  />
-		)}
+	{/* EXTERNAL */}
+	<label className="flex items-center gap-3">
+	  <input
+		type="radio"
+		name="booking"
+		checked={booking.mode === "external"}
+		onChange={() =>
+		  setBooking({
+			mode: "external" as const, // ✅ important
+			externalBookingUrl: "",
+		  })
+		}
+	  />
+	  <span>
+		External booking link (Vagaro, Fresha, Calendly, etc.)
+	  </span>
+	</label>
 
-      />
-      <span>
-        External booking link (Vagaro, Fresha, Calendly, etc.)
-      </span>
-    </label>
+	{booking.mode === "external" && (
+	  <input
+		className="w-full border p-3 rounded-md"
+		placeholder="https://your-booking-platform.com"
+		value={booking.externalBookingUrl}
+		onChange={(e) =>
+		  setBooking({
+			mode: "external" as const, // ✅ lock literal
+			externalBookingUrl: e.target.value,
+		  })
+		}
+	  />
+	)}
 
-    {/* 👇 THIS IS THE KEY PART */}
-    {booking.mode === "external" && (
-      <div className="space-y-2">
-        <input
-          className="w-full border p-3 rounded-md"
-          placeholder="https://your-booking-platform.com"
-          value={booking.externalBookingUrl || ""}
-          onChange={(e) =>
-            setBooking({
-              ...booking,
-              externalBookingUrl: e.target.value,
-            })
-          }
-        />
-        <p className="text-xs text-gray-500">
-          Clients will be redirected to this link when they click
-          “Book appointment”.
-        </p>
-      </div>
-    )}
-  </section>
-)}
 
 
       {/* REVIEW */}
