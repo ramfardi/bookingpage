@@ -14,11 +14,18 @@ export const defaultData = {
       "Effortless online booking for a premium salon experience.",
   },
 
-  about: {
-    title: "About Us",
-    description: "Professional hair services.",
-    highlights: ["10+ years experience"],
-  },
+	about: {
+	  title: "About Our Salon",
+	  description:
+		"We offer professional hair services tailored to your style, using premium products and experienced stylists.",
+	  highlights: [
+		"10+ years of experience",
+		"Certified professional stylists",
+		"Premium hair products",
+	  ],
+	  gallery: [],
+	},
+
 
   services: [
     "Haircut",

@@ -14,16 +14,18 @@ export const defaultData = {
       "Book a cleaner in minutes with flexible scheduling",
   },
 
-  about: {
-    title: "About Our Cleaning Service",
-    description:
-      "We provide high-quality residential and commercial cleaning using eco-friendly products and trained professionals.",
-    highlights: [
-      "Fully insured",
-      "Eco-friendly products",
-      "Trusted & background-checked staff",
-    ],
-  },
+	about: {
+	  title: "About Our Cleaning Service",
+	  description:
+		"We provide high-quality residential and commercial cleaning using eco-friendly products and trained professionals.",
+	  highlights: [
+		"Fully insured",
+		"Eco-friendly products",
+		"Trusted & background-checked staff",
+	  ],
+	  gallery: [], // ✅ IMPORTANT: always include this
+	},
+
 
   services: [
     "Standard Home Cleaning",

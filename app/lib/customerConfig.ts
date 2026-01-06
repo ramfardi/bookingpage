@@ -13,6 +13,14 @@ export type PricingSection = {
   rows: PricingRow[];  // table rows
 };
 
+export type AboutConfig = {
+  title: string;
+  description: string;
+  highlights: string[];
+  gallery?: string[]; // ✅ added (optional)
+};
+
+
 export type CustomerConfig = {
   siteId: string;
 
@@ -51,11 +59,7 @@ booking: {
     replyTo?: string;
   };
 
-  about: {
-    title: string;
-    description: string;
-    highlights: string[];
-  };
+	about: AboutConfig;
 
   trial: {
     expiresAt: string;
