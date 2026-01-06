@@ -473,68 +473,62 @@ export default function SetupPage() {
       )}
 
 
-{/* ---------------- STEP: BOOKING ---------------- */}
-{step === "booking" && (
-  <section className="space-y-6">
-    <h2 className="text-xl font-semibold">Booking</h2>
-    <p className="text-sm text-gray-500">
-      Choose how clients book appointments.
-    </p>
+		{/* ---------------- STEP: BOOKING ---------------- */}
+		{step === "booking" && (
+		  <section className="space-y-6">
+			<h2 className="text-xl font-semibold">Booking</h2>
+			<p className="text-sm text-gray-500">
+			  Choose how clients book appointments.
+			</p>
 
-    {/* INTERNAL */}
+			{/* INTERNAL */}
+			<label className="flex items-center gap-3">
+			  <input
+				type="radio"
+				name="booking"
+				checked={booking.mode === "internal"}
+				onChange={() =>
+				  setBooking({
+					mode: "internal",
+				  })
+				}
+			  />
+			  <span>Built-in booking system (email-based)</span>
+			</label>
 
-<label className="flex items-center gap-3">
-  <input
-    type="radio"
-    name="booking"
-    checked={booking.mode === "internal"}
-    onChange={() =>
-      setBooking({
-        mode: "internal",
-      })
-    }
-  />
-  <span>Built-in booking system (email-based)</span>
-</label>
+			{/* EXTERNAL */}
+			<label className="flex items-center gap-3">
+			  <input
+				type="radio"
+				name="booking"
+				checked={booking.mode === "external"}
+				onChange={() =>
+				  setBooking({
+					mode: "external",
+					externalBookingUrl: "",
+				  })
+				}
+			  />
+			  <span>
+				External booking link (Vagaro, Fresha, Calendly, etc.)
+			  </span>
+			</label>
 
-      <span>
-        Built-in booking system (email-based)
-      </span>
-    </label>
-
-	{/* EXTERNAL */}
-	<label className="flex items-center gap-3">
-	  <input
-		type="radio"
-		name="booking"
-		checked={booking.mode === "external"}
-		onChange={() =>
-		  setBooking({
-			mode: "external" as const, // ✅ important
-			externalBookingUrl: "",
-		  })
-		}
-	  />
-	  <span>
-		External booking link (Vagaro, Fresha, Calendly, etc.)
-	  </span>
-	</label>
-
-	{booking.mode === "external" && (
-	  <input
-		className="w-full border p-3 rounded-md"
-		placeholder="https://your-booking-platform.com"
-		value={booking.externalBookingUrl}
-		onChange={(e) =>
-		  setBooking({
-			mode: "external" as const, // ✅ lock literal
-			externalBookingUrl: e.target.value,
-		  })
-		}
-	  />
-	)}
-  </section>
-)}
+			{booking.mode === "external" && (
+			  <input
+				className="w-full border p-3 rounded-md"
+				placeholder="https://your-booking-platform.com"
+				value={booking.externalBookingUrl ?? ""}
+				onChange={(e) =>
+				  setBooking({
+					mode: "external",
+					externalBookingUrl: e.target.value,
+				  })
+				}
+			  />
+			)}
+		  </section>
+		)}
 
 
 
