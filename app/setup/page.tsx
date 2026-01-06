@@ -482,18 +482,21 @@ export default function SetupPage() {
     </p>
 
     {/* INTERNAL */}
-    <label className="flex items-center gap-3">
-      <input
-        type="radio"
-        name="booking"
-		onChange={() =>
-		  setBooking({
-			mode: "external",
-			externalBookingUrl: booking.externalBookingUrl ?? "",
-		  })
-		}
 
-      />
+<label className="flex items-center gap-3">
+  <input
+    type="radio"
+    name="booking"
+    checked={booking.mode === "internal"}
+    onChange={() =>
+      setBooking({
+        mode: "internal",
+      })
+    }
+  />
+  <span>Built-in booking system (email-based)</span>
+</label>
+
       <span>
         Built-in booking system (email-based)
       </span>
@@ -530,6 +533,8 @@ export default function SetupPage() {
 		}
 	  />
 	)}
+  </section>
+)}
 
 
 
