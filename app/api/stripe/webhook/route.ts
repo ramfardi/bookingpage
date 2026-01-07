@@ -2,13 +2,15 @@ import Stripe from "stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16",
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: Request) {
   const body = await req.text();
-  const signature = headers().get("stripe-signature")!;
+  const signature = headers().get("stripe-signature");
+
+  if (!signature) {
+    return new NextResponse("Missing Stripe signature", { status: 400 });
+  }
 
   let event: Stripe.Event;
 
@@ -19,6 +21,7 @@ export async function POST(req: Request) {
       process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (err) {
+    console.error("Webhook verification failed:", err);
     return new NextResponse("Webhook error", { status: 400 });
   }
 
@@ -33,13 +36,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ received: true });
     }
 
-    // ✅ ACTIVATE WEBSITE
-    // 1. Mark isPaid = true
-    // 2. Set paidAt
-    // 3. Generate subdomain
-    // 4. Send email to user
+    // TODO:
+    // - Update Supabase: isPaid = true
+    // - Set paidAt
+    // - Assign subdomain
+    // - Send confirmation email
 
-    console.log("Activate site:", siteId, email);
+    console.log("✅ Activate site:", siteId, email);
   }
 
   return NextResponse.json({ received: true });
