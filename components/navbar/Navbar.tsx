@@ -14,7 +14,7 @@ export default function Navbar() {
   const isClientSite = pathname.startsWith("/site/");
 
   // Preview sites start unpaid
-  const [isPaid, setIsPaid] = useState<boolean>(true);
+  const [isPaid, setIsPaid] = useState<boolean>(false);
 
   useEffect(() => {
     if (!isClientSite) return;

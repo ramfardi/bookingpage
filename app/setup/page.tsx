@@ -138,6 +138,9 @@ const [booking, setBooking] = useState<{
 
       booking,
       deposit,
+	  
+	    isPaid: true,
+  paidAt: new Date().toISOString(),
 		
       email: {
         bookingNotifications: form.email,
