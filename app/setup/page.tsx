@@ -138,7 +138,10 @@ const [booking, setBooking] = useState<{
 
       booking,
       deposit,
-
+	  
+	  isPaid,
+	  paidAt,
+		
       email: {
         bookingNotifications: form.email,
         replyTo: form.email,
