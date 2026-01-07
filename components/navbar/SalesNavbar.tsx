@@ -2,11 +2,25 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function SalesNavbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  /* --------------------------------------------------
+   * 🔒 HARD GUARD
+   * Never render SalesNavbar on client / preview routes
+   * -------------------------------------------------- */
+  const isPreviewRoute = pathname.startsWith("/site/");
+  const isSubdomain =
+    typeof window !== "undefined" &&
+    window.location.hostname.split(".").length > 2;
+
+  if (isPreviewRoute || isSubdomain) {
+    return null;
+  }
 
   return (
     <nav className="fixed top-0 inset-x-0 z-50 bg-white/90 backdrop-blur border-b">

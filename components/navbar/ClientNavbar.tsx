@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function ClientNavbar({
-  isPaid = true,
+  isPaid,
 }: {
   isPaid?: boolean;
 }) {
@@ -21,7 +21,8 @@ export default function ClientNavbar({
   // - subdomain → ""
   const base = isPreview && siteId ? `/site/${siteId}` : "";
 
-  const showPaymentBanner = isPreview && !isPaid;
+  // 🔐 Only show payment banner when explicitly unpaid
+  const showPaymentBanner = isPreview && isPaid === false;
 
   return (
     <>
@@ -119,7 +120,7 @@ export default function ClientNavbar({
               Book appointment
             </Link>
 
-            {!isPaid && (
+            {isPaid === false && (
               <Link
                 href={`${base}/checkout`}
                 className="py-3 text-base font-semibold text-center border border-indigo-600 text-indigo-600 rounded-lg"
