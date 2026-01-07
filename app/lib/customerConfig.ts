@@ -21,7 +21,11 @@ export type CustomerConfig = {
 
   businessName: string;
   
-  subdomain?: string; // 👈 ADD THIS
+  siteId: string;
+  subdomain?: string;
+
+  isPaid: boolean;
+  paidAt?: string;
   
     heroImage: string;
 
