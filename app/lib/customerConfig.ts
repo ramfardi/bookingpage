@@ -42,10 +42,10 @@ export type CustomerConfig = {
     stripePaymentLink?: string;
   };
 
-booking: {
-  mode: "internal" | "external";
-  externalBookingUrl?: string;
-};
+	booking: {
+	  is_external: boolean;
+	  bookingLink?: string;
+	};
 
   email?: {
     bookingNotifications?: string;

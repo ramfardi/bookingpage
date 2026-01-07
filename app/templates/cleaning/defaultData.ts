@@ -42,8 +42,8 @@ export const defaultData = {
   },
 
   booking: {
-    mode: "internal", // internal | external
-    externalBookingUrl: "",
+    is_external: false,
+    bookingLink: "",
   },
 
   deposit: {

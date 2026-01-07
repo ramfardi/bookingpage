@@ -41,8 +41,8 @@ export const defaultData = {
   },
 
   booking: {
-    mode: "internal", // "internal" | "external"
-    externalBookingUrl: "https://vagaro.com",
+    is_external: false,
+    bookingLink: "https://vagaro.com",
   },
 
   deposit: {

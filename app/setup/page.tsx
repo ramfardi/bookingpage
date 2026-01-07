@@ -71,13 +71,14 @@ export default function SetupPage() {
 
   /* ---------------- BOOKING ---------------- */
 
-  const [booking, setBooking] = useState<{
-  mode: "internal" | "external";
-  externalBookingUrl?: string;
+const [booking, setBooking] = useState<{
+  is_external: boolean;
+  bookingLink: string;
 }>({
-  mode: template.defaultData.booking.mode,
-  externalBookingUrl: template.defaultData.booking.externalBookingUrl,
+  is_external: template.defaultData.booking.is_external,
+  bookingLink: template.defaultData.booking.bookingLink ?? "",
 });
+
 
   const [deposit, setDeposit] = useState(template.defaultData.deposit);
 
@@ -486,14 +487,15 @@ export default function SetupPage() {
 			  <input
 				type="radio"
 				name="booking"
-				checked={booking.mode === "internal"}
+				checked={!booking.is_external}
 				onChange={() =>
 				  setBooking({
-					mode: "internal",
+					is_external: false,
+					bookingLink: "",
 				  })
 				}
 			  />
-			  <span>Built-in booking system (email-based)</span>
+			  <span>Built-in booking (email-based)</span>
 			</label>
 
 			{/* EXTERNAL */}
@@ -501,11 +503,11 @@ export default function SetupPage() {
 			  <input
 				type="radio"
 				name="booking"
-				checked={booking.mode === "external"}
+				checked={booking.is_external}
 				onChange={() =>
 				  setBooking({
-					mode: "external",
-					externalBookingUrl: "",
+					is_external: true,
+					bookingLink: booking.bookingLink,
 				  })
 				}
 			  />
@@ -514,15 +516,15 @@ export default function SetupPage() {
 			  </span>
 			</label>
 
-			{booking.mode === "external" && (
+			{booking.is_external && (
 			  <input
 				className="w-full border p-3 rounded-md"
 				placeholder="https://your-booking-platform.com"
-				value={booking.externalBookingUrl ?? ""}
+				value={booking.bookingLink}
 				onChange={(e) =>
 				  setBooking({
-					mode: "external",
-					externalBookingUrl: e.target.value,
+					is_external: true,
+					bookingLink: e.target.value,
 				  })
 				}
 			  />
