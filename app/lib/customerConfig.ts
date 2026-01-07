@@ -62,9 +62,4 @@ export type CustomerConfig = {
 	  gallery?: string[];
 	};
 
-
-  trial: {
-    expiresAt: string;
-    isPaid: boolean;
-  };
 };
