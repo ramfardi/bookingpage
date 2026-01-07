@@ -23,8 +23,9 @@ export type CustomerConfig = {
   siteId: string;
   subdomain?: string;
 
-  isPaid: boolean;
-  paidAt?: string;
+	isPaid?: boolean;
+	paidAt?: string;
+
   
     heroImage: string;
 
@@ -61,5 +62,6 @@ export type CustomerConfig = {
 	  highlights: string[];
 	  gallery?: string[];
 	};
+	
 
 };
