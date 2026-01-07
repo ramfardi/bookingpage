@@ -15,7 +15,6 @@ export type PricingSection = {
 
 
 export type CustomerConfig = {
-  siteId: string;
 
   templateId: "hairsalon" | "cleaning";
 
