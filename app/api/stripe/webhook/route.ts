@@ -6,7 +6,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: Request) {
   const body = await req.text();
-  const signature = headers().get("stripe-signature");
+
+  // ✅ headers() is async in Next 15
+  const headersList = await headers();
+  const signature = headersList.get("stripe-signature");
 
   if (!signature) {
     return new NextResponse("Missing Stripe signature", { status: 400 });
@@ -21,7 +24,7 @@ export async function POST(req: Request) {
       process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (err) {
-    console.error("Webhook verification failed:", err);
+    console.error("Webhook signature verification failed:", err);
     return new NextResponse("Webhook error", { status: 400 });
   }
 
@@ -32,14 +35,16 @@ export async function POST(req: Request) {
     const email = session.metadata?.email;
 
     if (!siteId) {
-      console.error("Missing siteId in metadata");
+      console.error("Missing siteId in Stripe metadata");
       return NextResponse.json({ received: true });
     }
 
+    // ✅ THIS IS WHERE YOU ACTIVATE THE SITE
     // TODO:
-    // - Update Supabase: isPaid = true
-    // - Set paidAt
-    // - Assign subdomain
+    // - Update Supabase:
+    //   isPaid = true
+    //   paidAt = new Date()
+    //   generate subdomain
     // - Send confirmation email
 
     console.log("✅ Activate site:", siteId, email);
