@@ -147,10 +147,6 @@ const [booking, setBooking] = useState<{
         replyTo: form.email,
       },
 
-      trial: {
-        expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-        isPaid: false,
-      },
     };
 
     const res = await fetch("/api/create-site", {
