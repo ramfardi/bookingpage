@@ -11,7 +11,7 @@ const SALES_CONFIG: LandingConfig = {
   },
 };
 
-const MAIN_DOMAIN = "yourdomain.com";
+const MAIN_DOMAIN = "simplebookme.com";
 
 export async function getCustomerConfigFromHost(
   hostname: string
