@@ -8,25 +8,37 @@ import type { CustomerConfig } from "@/app/lib/customerConfig";
 export default function SitePage({
   params,
 }: {
-  params: { siteId: string };
+  params: Promise<{ siteId: string }>;
 }) {
   const pathname = usePathname();
   const isEditor = pathname.startsWith("/site/");
 
+  const [siteId, setSiteId] = useState<string | null>(null);
   const [customer, setCustomer] = useState<CustomerConfig | null>(null);
   const [saving, setSaving] = useState(false);
 
+  /* ---------------- RESOLVE PARAMS ---------------- */
+  useEffect(() => {
+    async function resolveParams() {
+      const resolved = await params;
+      setSiteId(resolved.siteId);
+    }
+    resolveParams();
+  }, [params]);
+
   /* ---------------- LOAD SITE DATA ---------------- */
   useEffect(() => {
+    if (!siteId) return;
+
     async function load() {
-      const res = await fetch(`/api/site/${params.siteId}`);
+      const res = await fetch(`/api/site/${siteId}`);
       if (res.ok) {
         const data = await res.json();
         setCustomer(data);
       }
     }
     load();
-  }, [params.siteId]);
+  }, [siteId]);
 
   if (!customer) {
     return <div className="p-10">Loading editor…</div>;
@@ -34,8 +46,10 @@ export default function SitePage({
 
   /* ---------------- SAVE ---------------- */
   async function saveChanges() {
+    if (!siteId) return;
+
     setSaving(true);
-    await fetch(`/api/site/${params.siteId}`, {
+    await fetch(`/api/site/${siteId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(customer),
