@@ -132,11 +132,14 @@ export default function SitePage({
             />
           </section>
 
- {/* -------- SERVICES & PRICING (COMBINED) -------- */}
+ {/* -------- SERVICES & PRICING -------- */}
 <section className="mb-8">
   <h3 className="font-medium mb-3">Services & Pricing</h3>
 
-  {customer.pricing.items.map((item, index) => (
+  {(Array.isArray((customer.pricing as any).items)
+    ? (customer.pricing as any).items
+    : []
+  ).map((item: any, index: number) => (
     <div
       key={index}
       className="border rounded-md p-3 mb-3 space-y-2"
@@ -145,41 +148,38 @@ export default function SitePage({
       <input
         className="w-full border rounded-md p-2"
         placeholder="Service name"
-        value={item.label}
+        value={item.label ?? ""}
         onChange={(e) => {
-          const items = [...customer.pricing.items];
-          items[index] = {
-            ...items[index],
-            label: e.target.value,
-          };
+          const items = [...((customer.pricing as any).items ?? [])];
+          items[index] = { ...items[index], label: e.target.value };
 
           setCustomer({
             ...customer,
             pricing: {
-              ...customer.pricing,
+              ...(customer.pricing as any),
               items,
             },
           });
         }}
       />
 
-      {/* Description (safe, optional) */}
+      {/* Description */}
       <textarea
         className="w-full border rounded-md p-2 text-sm"
         rows={2}
         placeholder="Service description"
-        value={(item as any).description ?? ""}
+        value={item.description ?? ""}
         onChange={(e) => {
-          const items = [...customer.pricing.items];
+          const items = [...((customer.pricing as any).items ?? [])];
           items[index] = {
             ...items[index],
             description: e.target.value,
-          } as any;
+          };
 
           setCustomer({
             ...customer,
             pricing: {
-              ...customer.pricing,
+              ...(customer.pricing as any),
               items,
             },
           });
@@ -191,18 +191,15 @@ export default function SitePage({
         <input
           className="flex-1 border rounded-md p-2"
           placeholder="Price (e.g. $50)"
-          value={item.price}
+          value={item.price ?? ""}
           onChange={(e) => {
-            const items = [...customer.pricing.items];
-            items[index] = {
-              ...items[index],
-              price: e.target.value,
-            };
+            const items = [...((customer.pricing as any).items ?? [])];
+            items[index] = { ...items[index], price: e.target.value };
 
             setCustomer({
               ...customer,
               pricing: {
-                ...customer.pricing,
+                ...(customer.pricing as any),
                 items,
               },
             });
@@ -215,9 +212,9 @@ export default function SitePage({
             setCustomer({
               ...customer,
               pricing: {
-                ...customer.pricing,
-                items: customer.pricing.items.filter(
-                  (_, i) => i !== index
+                ...(customer.pricing as any),
+                items: ((customer.pricing as any).items ?? []).filter(
+                  (_: any, i: number) => i !== index
                 ),
               },
             })
@@ -235,14 +232,14 @@ export default function SitePage({
       setCustomer({
         ...customer,
         pricing: {
-          ...customer.pricing,
+          ...(customer.pricing as any),
           items: [
-            ...customer.pricing.items,
+            ...((customer.pricing as any).items ?? []),
             {
               label: "New service",
               price: "$0",
               description: "",
-            } as any,
+            },
           ],
         },
       })
