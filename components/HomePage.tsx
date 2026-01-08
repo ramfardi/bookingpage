@@ -21,9 +21,12 @@ export default function HomePage({
   const [customerKey, setCustomerKey] = useState<string | null>(null);
   const [mode, setMode] = useState<"sales" | "client">("sales");
   
-  useEffect(() => {
-  setCustomer(activeCustomer);
-}, [activeCustomer]);
+	useEffect(() => {
+	  if (activeCustomer) {
+		setCustomer(activeCustomer);
+		setMode("client");
+	  }
+	}, [activeCustomer]);
 
   useEffect(() => {
     async function load() {
