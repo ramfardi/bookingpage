@@ -1,38 +1,20 @@
-"use client";
-
-import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+import SuccessClient from "./success-client";
 
 export default function SuccessPage() {
-  const params = useSearchParams();
-  const sessionId = params.get("session_id");
+  return (
+    <Suspense fallback={<Loading />}>
+      <SuccessClient />
+    </Suspense>
+  );
+}
 
-  useEffect(() => {
-    async function run() {
-      if (!sessionId) return;
-
-      const res = await fetch(
-        `/api/stripe/session?session_id=${sessionId}`
-      );
-
-      if (!res.ok) return;
-
-      const { subdomain } = await res.json();
-
-      if (subdomain) {
-        window.location.href = `https://${subdomain}.simplebookme.com`;
-      }
-    }
-
-    run();
-  }, [sessionId]);
-
+function Loading() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <p className="text-lg font-medium">
-        Payment successful 🎉 Redirecting to your website…
+        Finalizing payment…
       </p>
     </div>
   );
 }
-
