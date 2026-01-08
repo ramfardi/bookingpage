@@ -103,7 +103,7 @@ export default function SitePage({
 
       {/* ================= RIGHT: LIVE PREVIEW ================= */}
       <main className="flex-1 overflow-y-auto">
-        <HomePage customer={customer} />
+        <HomePage activeCustomer={customer} />
       </main>
     </div>
   );

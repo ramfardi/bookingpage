@@ -8,9 +8,9 @@ import type { LandingConfig } from "@/app/lib/landingConfig";
 import { useRouter } from "next/navigation";
 
 export default function HomePage({
-  customer,
+  activeCustomer,
 }: {
-  customer: CustomerConfig;
+  activeCustomer: CustomerConfig;
 }) {
   const router = useRouter();
 
@@ -20,6 +20,10 @@ export default function HomePage({
 
   const [customerKey, setCustomerKey] = useState<string | null>(null);
   const [mode, setMode] = useState<"sales" | "client">("sales");
+  
+  useEffect(() => {
+  setCustomer(activeCustomer);
+}, [activeCustomer]);
 
   useEffect(() => {
     async function load() {
