@@ -32,7 +32,7 @@ export default function CheckoutPage() {
     const res = await fetch("/api/stripe/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ siteId, email }),
+      body: JSON.stringify({ siteId, subdomain, email }),
     });
 
     if (!res.ok) {

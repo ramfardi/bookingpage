@@ -10,11 +10,11 @@ function isValidEmail(email: string) {
 
 export async function POST(req: Request) {
   try {
-    const { siteId, email } = await req.json();
+    const { siteId, email, subdomain } = await req.json();
 
-    if (!siteId) {
+    if (!siteId || !subdomain) {
       return NextResponse.json(
-        { error: "Missing siteId" },
+        { error: "Missing siteId or subdomain" },
         { status: 400 }
       );
     }
@@ -48,6 +48,7 @@ export async function POST(req: Request) {
       // 🔑 REQUIRED FOR WEBHOOK
       metadata: {
         siteId,
+        subdomain,
         ...(customerEmail && { email: customerEmail }),
       },
     });
