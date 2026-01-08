@@ -132,49 +132,127 @@ export default function SitePage({
             />
           </section>
 
-          {/* -------- SERVICES -------- */}
-          <section className="mb-8">
-            <h3 className="font-medium mb-3">Services</h3>
+ {/* -------- SERVICES & PRICING (COMBINED) -------- */}
+<section className="mb-8">
+  <h3 className="font-medium mb-3">Services & Pricing</h3>
 
-            {customer.services.map((service, index) => (
-              <div key={index} className="flex gap-2 mb-2">
-                <input
-                  className="flex-1 border rounded-md p-2"
-                  value={service}
-                  onChange={(e) => {
-                    const services = [...customer.services];
-                    services[index] = e.target.value;
-                    setCustomer({ ...customer, services });
-                  }}
-                />
-                <button
-                  className="text-red-500"
-                  onClick={() =>
-                    setCustomer({
-                      ...customer,
-                      services: customer.services.filter(
-                        (_, i) => i !== index
-                      ),
-                    })
-                  }
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
+  {customer.pricing.items.map((item, index) => (
+    <div
+      key={index}
+      className="border rounded-md p-3 mb-3 space-y-2"
+    >
+      {/* Service name */}
+      <input
+        className="w-full border rounded-md p-2"
+        placeholder="Service name"
+        value={item.label}
+        onChange={(e) => {
+          const items = [...customer.pricing.items];
+          items[index] = {
+            ...items[index],
+            label: e.target.value,
+          };
 
-            <button
-              className="text-sm text-indigo-600"
-              onClick={() =>
-                setCustomer({
-                  ...customer,
-                  services: [...customer.services, "New service"],
-                })
-              }
-            >
-              + Add service
-            </button>
-          </section>
+          setCustomer({
+            ...customer,
+            pricing: {
+              ...customer.pricing,
+              items,
+            },
+          });
+        }}
+      />
+
+      {/* Description (safe, optional) */}
+      <textarea
+        className="w-full border rounded-md p-2 text-sm"
+        rows={2}
+        placeholder="Service description"
+        value={(item as any).description ?? ""}
+        onChange={(e) => {
+          const items = [...customer.pricing.items];
+          items[index] = {
+            ...items[index],
+            description: e.target.value,
+          } as any;
+
+          setCustomer({
+            ...customer,
+            pricing: {
+              ...customer.pricing,
+              items,
+            },
+          });
+        }}
+      />
+
+      {/* Price + Remove */}
+      <div className="flex gap-2 items-center">
+        <input
+          className="flex-1 border rounded-md p-2"
+          placeholder="Price (e.g. $50)"
+          value={item.price}
+          onChange={(e) => {
+            const items = [...customer.pricing.items];
+            items[index] = {
+              ...items[index],
+              price: e.target.value,
+            };
+
+            setCustomer({
+              ...customer,
+              pricing: {
+                ...customer.pricing,
+                items,
+              },
+            });
+          }}
+        />
+
+        <button
+          className="text-red-500 text-sm"
+          onClick={() =>
+            setCustomer({
+              ...customer,
+              pricing: {
+                ...customer.pricing,
+                items: customer.pricing.items.filter(
+                  (_, i) => i !== index
+                ),
+              },
+            })
+          }
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  ))}
+
+  <button
+    className="text-sm text-indigo-600 font-medium"
+    onClick={() =>
+      setCustomer({
+        ...customer,
+        pricing: {
+          ...customer.pricing,
+          items: [
+            ...customer.pricing.items,
+            {
+              label: "New service",
+              price: "$0",
+              description: "",
+            } as any,
+          ],
+        },
+      })
+    }
+  >
+    + Add service
+  </button>
+</section>
+
+
 
           {/* -------- ABOUT -------- */}
           <section className="mb-8">
