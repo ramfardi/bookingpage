@@ -37,6 +37,7 @@ export default function SitePage({
         setCustomer(data);
       }
     }
+
     load();
   }, [siteId]);
 
@@ -66,13 +67,13 @@ export default function SitePage({
             Edit your website
           </h2>
 
-          {/* HERO EDIT */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-1">
-              Main headline
-            </label>
+          {/* -------- HERO -------- */}
+          <section className="mb-8">
+            <h3 className="font-medium mb-3">Hero</h3>
+
             <input
-              className="w-full border rounded-md p-2"
+              className="w-full border rounded-md p-2 mb-2"
+              placeholder="Main headline"
               value={customer.landing.header1}
               onChange={(e) =>
                 setCustomer({
@@ -84,14 +85,10 @@ export default function SitePage({
                 })
               }
             />
-          </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-1">
-              Second headline
-            </label>
             <input
-              className="w-full border rounded-md p-2"
+              className="w-full border rounded-md p-2 mb-2"
+              placeholder="Second headline"
               value={customer.landing.header2}
               onChange={(e) =>
                 setCustomer({
@@ -103,7 +100,117 @@ export default function SitePage({
                 })
               }
             />
-          </div>
+
+            <input
+              className="w-full border rounded-md p-2 mb-2"
+              placeholder="Subheader line 1"
+              value={customer.landing.subheader1}
+              onChange={(e) =>
+                setCustomer({
+                  ...customer,
+                  landing: {
+                    ...customer.landing,
+                    subheader1: e.target.value,
+                  },
+                })
+              }
+            />
+
+            <input
+              className="w-full border rounded-md p-2"
+              placeholder="Subheader line 2"
+              value={customer.landing.subheader2}
+              onChange={(e) =>
+                setCustomer({
+                  ...customer,
+                  landing: {
+                    ...customer.landing,
+                    subheader2: e.target.value,
+                  },
+                })
+              }
+            />
+          </section>
+
+          {/* -------- SERVICES -------- */}
+          <section className="mb-8">
+            <h3 className="font-medium mb-3">Services</h3>
+
+            {customer.services.map((service, index) => (
+              <div key={index} className="flex gap-2 mb-2">
+                <input
+                  className="flex-1 border rounded-md p-2"
+                  value={service}
+                  onChange={(e) => {
+                    const services = [...customer.services];
+                    services[index] = e.target.value;
+                    setCustomer({ ...customer, services });
+                  }}
+                />
+                <button
+                  className="text-red-500"
+                  onClick={() =>
+                    setCustomer({
+                      ...customer,
+                      services: customer.services.filter(
+                        (_, i) => i !== index
+                      ),
+                    })
+                  }
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+
+            <button
+              className="text-sm text-indigo-600"
+              onClick={() =>
+                setCustomer({
+                  ...customer,
+                  services: [...customer.services, "New service"],
+                })
+              }
+            >
+              + Add service
+            </button>
+          </section>
+
+          {/* -------- ABOUT -------- */}
+          <section className="mb-8">
+            <h3 className="font-medium mb-3">About</h3>
+
+            <input
+              className="w-full border rounded-md p-2 mb-2"
+              placeholder="About title"
+              value={customer.about.title}
+              onChange={(e) =>
+                setCustomer({
+                  ...customer,
+                  about: {
+                    ...customer.about,
+                    title: e.target.value,
+                  },
+                })
+              }
+            />
+
+            <textarea
+              className="w-full border rounded-md p-2 mb-2"
+              rows={4}
+              placeholder="About description"
+              value={customer.about.description}
+              onChange={(e) =>
+                setCustomer({
+                  ...customer,
+                  about: {
+                    ...customer.about,
+                    description: e.target.value,
+                  },
+                })
+              }
+            />
+          </section>
 
           <button
             onClick={saveChanges}
