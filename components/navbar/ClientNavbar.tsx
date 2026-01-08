@@ -12,21 +12,21 @@ export default function ClientNavbar({
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  // Detect preview mode: /site/[siteId]/...
+  // 🔍 Preview mode = editor / preview lives under /site/{siteId}
   const isPreview = pathname.startsWith("/site/");
   const siteId = isPreview ? pathname.split("/")[2] : null;
 
   // Base path:
   // - preview → /site/{siteId}
-  // - subdomain → ""
+  // - public (subdomain) → ""
   const base = isPreview && siteId ? `/site/${siteId}` : "";
 
-  // 🔐 Only show payment banner when explicitly unpaid
+  // 🔐 Payment bar ONLY in preview AND explicitly unpaid
   const showPaymentBanner = isPreview && isPaid === false;
 
   return (
     <>
-      {/* 🔔 STICKY PAYMENT BANNER (PREVIEW ONLY) */}
+      {/* 🔔 PAYMENT BANNER (PREVIEW ONLY) */}
       {showPaymentBanner && (
         <div className="fixed top-0 left-0 right-0 z-[60] bg-indigo-600 text-white">
           <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between text-sm">
@@ -120,7 +120,7 @@ export default function ClientNavbar({
               Book appointment
             </Link>
 
-            {isPaid === false && (
+            {isPreview && isPaid === false && (
               <Link
                 href={`${base}/checkout`}
                 className="py-3 text-base font-semibold text-center border border-indigo-600 text-indigo-600 rounded-lg"
