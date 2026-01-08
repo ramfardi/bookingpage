@@ -16,6 +16,33 @@ export default function SitePage({
   const [siteId, setSiteId] = useState<string | null>(null);
   const [customer, setCustomer] = useState<CustomerConfig | null>(null);
   const [saving, setSaving] = useState(false);
+  
+  useEffect(() => {
+  if (!customer) return;
+
+  const pricing = customer.pricing as any;
+
+  // If pricing.items already exists → do nothing
+  if (Array.isArray(pricing.items) && pricing.items.length > 0) {
+    return;
+  }
+
+  // Convert legacy services[] → pricing.items[]
+  if (Array.isArray(customer.services) && customer.services.length > 0) {
+    setCustomer({
+      ...customer,
+      pricing: {
+        ...pricing,
+        items: customer.services.map((service) => ({
+          label: service,
+          description: "",
+          price: "$0",
+        })),
+      },
+    });
+  }
+}, [customer]);
+
 
   /* ---------------- RESOLVE PARAMS ---------------- */
   useEffect(() => {
