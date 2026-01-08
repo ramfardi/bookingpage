@@ -132,7 +132,7 @@ export default function SitePage({
             />
           </section>
 
- {/* -------- SERVICES & PRICING -------- */}
+{/* -------- SERVICES & PRICING -------- */}
 <section className="mb-8">
   <h3 className="font-medium mb-3">Services & Pricing</h3>
 
@@ -206,19 +206,24 @@ export default function SitePage({
           }}
         />
 
+        {/* REMOVE SERVICE */}
         <button
-          className="text-red-500 text-sm"
-          onClick={() =>
+          type="button"
+          className="text-red-600 hover:text-red-700 px-2"
+          onClick={() => {
+            if (!confirm("Remove this service?")) return;
+
+            const items = [...((customer.pricing as any).items ?? [])];
+            items.splice(index, 1);
+
             setCustomer({
               ...customer,
               pricing: {
                 ...(customer.pricing as any),
-                items: ((customer.pricing as any).items ?? []).filter(
-                  (_: any, i: number) => i !== index
-                ),
+                items,
               },
-            })
-          }
+            });
+          }}
         >
           ✕
         </button>
@@ -226,7 +231,9 @@ export default function SitePage({
     </div>
   ))}
 
+  {/* ADD SERVICE */}
   <button
+    type="button"
     className="text-sm text-indigo-600 font-medium"
     onClick={() =>
       setCustomer({
@@ -237,8 +244,8 @@ export default function SitePage({
             ...((customer.pricing as any).items ?? []),
             {
               label: "New service",
-              price: "$0",
               description: "",
+              price: "$0",
             },
           ],
         },
@@ -248,6 +255,7 @@ export default function SitePage({
     + Add service
   </button>
 </section>
+
 
 
 
