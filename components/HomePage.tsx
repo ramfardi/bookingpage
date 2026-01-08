@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 export default function HomePage({
   activeCustomer,
 }: {
-  activeCustomer: CustomerConfig;
+  activeCustomer?: CustomerConfig;
 }) {
   const router = useRouter();
 
