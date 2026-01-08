@@ -156,7 +156,7 @@ const [booking, setBooking] = useState<{
     });
 
     const { siteId } = await res.json();
-    window.location.href = `/site/${siteId}`;
+    window.location.href = `/site/${siteId}?mode=preview`;
   }
 
   /* ---------------- UI HELPERS ---------------- */

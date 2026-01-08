@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export default function ClientNavbar({
   isPaid,
@@ -11,15 +11,22 @@ export default function ClientNavbar({
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  // 🔍 Preview mode = editor / preview lives under /site/{siteId}
-  const isPreview = pathname.startsWith("/site/");
-  const siteId = isPreview ? pathname.split("/")[2] : null;
+  // 🔑 Explicit mode handling
+  const mode = searchParams.get("mode"); // "preview" | null
+
+  // Route type detection
+  const isSiteRoute = pathname.startsWith("/site/");
+  const isPreview = isSiteRoute && mode === "preview";
+  const isAdmin = isSiteRoute && mode !== "preview";
+
+  const siteId = isSiteRoute ? pathname.split("/")[2] : null;
 
   // Base path:
-  // - preview → /site/{siteId}
-  // - public (subdomain) → ""
-  const base = isPreview && siteId ? `/site/${siteId}` : "";
+  // - preview/admin → /site/{siteId}
+  // - public subdomain → ""
+  const base = isSiteRoute && siteId ? `/site/${siteId}` : "";
 
   // 🔐 Payment bar ONLY in preview AND explicitly unpaid
   const showPaymentBanner = isPreview && isPaid === false;
@@ -120,6 +127,7 @@ export default function ClientNavbar({
               Book appointment
             </Link>
 
+            {/* Upsell only in PREVIEW */}
             {isPreview && isPaid === false && (
               <Link
                 href={`${base}/checkout`}
