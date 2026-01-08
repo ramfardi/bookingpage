@@ -7,7 +7,11 @@ import type { CustomerConfig } from "@/app/lib/customerConfig";
 import type { LandingConfig } from "@/app/lib/landingConfig";
 import { useRouter } from "next/navigation";
 
-export default function HomePage() {
+export default function HomePage({
+  customer,
+}: {
+  customer: CustomerConfig;
+}) {
   const router = useRouter();
 
   const [customer, setCustomer] = useState<
