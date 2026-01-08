@@ -12,6 +12,7 @@ export async function POST(req: Request) {
   try {
     const { siteId, email, subdomain } = await req.json();
 
+    // 🔒 HARD VALIDATION (prevents broken Stripe sessions)
     if (!siteId || !subdomain) {
       return NextResponse.json(
         { error: "Missing siteId or subdomain" },
@@ -27,6 +28,8 @@ export async function POST(req: Request) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
 
+      payment_method_types: ["card"],
+
       line_items: [
         {
           price_data: {
@@ -40,17 +43,19 @@ export async function POST(req: Request) {
         },
       ],
 
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/cancel`,
-
-      ...(customerEmail && { customer_email: customerEmail }),
-
-      // 🔑 REQUIRED FOR WEBHOOK
+      // ✅ DO NOT send undefined metadata (breaks webhook)
       metadata: {
         siteId,
         subdomain,
         ...(customerEmail && { email: customerEmail }),
       },
+
+      // ✅ Stripe-hosted receipt email
+      ...(customerEmail && { customer_email: customerEmail }),
+
+      // ✅ MUST redirect to an existing route
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/site/${siteId}?paid=1`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/site/${siteId}?canceled=1`,
     });
 
     return NextResponse.json({ url: session.url });
