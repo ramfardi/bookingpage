@@ -7,11 +7,23 @@ export type PricingRow = {
   includes?: string;   // optional description
 };
 
-export type PricingSection = {
-  title: string;       // e.g. "Our Services & Pricing"
-  subtitle?: string;   // optional helper text
-  rows: PricingRow[];  // table rows
+export type PricingItem = {
+  label: string;
+  description?: string;
+  price?: string;
 };
+
+export type PricingSection = {
+  title: string;               // existing
+  subtitle?: string;           // existing
+
+  // ✅ OLD (keep working)
+  rows?: PricingRow[];
+
+  // ✅ NEW (editor-based)
+  items?: PricingItem[];
+};
+
 
 
 export type CustomerConfig = {
