@@ -67,22 +67,27 @@ export default function SitePage({
 
   /* ---------------- SAVE ---------------- */
 	async function saveChanges() {
-	  if (!siteId) return;
+	  if (!siteId || !customer) return;
 
 	  setSaving(true);
 
 	  const res = await fetch(`/api/site/${siteId}`, {
 		method: "PUT",
 		headers: { "Content-Type": "application/json" },
-		 body: JSON.stringify({ data: customer }),
+		body: JSON.stringify({
+		  data: customer,
+		}),
 	  });
 
 	  setSaving(false);
 
 	  if (!res.ok) {
+		const text = await res.text();
+		console.error("Save failed:", text);
 		alert("Save failed. Please try again.");
 	  }
 	}
+
 
 
   return (

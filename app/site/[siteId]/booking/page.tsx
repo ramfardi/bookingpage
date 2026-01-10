@@ -5,6 +5,10 @@ import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 import type { LandingConfig } from "@/app/lib/landingConfig";
 
+type BookingService = {
+  label: string;
+};
+
 export default function BookingPage() {
   const [customer, setCustomer] = useState<
     CustomerConfig | LandingConfig | null
@@ -28,7 +32,6 @@ export default function BookingPage() {
     load();
   }, []);
 
-  // Loading state
   if (!customer) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -37,12 +40,25 @@ export default function BookingPage() {
     );
   }
 
-  // Booking page is CLIENT-ONLY
-  if (mode !== "client") {
-    return null; // or redirect("/")
-  }
+  if (mode !== "client") return null;
 
   const customerConfig = customer as CustomerConfig;
+
+  // 🔁 NORMALIZE SERVICES FOR BOOKING DROPDOWN
+  const bookingServices: BookingService[] =
+    customerConfig.pricing?.items?.length
+      ? customerConfig.pricing.items.map((item) => ({
+          label: item.label,
+        }))
+      : customerConfig.pricing?.rows?.length
+      ? customerConfig.pricing.rows.map((row: any) => ({
+          label: row.name,
+        }))
+      : customerConfig.services?.length
+      ? customerConfig.services.map((service) => ({
+          label: service,
+        }))
+      : [];
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -59,7 +75,7 @@ export default function BookingPage() {
       preferred_date: formData.get("preferred_date"),
       preferred_time: formData.get("preferred_time"),
       customer_email: formData.get("email"),
-      company: formData.get("company"), // honeypot
+      company: formData.get("company"),
     };
 
     try {
@@ -69,9 +85,7 @@ export default function BookingPage() {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) {
-        throw new Error("Booking failed");
-      }
+      if (!res.ok) throw new Error("Booking failed");
 
       const deposit = customerConfig.deposit;
 
@@ -119,7 +133,6 @@ export default function BookingPage() {
         )}
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-          {/* Honeypot */}
           <input
             type="text"
             name="company"
@@ -134,9 +147,10 @@ export default function BookingPage() {
             className="w-full border rounded-xl p-3"
           >
             <option value="">Select service</option>
-            {customerConfig.services.map((service) => (
-              <option key={service} value={service}>
-                {service}
+
+            {bookingServices.map((service) => (
+              <option key={service.label} value={service.label}>
+                {service.label}
               </option>
             ))}
           </select>
