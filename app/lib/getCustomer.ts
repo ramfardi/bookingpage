@@ -42,32 +42,28 @@ export async function getCustomerConfigFromHost(
     }
   }
 
-  /* --------------------------------------------------
-   * 2️⃣ SUBDOMAIN (robust)
-   * -------------------------------------------------- */
-  const cleanHost = hostname
-    .replace(":3000", "")
-    .replace("www.", "");
+	/* --------------------------------------------------
+	 * 2️⃣ SUBDOMAIN (robust)
+	 * -------------------------------------------------- */
+	const cleanHost = hostname
+	  .replace(":3000", "")
+	  .replace("www.", "");
 
-  let subdomain: string | null = null;
+	let subdomain: string | null = null;
 
-  // localhost: client.localhost
-  if (cleanHost.endsWith("localhost")) {
-    subdomain = cleanHost.split(".")[0];
-  }
+	if (cleanHost.endsWith("localhost")) {
+	  subdomain = cleanHost.split(".")[0];
+	}
 
-  // production: client.yourdomain.com
-  if (cleanHost.endsWith(MAIN_DOMAIN)) {
-    const parts = cleanHost.split(".");
-    if (parts.length > 2) {
-      subdomain = parts[0];
-    }
-  }
+	if (cleanHost.endsWith(MAIN_DOMAIN)) {
+	  const parts = cleanHost.split(".");
+	  if (parts.length > 2) {
+		subdomain = parts[0];
+	  }
+	}
 
 	if (subdomain && subdomain !== "localhost") {
-	  const res = await fetch(
-		`/api/site/by-subdomain?subdomain=${subdomain}`
-	  );
+	  const res = await fetch(`/api/site/${subdomain}`);
 
 	  if (res.ok) {
 		const site = (await res.json()) as CustomerConfig & {
