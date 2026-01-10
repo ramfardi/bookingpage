@@ -381,15 +381,18 @@ const [booking, setBooking] = useState<{
 			<button
 			  type="button"
 			  className="text-red-500"
-			  onClick={() =>
+			  onClick={(e) => {
+				e.preventDefault();
+				e.stopPropagation(); // 🔑 CRITICAL FOR MOBILE
 				setAbout({
 				  ...about,
 				  gallery: about.gallery.filter((_, i) => i !== index),
-				})
-			  }
+				});
+			  }}
 			>
 			  Remove
 			</button>
+
 		  </div>
 		))}
 
@@ -411,78 +414,100 @@ const [booking, setBooking] = useState<{
       )}
 
       {/* SERVICES */}
-      {step === "services" && (
-        <section className="space-y-6">
-          <h2 className="text-xl font-semibold">Services & Pricing</h2>
-          <p className="text-gray-500 text-sm">
-            Select services you offer and enter prices.
-          </p>
+	{step === "services" && (
+	  <section className="space-y-6">
+		<h2 className="text-xl font-semibold">Services & Pricing</h2>
+		<p className="text-gray-500 text-sm">
+		  Select services you offer and enter prices.
+		</p>
 
-          {services.map((s) => (
-            <div
-              key={s.id}
-              className="flex gap-3 items-center border p-3 rounded-md"
-            >
-              <input
-                type="checkbox"
-                checked={s.enabled}
-                onChange={() =>
-                  setServices((prev) =>
-                    prev.map((x) =>
-                      x.id === s.id ? { ...x, enabled: !x.enabled } : x
-                    )
-                  )
-                }
-              />
+		{services.map((s) => (
+		  <div
+			key={s.id}
+			className="flex gap-3 items-center border p-3 rounded-md"
+		  >
+			{/* Enable / Disable */}
+			<input
+			  type="checkbox"
+			  checked={s.enabled}
+			  onChange={() =>
+				setServices((prev) =>
+				  prev.map((x) =>
+					x.id === s.id ? { ...x, enabled: !x.enabled } : x
+				  )
+				)
+			  }
+			/>
 
-              <input
-                className="flex-1 font-medium"
-                value={s.name}
-                onChange={(e) =>
-                  setServices((prev) =>
-                    prev.map((x) =>
-                      x.id === s.id ? { ...x, name: e.target.value } : x
-                    )
-                  )
-                }
-              />
+			{/* Service name */}
+			<input
+			  className="flex-1 font-medium"
+			  value={s.name}
+			  onChange={(e) =>
+				setServices((prev) =>
+				  prev.map((x) =>
+					x.id === s.id ? { ...x, name: e.target.value } : x
+				  )
+				)
+			  }
+			/>
 
-              {s.enabled && (
-                <input
-                  className="w-28 border p-2 rounded-md"
-                  placeholder="Price"
-                  value={s.price ?? ""}
-                  onChange={(e) =>
-                    setServices((prev) =>
-                      prev.map((x) =>
-                        x.id === s.id
-                          ? { ...x, price: e.target.value }
-                          : x
-                      )
-                    )
-                  }
-                />
-              )}
-            </div>
-          ))}
+			{/* Price */}
+			{s.enabled && (
+			  <input
+				className="w-28 border p-2 rounded-md"
+				placeholder="Price"
+				value={s.price ?? ""}
+				onChange={(e) =>
+				  setServices((prev) =>
+					prev.map((x) =>
+					  x.id === s.id
+						? { ...x, price: e.target.value }
+						: x
+					)
+				  )
+				}
+			  />
+			)}
 
-          <button
-            onClick={() =>
-              setServices((prev) => [
-                ...prev,
-                {
-                  id: crypto.randomUUID(),
-                  name: "",
-                  enabled: true,
-                },
-              ])
-            }
-            className={accent.text}
-          >
-            + Add service
-          </button>
-        </section>
-      )}
+			{/* ❌ REMOVE (mobile-safe) */}
+			<button
+			  type="button"
+			  aria-label="Remove service"
+			  className="ml-1 text-red-500 text-lg font-semibold px-2 py-1"
+			  onClick={(e) => {
+				e.preventDefault();
+				e.stopPropagation(); // ✅ critical for mobile
+				setServices((prev) =>
+				  prev.filter((x) => x.id !== s.id)
+				);
+			  }}
+			>
+			  ×
+			</button>
+		  </div>
+		))}
+
+		{/* Add service */}
+		<button
+		  type="button"
+		  onClick={() =>
+			setServices((prev) => [
+			  ...prev,
+			  {
+				id: crypto.randomUUID(),
+				name: "",
+				enabled: true,
+			  },
+			])
+		  }
+		  className={accent.text}
+		>
+		  + Add service
+		</button>
+	  </section>
+	)}
+
 
 
 		{/* ---------------- STEP: BOOKING ---------------- */}

@@ -15,6 +15,9 @@ export default function BookingPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // ✅ FIX: controlled service selection
+  const [selectedService, setSelectedService] = useState<string>("");
+
   useEffect(() => {
     async function load() {
       const hostname = window.location.hostname;
@@ -39,14 +42,24 @@ export default function BookingPage() {
 
   // Booking page is CLIENT-ONLY
   if (mode !== "client") {
-    return null; // or redirect("/")
+    return null;
   }
 
   const customerConfig = customer as CustomerConfig;
 
+  // ✅ FIX: reset service if it was removed
+  useEffect(() => {
+    if (
+      selectedService &&
+      !customerConfig.services.includes(selectedService)
+    ) {
+      setSelectedService("");
+    }
+  }, [customerConfig.services, selectedService]);
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!customerKey) return;
+    if (!customerKey || !selectedService) return;
 
     setLoading(true);
 
@@ -55,7 +68,7 @@ export default function BookingPage() {
 
     const payload = {
       customerKey,
-      service: formData.get("service"),
+      service: selectedService, // ✅ use React state
       preferred_date: formData.get("preferred_date"),
       preferred_time: formData.get("preferred_time"),
       customer_email: formData.get("email"),
@@ -128,9 +141,12 @@ export default function BookingPage() {
             className="hidden"
           />
 
+          {/* ✅ FIXED SELECT */}
           <select
             name="service"
             required
+            value={selectedService}
+            onChange={(e) => setSelectedService(e.target.value)}
             className="w-full border rounded-xl p-3"
           >
             <option value="">Select service</option>
