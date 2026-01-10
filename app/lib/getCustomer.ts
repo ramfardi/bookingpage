@@ -21,7 +21,7 @@ export async function getCustomerConfigFromHost(
   config: LandingConfig | CustomerConfig;
 }> {
   /* --------------------------------------------------
-   * 1️⃣ PATH-BASED PREVIEW (authoritative)
+   * 1️⃣ PREVIEW / EDITOR MODE (PATH-BASED)
    * -------------------------------------------------- */
   if (typeof window !== "undefined") {
     const match = window.location.pathname.match(/^\/site\/([^/]+)/);
@@ -42,45 +42,46 @@ export async function getCustomerConfigFromHost(
     }
   }
 
-	/* --------------------------------------------------
-	 * 2️⃣ SUBDOMAIN (robust)
-	 * -------------------------------------------------- */
-	const cleanHost = hostname
-	  .replace(":3000", "")
-	  .replace("www.", "");
+  /* --------------------------------------------------
+   * 2️⃣ CLIENT MODE (SUBDOMAIN)
+   * -------------------------------------------------- */
+  const cleanHost = hostname
+    .replace(":3000", "")
+    .replace("www.", "");
 
-	let subdomain: string | null = null;
+  let subdomain: string | null = null;
 
-	if (cleanHost.endsWith("localhost")) {
-	  subdomain = cleanHost.split(".")[0];
-	}
+  // localhost: qq.localhost
+  if (cleanHost.endsWith("localhost")) {
+    subdomain = cleanHost.split(".")[0];
+  }
 
-	if (cleanHost.endsWith(MAIN_DOMAIN)) {
-	  const parts = cleanHost.split(".");
-	  if (parts.length > 2) {
-		subdomain = parts[0];
-	  }
-	}
+  // production: qq.simplebookme.com
+  if (cleanHost.endsWith(MAIN_DOMAIN)) {
+    const parts = cleanHost.split(".");
+    if (parts.length > 2) {
+      subdomain = parts[0];
+    }
+  }
 
-	if (subdomain && subdomain !== "localhost") {
-	  const res = await fetch(`/api/site/${subdomain}`);
+  if (subdomain && subdomain !== "localhost") {
+    const res = await fetch(`/api/site/${subdomain}`);
 
-	  if (res.ok) {
-		const site = (await res.json()) as CustomerConfig & {
-		  siteId?: string;
-		};
+    if (res.ok) {
+      const site = (await res.json()) as CustomerConfig & {
+        siteId?: string;
+      };
 
-		return {
-		  mode: "client",
-		  key: site.siteId ?? subdomain,
-		  config: site,
-		};
-	  }
-	}
-
+      return {
+        mode: "client",
+        key: site.siteId ?? subdomain,
+        config: site,
+      };
+    }
+  }
 
   /* --------------------------------------------------
-   * 3️⃣ SALES FALLBACK
+   * 3️⃣ SALES MODE (FALLBACK)
    * -------------------------------------------------- */
   return {
     mode: "sales",
