@@ -64,18 +64,24 @@ export async function getCustomerConfigFromHost(
     }
   }
 
-  if (subdomain && subdomain !== "localhost") {
-    const res = await fetch(`/api/site/${subdomain}`);
-    if (res.ok) {
-      const site = (await res.json()) as CustomerConfig;
+	if (subdomain && subdomain !== "localhost") {
+	  const res = await fetch(
+		`/api/site/by-subdomain?subdomain=${subdomain}`
+	  );
 
-      return {
-        mode: "client",
-        key: site.siteId ?? subdomain,
-        config: site,
-      };
-    }
-  }
+	  if (res.ok) {
+		const site = (await res.json()) as CustomerConfig & {
+		  siteId?: string;
+		};
+
+		return {
+		  mode: "client",
+		  key: site.siteId ?? subdomain,
+		  config: site,
+		};
+	  }
+	}
+
 
   /* --------------------------------------------------
    * 3️⃣ SALES FALLBACK

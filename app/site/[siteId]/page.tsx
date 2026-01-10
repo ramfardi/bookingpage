@@ -17,31 +17,24 @@ export default function SitePage({
   const [customer, setCustomer] = useState<CustomerConfig | null>(null);
   const [saving, setSaving] = useState(false);
   
-  useEffect(() => {
-  if (!customer) return;
+	useEffect(() => {
+	  if (!customer) return;
+	  if (customer.pricing?.items?.length) return;
+	  if (!customer.services?.length) return;
 
-  const pricing = customer.pricing as any;
+	  setCustomer((prev) => ({
+		...prev!,
+		pricing: {
+		  ...prev!.pricing,
+		  items: prev!.services.map((service) => ({
+			label: service,
+			description: "",
+			price: "$0",
+		  })),
+		},
+	  }));
+	}, [customer?.pricing?.items]);
 
-  // If pricing.items already exists → do nothing
-  if (Array.isArray(pricing.items) && pricing.items.length > 0) {
-    return;
-  }
-
-  // Convert legacy services[] → pricing.items[]
-  if (Array.isArray(customer.services) && customer.services.length > 0) {
-    setCustomer({
-      ...customer,
-      pricing: {
-        ...pricing,
-        items: customer.services.map((service) => ({
-          label: service,
-          description: "",
-          price: "$0",
-        })),
-      },
-    });
-  }
-}, [customer]);
 
 
   /* ---------------- RESOLVE PARAMS ---------------- */
@@ -73,17 +66,24 @@ export default function SitePage({
   }
 
   /* ---------------- SAVE ---------------- */
-  async function saveChanges() {
-    if (!siteId) return;
+	async function saveChanges() {
+	  if (!siteId) return;
 
-    setSaving(true);
-    await fetch(`/api/site/${siteId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(customer),
-    });
-    setSaving(false);
-  }
+	  setSaving(true);
+
+	  const res = await fetch(`/api/site/${siteId}`, {
+		method: "PUT",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(customer),
+	  });
+
+	  setSaving(false);
+
+	  if (!res.ok) {
+		alert("Save failed. Please try again.");
+	  }
+	}
+
 
   return (
     <div className="flex h-screen">
