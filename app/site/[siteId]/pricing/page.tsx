@@ -40,14 +40,23 @@ export default function PricingPage() {
   const pricing = customerConfig.pricing;
 
   // 🔁 BACKWARD-COMPATIBLE NORMALIZATION
-  const pricingItems: UnifiedPricingItem[] =
-    pricing?.items ??
-    pricing?.rows?.map((row) => ({
-      label: row.name,
-      description: row.includes,
-      price: row.price,
-    })) ??
-    [];
+	const pricingItems =
+	  pricing?.items?.length
+		? pricing.items
+		: pricing?.rows?.length
+		? pricing.rows.map((row) => ({
+			label: row.name,
+			description: row.includes,
+			price: row.price,
+		  }))
+		: customerConfig.services?.length
+		? customerConfig.services.map((service) => ({
+			label: service,
+			description: "",
+			price: "",
+		  }))
+		: [];
+
 
   // Extra safety
   if (!pricing || pricingItems.length === 0) {
