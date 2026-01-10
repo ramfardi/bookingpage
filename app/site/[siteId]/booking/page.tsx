@@ -45,20 +45,27 @@ export default function BookingPage() {
   const customerConfig = customer as CustomerConfig;
 
   // 🔁 NORMALIZE SERVICES FOR BOOKING DROPDOWN
-  const bookingServices: BookingService[] =
-    customerConfig.pricing?.items?.length
-      ? customerConfig.pricing.items.map((item) => ({
-          label: item.label,
-        }))
-      : customerConfig.pricing?.rows?.length
-      ? customerConfig.pricing.rows.map((row: any) => ({
-          label: row.name,
-        }))
-      : customerConfig.services?.length
-      ? customerConfig.services.map((service) => ({
-          label: service,
-        }))
-      : [];
+	const bookingServices: BookingService[] = Array.from(
+	  new Map(
+		[
+		  // 1️⃣ Default services
+		  ...(customerConfig.services ?? []).map((s) => [s, { label: s }]),
+
+		  // 2️⃣ Legacy pricing rows
+		  ...(customerConfig.pricing?.rows ?? []).map((row: any) => [
+			row.name,
+			{ label: row.name },
+		  ]),
+
+		  // 3️⃣ New editor services
+		  ...(customerConfig.pricing?.items ?? []).map((item) => [
+			item.label,
+			{ label: item.label },
+		  ]),
+		]
+	  ).values()
+	);
+
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
