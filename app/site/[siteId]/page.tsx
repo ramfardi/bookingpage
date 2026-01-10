@@ -74,7 +74,7 @@ export default function SitePage({
 	  const res = await fetch(`/api/site/${siteId}`, {
 		method: "PUT",
 		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(customer),
+		 body: JSON.stringify({ data: customer }),
 	  });
 
 	  setSaving(false);

@@ -5,6 +5,12 @@ import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 import type { LandingConfig } from "@/app/lib/landingConfig";
 
+type UnifiedPricingItem = {
+  label: string;
+  description?: string;
+  price?: string;
+};
+
 export default function PricingPage() {
   const [customer, setCustomer] = useState<
     CustomerConfig | LandingConfig | null
@@ -33,8 +39,18 @@ export default function PricingPage() {
   const customerConfig = customer as CustomerConfig;
   const pricing = customerConfig.pricing;
 
-  // Extra safety (important)
-  if (!pricing || !pricing.rows || pricing.rows.length === 0) {
+  // 🔁 BACKWARD-COMPATIBLE NORMALIZATION
+  const pricingItems: UnifiedPricingItem[] =
+    pricing?.items ??
+    pricing?.rows?.map((row) => ({
+      label: row.name,
+      description: row.includes,
+      price: row.price,
+    })) ??
+    [];
+
+  // Extra safety
+  if (!pricing || pricingItems.length === 0) {
     return (
       <main className="min-h-screen px-6 py-24 text-center">
         <h1 className="text-3xl font-bold">Pricing</h1>
@@ -71,16 +87,16 @@ export default function PricingPage() {
             </thead>
 
             <tbody>
-              {pricing.rows.map((row) => (
-                <tr key={row.id} className="border-t">
+              {pricingItems.map((item, index) => (
+                <tr key={index} className="border-t">
                   <td className="p-4 font-medium">
-                    {row.name}
+                    {item.label}
                   </td>
                   <td className="p-4 whitespace-nowrap">
-                    {row.price}
+                    {item.price || "—"}
                   </td>
                   <td className="p-4 text-gray-600">
-                    {row.includes || "—"}
+                    {item.description || "—"}
                   </td>
                 </tr>
               ))}
