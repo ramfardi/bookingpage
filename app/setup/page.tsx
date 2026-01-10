@@ -154,6 +154,18 @@ const [booking, setBooking] = useState<{
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(siteConfig),
     });
+	
+	if (!res.ok) {
+	  const err = await res.json();
+
+	  if (res.status === 409) {
+		alert("This subdomain is already taken. Please choose another one.");
+		return;
+	  }
+
+	  alert("Failed to create website. Please try again.");
+	  return;
+	}
 
     const { siteId } = await res.json();
     window.location.href = `/site/${siteId}?mode=preview`;
