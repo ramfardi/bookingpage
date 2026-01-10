@@ -163,9 +163,22 @@ export default function SitePage({
 <section className="mb-8">
   <h3 className="font-medium mb-3">Services & Pricing</h3>
 
-  {(Array.isArray((customer.pricing as any).items)
-    ? (customer.pricing as any).items
-    : []
+  {(
+    customer.pricing?.items?.length
+      ? customer.pricing.items
+      : customer.pricing?.rows?.length
+      ? customer.pricing.rows.map((row: any) => ({
+          label: row.name,
+          description: row.includes,
+          price: row.price,
+        }))
+      : customer.services?.length
+      ? customer.services.map((service: string) => ({
+          label: service,
+          description: "",
+          price: "",
+        }))
+      : []
   ).map((item: any, index: number) => (
     <div
       key={index}
@@ -177,13 +190,13 @@ export default function SitePage({
         placeholder="Service name"
         value={item.label ?? ""}
         onChange={(e) => {
-          const items = [...((customer.pricing as any).items ?? [])];
+          const items = [...(customer.pricing.items ?? [])];
           items[index] = { ...items[index], label: e.target.value };
 
           setCustomer({
             ...customer,
             pricing: {
-              ...(customer.pricing as any),
+              ...customer.pricing,
               items,
             },
           });
@@ -197,7 +210,7 @@ export default function SitePage({
         placeholder="Service description"
         value={item.description ?? ""}
         onChange={(e) => {
-          const items = [...((customer.pricing as any).items ?? [])];
+          const items = [...(customer.pricing.items ?? [])];
           items[index] = {
             ...items[index],
             description: e.target.value,
@@ -206,7 +219,7 @@ export default function SitePage({
           setCustomer({
             ...customer,
             pricing: {
-              ...(customer.pricing as any),
+              ...customer.pricing,
               items,
             },
           });
@@ -220,33 +233,32 @@ export default function SitePage({
           placeholder="Price (e.g. $50)"
           value={item.price ?? ""}
           onChange={(e) => {
-            const items = [...((customer.pricing as any).items ?? [])];
+            const items = [...(customer.pricing.items ?? [])];
             items[index] = { ...items[index], price: e.target.value };
 
             setCustomer({
               ...customer,
               pricing: {
-                ...(customer.pricing as any),
+                ...customer.pricing,
                 items,
               },
             });
           }}
         />
 
-        {/* REMOVE SERVICE */}
         <button
           type="button"
           className="text-red-600 hover:text-red-700 px-2"
           onClick={() => {
             if (!confirm("Remove this service?")) return;
 
-            const items = [...((customer.pricing as any).items ?? [])];
+            const items = [...(customer.pricing.items ?? [])];
             items.splice(index, 1);
 
             setCustomer({
               ...customer,
               pricing: {
-                ...(customer.pricing as any),
+                ...customer.pricing,
                 items,
               },
             });
@@ -258,7 +270,6 @@ export default function SitePage({
     </div>
   ))}
 
-  {/* ADD SERVICE */}
   <button
     type="button"
     className="text-sm text-indigo-600 font-medium"
@@ -266,13 +277,13 @@ export default function SitePage({
       setCustomer({
         ...customer,
         pricing: {
-          ...(customer.pricing as any),
+          ...customer.pricing,
           items: [
-            ...((customer.pricing as any).items ?? []),
+            ...(customer.pricing.items ?? []),
             {
               label: "New service",
               description: "",
-              price: "$0",
+              price: "",
             },
           ],
         },
@@ -282,9 +293,6 @@ export default function SitePage({
     + Add service
   </button>
 </section>
-
-
-
 
           {/* -------- ABOUT -------- */}
           <section className="mb-8">
