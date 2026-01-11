@@ -6,8 +6,8 @@ const SALES_CONFIG: LandingConfig = {
   landing: {
     header1: "Simple",
     header2: "Booking",
-    subheader1: "Create a booking website in minutes",
-    subheader2: "No setup. No hassle.",
+    subheader1: "Create a booking website in seconds",
+    subheader2: "No monthly fee | Easy to use | Customizable",
   },
 };
 
