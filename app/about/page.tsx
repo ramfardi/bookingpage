@@ -24,7 +24,115 @@ export default function AboutPage() {
     load();
   }, []);
 
-  if (!customer || mode !== "client") return null;
+  if (!customer) return null;
+
+  /* =====================================================
+     SALES ABOUT PAGE
+     ===================================================== */
+  if (mode === "sales") {
+    return (
+      <main className="min-h-screen w-full bg-white">
+        {/* HERO */}
+        <section className="py-28 px-6 text-center bg-gradient-to-b from-indigo-50 to-white">
+          <div className="max-w-3xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
+              About SimpleBookMe
+            </h1>
+
+            <p className="mt-6 text-lg text-gray-600">
+              A simple, affordable way for independent professionals to accept bookings online.
+            </p>
+          </div>
+        </section>
+
+        {/* CONTENT */}
+        <section className="py-20 px-6">
+          <div className="max-w-3xl mx-auto space-y-16">
+            {/* WHAT IT IS */}
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                What is SimpleBookMe?
+              </h2>
+
+              <p className="text-lg text-gray-700 leading-relaxed">
+                SimpleBookMe helps small businesses and independent professionals
+                create a clean booking website without subscriptions, complex tools,
+                or technical setup. You get a single booking link that you can share
+                with clients and update anytime.
+              </p>
+            </div>
+
+            {/* EMAIL BOOKING */}
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                How email booking works
+              </h2>
+
+              <p className="text-lg text-gray-700 leading-relaxed">
+                With email-based booking, clients submit a booking request using
+                their email. You receive the request instantly, along with the
+                service details and preferred time. Both you and your client
+                receive a confirmation email, and a calendar (.ics) file can be
+                added to your calendar.
+              </p>
+
+              <p className="mt-4 text-gray-700">
+                This approach keeps things simple, avoids forcing clients to create
+                accounts, and works well for businesses that prefer direct
+                communication.
+              </p>
+            </div>
+
+            {/* EXTERNAL BOOKING */}
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                Using an external booking system
+              </h2>
+
+              <p className="text-lg text-gray-700 leading-relaxed">
+                If you already use a booking platform such as Vagaro, Fresha, or
+                another service, you can simply link it to your website. When
+                clients click “Book”, they are redirected to your existing booking
+                system.
+              </p>
+
+              <p className="mt-4 text-gray-700">
+                This lets you keep your current workflow while still having a
+                professional website and booking link.
+              </p>
+            </div>
+
+            {/* WHY IT HELPS */}
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                Why SimpleBookMe works for small businesses
+              </h2>
+
+              <ul className="space-y-3 text-lg text-gray-700">
+                <li>• One-time low cost, no monthly fees</li>
+                <li>• Free preview and testing before purchase</li>
+                <li>• Your own booking website and unique link</li>
+                <li>• Pre-built services based on your business category</li>
+                <li>• Edit and update your content anytime</li>
+                <li>• No technical knowledge required</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* FOOTER */}
+        <footer className="border-t py-8 text-center text-sm text-gray-500">
+          © {new Date().getFullYear()} SimpleBookMe
+        </footer>
+      </main>
+    );
+  }
+
+  /* =====================================================
+     CLIENT ABOUT PAGE (UNCHANGED)
+     ===================================================== */
+
+  if (mode !== "client") return null;
 
   const customerConfig = customer as CustomerConfig;
   const { about, heroImage, businessName } = customerConfig;
@@ -52,12 +160,10 @@ export default function AboutPage() {
       {/* CONTENT */}
       <section className="py-20 px-6 bg-white">
         <div className="max-w-3xl mx-auto space-y-16">
-          {/* DESCRIPTION */}
           <p className="text-lg text-gray-700 leading-relaxed">
             {about.description}
           </p>
 
-          {/* HIGHLIGHTS */}
           {about.highlights?.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {about.highlights.map((item) => (
@@ -72,7 +178,6 @@ export default function AboutPage() {
             </div>
           )}
 
-          {/* SAMPLE WORK / GALLERY */}
           {about.gallery && about.gallery.length > 0 && (
             <div>
               <h2 className="text-2xl font-semibold mb-6">
@@ -94,7 +199,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* FOOTER */}
       <footer className="border-t py-8 text-center text-sm text-gray-500">
         © {new Date().getFullYear()} {businessName}
       </footer>
