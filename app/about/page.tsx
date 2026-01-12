@@ -1,5 +1,11 @@
 "use client";
 
+export const metadata = {
+  title: "About SimpleBookMe | Simple, Low-Cost Online Booking Website",
+  description:
+    "Learn about SimpleBookMe and our mission to make online booking simple, affordable, and accessible for service businesses of all sizes.",
+};
+
 import { useEffect, useState } from "react";
 import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
