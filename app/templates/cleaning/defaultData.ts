@@ -28,12 +28,53 @@ export const defaultData = {
 
 
   services: [
-    "Standard Home Cleaning",
-    "Deep Cleaning",
-    "Move-in / Move-out Cleaning",
-    "Office Cleaning",
-    "Post-Construction Cleaning",
-    "Airbnb Cleaning",
+  "Standard Home Cleaning",
+  "Deep Cleaning",
+  "Move-in / Move-out Cleaning",
+  "Same-Day Cleaning",
+  "One-Time Cleaning",
+  "Recurring Cleaning (Weekly / Bi-Weekly / Monthly)",
+
+  "Apartment Cleaning",
+  "Condo Cleaning",
+  "House Cleaning",
+
+  "Office Cleaning",
+  "Commercial Cleaning",
+  "Retail Store Cleaning",
+
+  "Post-Construction Cleaning",
+  "Post-Renovation Cleaning",
+
+  "Airbnb Cleaning",
+  "Short-Term Rental Cleaning",
+  "Vacation Rental Turnover Cleaning",
+
+  "Kitchen Deep Cleaning",
+  "Bathroom Deep Cleaning",
+  "Fridge Cleaning",
+  "Oven Cleaning",
+
+  "Window Cleaning (Interior)",
+  "Window Cleaning (Exterior)",
+
+  "Laundry & Ironing",
+  "Bed Linen Change",
+  "Dishwashing",
+
+  "Carpet Cleaning",
+  "Rug Cleaning",
+  "Upholstery Cleaning",
+
+  "Garage Cleaning",
+  "Basement Cleaning",
+
+  "Move Preparation Cleaning",
+  "Move-Out Inspection Cleaning",
+
+  "Green / Eco-Friendly Cleaning",
+
+  "Cleaning Consultation",
   ],
 
   pricing: {

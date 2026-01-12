@@ -26,13 +26,47 @@ const accentClass = {
     text: "text-emerald-600",
     bg: "bg-emerald-600",
   },
+  beauty: {
+    text: "text-emerald-600",
+    bg: "bg-emerald-600",
+  },
+  
+    fitness: {
+    text: "text-emerald-600",
+    bg: "bg-emerald-600",
+  },
+  
+      home: {
+    text: "text-emerald-600",
+    bg: "bg-emerald-600",
+  },
+  
+        auto: {
+    text: "text-emerald-600",
+    bg: "bg-emerald-600",
+  },
+  
+          accounting: {
+    text: "text-emerald-600",
+    bg: "bg-emerald-600",
+  },
+  
+            pet: {
+    text: "text-emerald-600",
+    bg: "bg-emerald-600",
+  },
+  
+              photo: {
+    text: "text-emerald-600",
+    bg: "bg-emerald-600",
+  },
 };
 
 /* ---------------- COMPONENT ---------------- */
 
 export default function SetupPage() {
   const [templateId, setTemplateId] =
-    useState<"hairsalon" | "cleaning">("hairsalon");
+    useState<"hairsalon" | "cleaning" | "beauty" | "fitness" | "home" | "auto" |"accounting" | "pet" | "photo">("hairsalon");
 
   const template = templates[templateId];
   const accent = accentClass[templateId];
@@ -225,6 +259,13 @@ const [booking, setBooking] = useState<{
           >
             <option value="hairsalon">Hair Salon</option>
             <option value="cleaning">Cleaning</option>
+			<option value="beauty">Beauty</option>
+			<option value="fitness">Fitness</option>
+			<option value="home">Home Services</option>
+			<option value="auto">Automotive Services</option>
+			<option value="accounting">Accounting Services</option>
+			<option value="pet">Pet Services</option>
+			<option value="photo">Photography Services</option>
           </select>
 
           <input
