@@ -2,6 +2,13 @@ import "./globals.css";
 import Navbar from "@/components/navbar/Navbar";
 import { Providers } from "./providers";
 
+
+export const metadata = {
+  other: {
+    "google-site-verification": "_9XPHh7SY5Gvnydgm5jhkLwhbaswIr3RsACqQhq580A",
+  },
+};
+
 export default function RootLayout({
   children,
 }: {
