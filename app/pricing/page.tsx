@@ -1,11 +1,5 @@
 "use client";
 
-export const metadata = {
-  title: "SimpleBookMe Pricing | Low-Cost Booking Website with No Monthly Fees",
-  description:
-    "View SimpleBookMe pricing. Create a simple booking website with a low one-time cost and no monthly fees. Transparent pricing for service businesses.",
-};
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
