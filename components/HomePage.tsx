@@ -176,20 +176,19 @@ export default function HomePage({
             </div>
           </section>
 
-          {/* -------- HOW TO USE (VIDEO) -------- */}
-          <section className="bg-white py-28">
-            <div className="mx-auto max-w-5xl px-8 text-center">
-              <h2 className="text-3xl font-bold text-gray-900">
-                How to use SimpleBookMe
-              </h2>
-              <p className="mt-4 text-lg text-gray-600">
-                A quick walkthrough showing how to create your site and accept bookings.
-              </p>
+			{/*
+			<section className="bg-white py-28">
+			  <div className="mx-auto max-w-5xl px-8 text-center">
+				<h2 className="text-3xl font-bold text-gray-900">
+				  How to use SimpleBookMe
+				</h2>
+				<p className="mt-4 text-lg text-gray-600">
+				  A quick walkthrough showing how to create your site and accept bookings.
+				</p>
 
-				<div className="mt-12 aspect-video rounded-2xl bg-gray-100 border rounded-2xl flex items-center justify-center text-gray-400 text-sm">
+				<div className="mt-12 aspect-video rounded-2xl bg-gray-100 border flex items-center justify-center text-gray-400 text-sm">
 				  Demo video coming soon
 
-				  {/*
 				  <iframe
 					className="absolute inset-0 w-full h-full"
 					src="https://www.youtube.com/embed/VIDEO_ID"
@@ -198,10 +197,11 @@ export default function HomePage({
 					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 					allowFullScreen
 				  />
-				  */}
 				</div>
-            </div>
-          </section>
+			  </div>
+			</section>
+			*/}
+
 
           {/* -------- FAQ -------- */}
           <section className="bg-gray-50 py-28">
