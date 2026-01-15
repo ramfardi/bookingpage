@@ -37,7 +37,7 @@ export async function POST(req: Request) {
             product_data: {
               name: "SimpleBookMe – Website Activation",
             },
-            unit_amount: 4900,
+            unit_amount: 3900,
           },
           quantity: 1,
         },
