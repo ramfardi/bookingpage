@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useEffect, useState } from "react";
 import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
@@ -32,16 +31,17 @@ export default function AboutPage() {
      ===================================================== */
   if (mode === "sales") {
     return (
-      <main className="min-h-screen w-full bg-white">
+      <main className="w-full bg-white">
         {/* HERO */}
-        <section className="py-28 px-6 text-center bg-gradient-to-b from-indigo-50 to-white">
+        <section className="pt-16 pb-10 md:pt-20 md:pb-14 px-6 text-center bg-gradient-to-b from-indigo-50 to-white">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
               About SimpleBookMe
             </h1>
 
             <p className="mt-6 text-lg text-gray-600">
-              A simple, affordable way for independent professionals to accept bookings online.
+              A simple, affordable way for independent professionals to accept
+              bookings online.
             </p>
           </div>
         </section>
@@ -57,9 +57,9 @@ export default function AboutPage() {
 
               <p className="text-lg text-gray-700 leading-relaxed">
                 SimpleBookMe helps small businesses and independent professionals
-                create a clean booking website without subscriptions, complex tools,
-                or technical setup. You get a single booking link that you can share
-                with clients and update anytime.
+                create a clean booking website without subscriptions, complex
+                tools, or technical setup. You get a single booking link that you
+                can share with clients and update anytime.
               </p>
             </div>
 
@@ -78,8 +78,8 @@ export default function AboutPage() {
               </p>
 
               <p className="mt-4 text-gray-700">
-                This approach keeps things simple, avoids forcing clients to create
-                accounts, and works well for businesses that prefer direct
+                This approach keeps things simple, avoids forcing clients to
+                create accounts, and works well for businesses that prefer direct
                 communication.
               </p>
             </div>
@@ -93,8 +93,8 @@ export default function AboutPage() {
               <p className="text-lg text-gray-700 leading-relaxed">
                 If you already use a booking platform such as Vagaro, Fresha, or
                 another service, you can simply link it to your website. When
-                clients click “Book”, they are redirected to your existing booking
-                system.
+                clients click “Book”, they are redirected to your existing
+                booking system.
               </p>
 
               <p className="mt-4 text-gray-700">
@@ -117,6 +117,25 @@ export default function AboutPage() {
                 <li>• Edit and update your content anytime</li>
                 <li>• No technical knowledge required</li>
               </ul>
+            </div>
+
+            {/* SUPPORT */}
+            <div className="pt-10 text-center">
+              <p className="text-lg text-gray-700 mb-3">
+                Need help or have questions? Contact our support team:
+              </p>
+
+              <a
+                href="mailto:support@simplebookme.com"
+                aria-label="Email SimpleBookMe support"
+                className="inline-flex justify-center"
+              >
+                <img
+                  src="/images/support-email.svg"
+                  alt="Support email"
+                  className="h-6"
+                />
+              </a>
             </div>
           </div>
         </section>
