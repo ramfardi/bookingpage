@@ -81,6 +81,7 @@ export default function PricingPage() {
                 <li>✔️ Edit and update your website anytime</li>
                 <li>✔️ Changes apply instantly to the same link</li>
                 <li>✔️ No monthly or hidden fees</li>
+				<li>✔️ 24/7 Support </li>
               </ul>
             </div>
 
