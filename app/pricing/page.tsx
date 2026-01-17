@@ -56,7 +56,7 @@ export default function PricingPage() {
                 $39.90
               </span>
               <span className="ml-2 text-lg text-gray-500">
-                USD
+                CAD
               </span>
             </div>
 
