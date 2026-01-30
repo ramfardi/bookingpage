@@ -16,7 +16,7 @@ export const metadata = {
     title: "Home Services Booking Website | SimpleBookMe",
     description:
       "Launch a professional website for your home services business with online booking. No phone calls. Instant confirmation.",
-    url: "https://simplebookme.com/home-services",
+    url: "https://simplebookme.com/home_services",
     siteName: "SimpleBookMe",
     type: "website",
   },
@@ -27,7 +27,7 @@ export const metadata = {
       "Build a modern home services website with online booking for handyman, plumbing, and repair services.",
   },
   alternates: {
-    canonical: "https://simplebookme.com/home-services",
+    canonical: "https://simplebookme.com/home_services",
   },
 };
 
