@@ -1,10 +1,22 @@
 import HomePage from "@/components/HomePage";
 
-export const metadata = {
-  title: "SimpleBookMe | Low-Cost Online Booking Website for Service Businesses",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "SimpleBookMe | Create a Booking Website in Minutes",
   description:
-    "Create a simple, low-cost booking website for your business. No monthly fees, no complex setup — launch your booking site in minutes.",
+    "SimpleBookMe helps service businesses create a professional booking website with online appointments and instant confirmations.",
+
+  alternates: {
+    canonical: "https://simplebookme.com/",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
+
 
 export default function Page() {
   return <HomePage />;
