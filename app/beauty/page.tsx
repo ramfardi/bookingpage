@@ -1,35 +1,37 @@
 import HomePage from "@/components/HomePage_beauty";
 
 export const metadata = {
-  title: "Create a Beauty Services Booking Website | Online Appointments Made Easy",
+  title: "Beauty Salon Website with Online Booking | SimpleBookMe",
   description:
-    "Create a professional beauty services website with online booking. Let clients book nail salon, massage, spa, and beauty treatments online with instant confirmation.",
+    "Create a professional beauty salon website with online booking and appointments. Perfect for nail salons, spas, massage therapists, and beauty professionals.",
   keywords: [
-    "beauty services booking website",
-    "nail salon booking website",
-    "massage booking system",
+    "beauty salon website",
+    "beauty booking website",
+    "nail salon website",
     "spa booking website",
+    "massage therapist website",
+    "online booking for beauty business",
     "beauty appointment scheduling",
-    "beauty business website builder",
   ],
   openGraph: {
-    title: "Beauty Services Booking Website | SimpleBookMe",
+    title: "Beauty Salon Website with Online Booking | SimpleBookMe",
     description:
-      "Launch a professional beauty services website with online booking for salons, spas, and wellness businesses.",
+      "Launch a professional beauty salon website with online booking, appointments, and payments. Built for salons, spas, and beauty professionals.",
     url: "https://simplebookme.com/beauty",
     siteName: "SimpleBookMe",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Create a Beauty Services Booking Website | SimpleBookMe",
+    title: "Beauty Salon Website with Online Booking | SimpleBookMe",
     description:
-      "Build a modern beauty services website with online booking for nail salons, massage therapists, and spas.",
+      "Build a modern beauty salon website with online booking and appointments for nail salons, spas, and massage therapists.",
   },
   alternates: {
     canonical: "https://simplebookme.com/beauty",
   },
 };
+
 
 
 export default function Page() {
