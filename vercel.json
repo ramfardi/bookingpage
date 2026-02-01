@@ -1,0 +1,12 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        { "type": "host", "value": "www.simplebookme.com" }
+      ],
+      "destination": "https://simplebookme.com/$1",
+      "permanent": true
+    }
+  ]
+}
