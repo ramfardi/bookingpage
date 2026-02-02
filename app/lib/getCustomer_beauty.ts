@@ -4,13 +4,14 @@ import type { CustomerConfig } from "./customerConfig";
 const SALES_CONFIG: LandingConfig = {
   heroImage: "/images/beauty.png",
   landing: {
-    header1: "Create a Beauty Services",
-    header2: "Booking Website",
-    subheader1: "Launch a professional beauty website with online booking in seconds",
-    subheader2: "No monthly fee | Easy to use | Customizable",
+    header1: "Create a Beauty Salon Website",
+    header2: "with Online Booking",
+    subheader1:
+      "Launch a professional beauty salon website that lets clients book appointments online 24/7.",
+    subheader2:
+      "Perfect for nail salons, spas, massage therapists, and beauty professionals.",
   },
 };
-
 
 const MAIN_DOMAIN = "simplebookme.com";
 
