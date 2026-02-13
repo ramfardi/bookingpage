@@ -44,6 +44,14 @@ const guideItems: GuideItem[] = [
       "Simple marketing strategies for solo business owners to attract their first paying customers.",
     href: "/guide/getting-first-clients",
   },
+  
+  {
+  title: "Advertising for Small Businesses",
+  description:
+    "Practical advertising strategies for small service businesses. Learn how to use Google Ads, social media, local partnerships, and low-budget marketing methods to attract consistent clients without wasting money.",
+  href: "/guide/advertising-small-business",
+},
+
 ];
 
 export default function BusinessGuidePage() {
