@@ -83,10 +83,18 @@ export default function AdvertisingGuidePage() {
             First: Understand the Goal of Advertising
           </h2>
 
-          <p className="mt-6 text-gray-700 leading-relaxed">
-            Advertising has only one purpose: generating consistent clients.
-            Not likes. Not followers. Not vanity metrics.
-          </p>
+		<p className="mt-6 text-gray-700 leading-relaxed">
+		  Advertising has only one purpose: generating consistent clients.
+		  Not likes. Not followers. Not vanity metrics.{" "}
+		  <Link
+			href="/advertising-budget-calculator"
+			className="text-indigo-600 font-medium hover:underline"
+		  >
+			Use our advertising budget calculator
+		  </Link>{" "}
+		  to plan your marketing spend properly.
+		</p>
+
 
           <p className="mt-6 text-gray-700 leading-relaxed">
             Before spending money or time, define:
@@ -237,10 +245,18 @@ export default function AdvertisingGuidePage() {
             Business Cards
           </h3>
 
-          <p className="mt-6 text-gray-700 leading-relaxed">
-            Business cards still work when distributed intentionally.
-            Leave them at complementary businesses.
-          </p>
+		<p className="mt-6 text-gray-700 leading-relaxed">
+		  Business cards still work when distributed intentionally.
+		  Leave them at complementary businesses. You can also create a{" "}
+		  <Link
+			href="/qr-code-generator"
+			className="text-indigo-600 font-medium hover:underline"
+		  >
+			branded QR code for your business cards
+		  </Link>{" "}
+		  to make it easy for customers to scan and book instantly.
+		</p>
+
 
           <h3 className="mt-8 text-lg font-semibold text-gray-900">
             Flyers
