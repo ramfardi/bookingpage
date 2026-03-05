@@ -29,6 +29,47 @@ export default function QRCodeGeneratorPage() {
   const [pngDataUrl, setPngDataUrl] = useState<string | null>(null);
   const [svgData, setSvgData] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const toggleFaq = (index: number) => {
+  setOpenFaq(openFaq === index ? null : index);
+};
+const faqs = [
+  {
+    question: "What is a QR code used for?",
+    answer:
+      "QR codes allow customers to instantly open a website, booking page, menu, contact form, payment page, or social media profile by scanning the code with their phone camera."
+  },
+  {
+    question: "Can I print QR codes on business cards?",
+    answer:
+      "Yes. QR codes are commonly printed on business cards so customers can scan and instantly visit your website, booking page, or contact details without typing a web address."
+  },
+  {
+    question: "What size should a QR code be for printing?",
+    answer:
+      "For reliable scanning, printed QR codes should usually be at least 2–3 cm wide. High-resolution PNG or scalable SVG files ensure the QR code remains sharp and readable when printed."
+  },
+  {
+    question: "Can I add my logo inside a QR code?",
+    answer:
+      "Yes. QR codes can safely include a logo in the center if they are generated with high error correction. This helps maintain scannability while adding professional branding."
+  },
+  {
+    question: "Do QR codes expire?",
+    answer:
+      "Standard QR codes do not expire. As long as the destination link remains active, the QR code will continue to work indefinitely."
+  },
+  {
+    question: "Where should businesses place QR codes?",
+    answer:
+      "Businesses often place QR codes on storefront windows, flyers, menus, product packaging, posters, and business cards so customers can quickly access websites, booking pages, or promotions."
+  },
+  {
+    question: "What is the difference between PNG and SVG QR codes?",
+    answer:
+      "PNG files are high-resolution images suitable for most uses, while SVG files are vector graphics that can be scaled infinitely without losing quality. SVG is ideal for large prints like banners or signage."
+  }
+];
 
   const generateQR = async () => {
     if (!inputUrl) return;
@@ -279,8 +320,30 @@ if (logoFile) {
     URL.revokeObjectURL(url);
   };
 
-  return (
-    <main className={`${poppins.className} min-h-screen bg-white px-6 py-24 flex justify-center`}>
+return (
+  <main className={`${poppins.className} min-h-screen bg-white px-6 py-24 flex justify-center`}>
+
+    {/* Structured Data - Tool Schema */}
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "QR Code Generator",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "description":
+            "Free QR code generator for creating high-resolution printable QR codes for business cards, booking pages, and marketing materials.",
+          "url": "https://simplebookme.com/qr-code-generator"
+        }),
+      }}
+    />
       <div className="w-full max-w-4xl">
 
         <div className="mb-8">
@@ -478,6 +541,49 @@ if (logoFile) {
           </p>
 
         </div>
+		
+				{/* FAQ Section */}
+<div className="mt-20">
+  <h2 className="text-3xl font-bold text-gray-900 mb-8">
+    FAQ
+  </h2>
+
+  <div className="space-y-4">
+    {faqs.map((faq, index) => (
+      <div
+        key={index}
+        className="border border-gray-200 rounded-xl p-6 bg-white shadow-sm"
+      >
+        <button
+          onClick={() => toggleFaq(index)}
+          className="w-full flex justify-between items-center text-left"
+        >
+          <span className="text-lg font-medium text-gray-900">
+            {faq.question}
+          </span>
+
+          <span
+            className={`text-2xl font-bold transition-transform duration-300 ${
+              openFaq === index ? "rotate-45" : ""
+            }`}
+          >
+            +
+          </span>
+        </button>
+
+        <div
+          className={`overflow-hidden transition-all duration-300 ${
+            openFaq === index ? "max-h-96 mt-4" : "max-h-0"
+          }`}
+        >
+          <p className="text-gray-700 leading-relaxed">
+            {faq.answer}
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
 
         {/* CTA */}
         <div className="mt-16 p-8 bg-gray-50 rounded-2xl text-center">
