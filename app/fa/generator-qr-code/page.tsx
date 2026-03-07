@@ -7,7 +7,6 @@ const poppins = Poppins({
   weight: ["400", "600", "700"],
 });
 
-import { Poppins } from "next/font/google";
 import { useState, useRef } from "react";
 import QRCode from "qrcode";
 import { useRouter } from "next/navigation";
