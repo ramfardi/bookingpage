@@ -1,0 +1,608 @@
+"use client";
+
+import { Poppins } from "next/font/google";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+});
+
+
+import { useState, useRef } from "react";
+import QRCode from "qrcode";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+export default function QRCodeGeneratorPage() {
+  const router = useRouter();
+  const [services, setServices] = useState("");
+
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const [inputUrl, setInputUrl] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+
+  const [pngDataUrl, setPngDataUrl] = useState<string | null>(null);
+  const [svgData, setSvgData] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const toggleFaq = (index: number) => {
+  setOpenFaq(openFaq === index ? null : index);
+};
+  const faqs = [
+    {
+      question: "ما هو استخدام رمز QR؟",
+      answer:
+        "تسمح رموز QR للعملاء بفتح موقع ويب أو صفحة حجز أو قائمة طعام أو نموذج اتصال أو صفحة دفع أو ملف على وسائل التواصل الاجتماعي فورًا عن طريق مسح الرمز باستخدام كاميرا الهاتف."
+    },
+    {
+      question: "هل يمكن طباعة رموز QR على بطاقات العمل؟",
+      answer:
+        "نعم. غالبًا ما يتم طباعة رموز QR على بطاقات العمل بحيث يمكن للعملاء مسح الرمز وزيارة موقعك أو صفحة الحجز أو معلومات الاتصال الخاصة بك فورًا دون كتابة عنوان الموقع."
+    },
+    {
+      question: "ما الحجم المناسب لرمز QR عند الطباعة؟",
+      answer:
+        "لضمان قراءة الرمز بسهولة، يجب أن يكون عرض رمز QR المطبوع عادةً 2 إلى 3 سم على الأقل. تساعد ملفات PNG عالية الدقة أو ملفات SVG القابلة للتكبير على الحفاظ على وضوح الرمز عند الطباعة."
+    },
+    {
+      question: "هل يمكن إضافة شعار داخل رمز QR؟",
+      answer:
+        "نعم. يمكن إضافة شعار في وسط رمز QR عند استخدام مستوى تصحيح أخطاء مرتفع، مما يحافظ على إمكانية المسح مع إضافة هوية بصرية احترافية."
+    },
+    {
+      question: "هل تنتهي صلاحية رموز QR؟",
+      answer:
+        "لا تنتهي صلاحية رموز QR القياسية. طالما أن الرابط المرتبط بها لا يزال نشطًا، سيستمر رمز QR في العمل بشكل دائم."
+    },
+    {
+      question: "أين يجب على الشركات وضع رموز QR؟",
+      answer:
+        "تضع الشركات رموز QR عادةً على نوافذ المتاجر، المنشورات، القوائم، عبوات المنتجات، الملصقات وبطاقات العمل حتى يتمكن العملاء من الوصول بسرعة إلى المواقع أو صفحات الحجز أو العروض."
+    },
+    {
+      question: "ما الفرق بين رمز QR بصيغة PNG وSVG؟",
+      answer:
+        "ملفات PNG عبارة عن صور عالية الدقة مناسبة لمعظم الاستخدامات، بينما ملفات SVG هي رسومات متجهية يمكن تكبيرها بلا حدود دون فقدان الجودة، مما يجعلها مثالية للطباعة الكبيرة مثل اللافتات."
+    }
+  ];
+  const generateQR = async () => {
+    if (!inputUrl) return;
+
+    setLoading(true);
+
+    try {
+      const size = 2000;
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      if (!ctx) return;
+
+      canvas.width = size;
+      canvas.height = size + 400; // extra space for text
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Generate QR
+      const qrCanvas = document.createElement("canvas");
+	await QRCode.toCanvas(qrCanvas, inputUrl, {
+	  width: size,
+	  margin: 6,
+	  errorCorrectionLevel: "H",
+	  color: {
+		dark: "#000000",
+		light: "#ffffff",
+	  },
+	});
+
+
+      ctx.drawImage(qrCanvas, 0, 350, size, size);
+
+      // Business Name (top)
+      if (businessName) {
+        ctx.fillStyle = "#000000";
+        ctx.font = "bold 80px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(businessName, size / 2, 120);
+      }
+	  
+	  // Services block (between name and QR)
+		if (services) {
+		  const serviceList = services.split(",");
+		  ctx.font = "55px Arial";
+		  ctx.fillStyle = "#333333";
+		  ctx.textAlign = "center";
+
+		  let serviceY = 180;
+
+		  serviceList.forEach((service) => {
+			ctx.fillText(service.trim(), size / 2, serviceY);
+			serviceY += 70;
+		  });
+		}
+
+
+      // Phone & Email (bottom)
+      ctx.font = "60px Arial";
+      ctx.fillStyle = "#000000";
+      let bottomY = size + 260;
+
+      if (phone) {
+        ctx.fillText(phone, size / 2, bottomY);
+        bottomY += 80;
+      }
+
+      if (email) {
+        ctx.fillText(email, size / 2, bottomY);
+      }
+
+
+	// Logo in center (optional)
+	if (logoFile) {
+	  const logoImg = new Image();
+	  const reader = new FileReader();
+
+	  await new Promise<void>((resolve) => {
+		reader.onload = () => {
+		  logoImg.src = reader.result as string;
+		};
+
+		logoImg.onload = () => {
+		  const logoSize = size * 0.18; // smaller = safer
+		  const x = size / 2 - logoSize / 2;
+		  const y = 200 + size / 2 - logoSize / 2;
+
+		  // Large white background for safety
+		  ctx.fillStyle = "#ffffff";
+		  ctx.fillRect(
+			x - 40,
+			y - 40,
+			logoSize + 80,
+			logoSize + 80
+		  );
+
+		  ctx.drawImage(logoImg, x, y, logoSize, logoSize);
+		  resolve();
+		};
+
+		reader.readAsDataURL(logoFile);
+	  });
+	}
+
+
+      const png = canvas.toDataURL("image/png");
+      setPngDataUrl(png);
+
+      const svg = await QRCode.toString(inputUrl, {
+        type: "svg",
+        margin: 4,
+      });
+
+      setSvgData(svg);
+    } catch (err) {
+      console.error(err);
+    }
+
+    setLoading(false);
+  };
+
+  const downloadPNG = () => {
+    if (!pngDataUrl) return;
+    const link = document.createElement("a");
+    link.href = pngDataUrl;
+    link.download = "branded-business-qr.png";
+    link.click();
+  };
+  
+  const downloadBusinessCard = async () => {
+  if (!inputUrl) return;
+
+  const cardWidth = 600;
+  const cardHeight = 850;
+
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  canvas.width = cardWidth;
+  canvas.height = cardHeight;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, cardWidth, cardHeight);
+
+  // Business Name
+  if (businessName) {
+    ctx.fillStyle = "#000000";
+    ctx.font = "bold 40px Poppins";
+    ctx.textAlign = "center";
+    ctx.fillText(businessName, cardWidth / 2, 80);
+  }
+
+  // Services
+  if (services) {
+    const serviceList = services.split(",");
+    ctx.font = "26px Poppins";
+    ctx.fillStyle = "#444444";
+
+    let y = 130;
+    serviceList.forEach((service) => {
+      ctx.fillText(service.trim(), cardWidth / 2, y);
+      y += 35;
+    });
+  }
+
+  // Generate QR smaller for card
+const qrCanvas = document.createElement("canvas");
+
+await QRCode.toCanvas(qrCanvas, inputUrl, {
+  width: 400,
+  margin: 6,
+  errorCorrectionLevel: "H",
+});
+
+const qrX = 100;
+const qrY = 250;
+const qrSize = 400;
+
+ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+
+// Add logo inside QR (if exists)
+if (logoFile) {
+  const logoImg = new Image();
+  const reader = new FileReader();
+
+  await new Promise<void>((resolve) => {
+    reader.onload = () => {
+      logoImg.src = reader.result as string;
+    };
+
+    logoImg.onload = () => {
+      const logoSize = qrSize * 0.2; // 20% safe
+      const x = qrX + qrSize / 2 - logoSize / 2;
+      const y = qrY + qrSize / 2 - logoSize / 2;
+
+      // White background for safety
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(
+        x - 15,
+        y - 15,
+        logoSize + 30,
+        logoSize + 30
+      );
+
+      ctx.drawImage(logoImg, x, y, logoSize, logoSize);
+      resolve();
+    };
+
+    reader.readAsDataURL(logoFile);
+  });
+}
+
+  // Phone & Email
+  ctx.font = "28px Arial";
+  ctx.fillStyle = "#000000";
+
+  let bottomY = 720;
+
+  if (phone) {
+    ctx.fillText(phone, cardWidth / 2, bottomY);
+    bottomY += 40;
+  }
+
+  if (email) {
+    ctx.fillText(email, cardWidth / 2, bottomY);
+  }
+
+  const dataUrl = canvas.toDataURL("image/png");
+
+  const link = document.createElement("a");
+  link.href = dataUrl;
+  link.download = "vertical-business-card.png";
+  link.click();
+};
+
+
+  const downloadSVG = () => {
+    if (!svgData) return;
+    const blob = new Blob([svgData], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "business-qr-code.svg";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+return (
+    <main dir="rtl" className={`${poppins.className} min-h-screen bg-white px-6 py-24 flex justify-center`}>
+
+    {/* Structured Data - Tool Schema */}
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "QR Code Generator",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "description":
+            "Free QR code generator for creating high-resolution printable QR codes for business cards, booking pages, and marketing materials.",
+          "url": "https://simplebookme.com/qr-code-generator"
+        }),
+      }}
+    />
+      <div className="w-full max-w-4xl">
+
+        <div className="mb-8">
+          <Link
+            href="/guide"
+            className="text-sm text-indigo-600 hover:underline"
+          >
+            ← Back to Business Guide
+          </Link>
+        </div>
+
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+          مولد رمز QR مجاني للشركات
+        </h1>
+
+<p className="mt-6 text-lg text-gray-600 leading-relaxed">
+  أنشئ رمز QR احترافي لعملك خلال ثوانٍ. 
+  يمكنك إضافة اسم شركتك ورقم الهاتف والبريد الإلكتروني، 
+  وحتى تحميل شعارك لوضعه داخل رمز QR. 
+  مثالي لبطاقات العمل، المنشورات الدعائية، واجهات المتاجر، 
+  تغليف المنتجات، طاولات المطاعم، وصفحات الحجز.
+</p>
+
+{/* INPUT SECTION */}
+<div className="mt-12 bg-gray-50 p-8 rounded-2xl border space-y-6">
+
+  <div>
+    <label className="block text-sm font-medium text-gray-700">
+      رابط الموقع (مطلوب)
+    </label>
+    <input
+      type="text"
+      value={inputUrl}
+      onChange={(e) => setInputUrl(e.target.value)}
+      placeholder="https://yourwebsite.com"
+      className="mt-2 w-full rounded-lg border px-4 py-3"
+    />
+  </div>
+
+  <div>
+    <label className="block text-sm font-medium text-gray-700">
+      اسم النشاط التجاري (اختياري)
+    </label>
+    <input
+      type="text"
+      value={businessName}
+      onChange={(e) => setBusinessName(e.target.value)}
+      className="mt-2 w-full rounded-lg border px-4 py-3"
+    />
+  </div>
+
+  <div>
+    <label className="block text-sm font-medium text-gray-700">
+      الخدمات (اختياري – افصل بينها بفاصلة)
+    </label>
+    <input
+      type="text"
+      value={services}
+      onChange={(e) => setServices(e.target.value)}
+      placeholder="قص شعر، تهذيب اللحية، صبغ الشعر"
+      className="mt-2 w-full rounded-lg border px-4 py-3"
+    />
+  </div>
+
+  <div className="grid md:grid-cols-2 gap-6">
+    <div>
+      <label className="block text-sm font-medium text-gray-700">
+        رقم الهاتف (اختياري)
+      </label>
+      <input
+        type="text"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+        className="mt-2 w-full rounded-lg border px-4 py-3"
+      />
+    </div>
+
+    <div>
+      <label className="block text-sm font-medium text-gray-700">
+        البريد الإلكتروني (اختياري)
+      </label>
+      <input
+        type="text"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="mt-2 w-full rounded-lg border px-4 py-3"
+      />
+    </div>
+  </div>
+
+  <div>
+    <label className="block text-sm font-medium text-gray-700">
+      تحميل الشعار (اختياري)
+    </label>
+    <input
+      type="file"
+      accept="image/*"
+      onChange={(e) =>
+        setLogoFile(e.target.files ? e.target.files[0] : null)
+      }
+      className="mt-2"
+    />
+  </div>
+
+  <button
+    onClick={generateQR}
+    className="rounded-xl bg-indigo-600 text-white px-8 py-3 font-semibold hover:bg-indigo-700 transition"
+  >
+    {loading ? "جارٍ الإنشاء..." : "إنشاء رمز QR مخصص"}
+  </button>
+
+</div>
+{/* PREVIEW */}
+{pngDataUrl && (
+  <div className="mt-12 text-center">
+
+    <img
+      src={pngDataUrl}
+      alt="رمز QR مخصص تم إنشاؤه"
+      className="mx-auto w-64 border rounded-xl"
+    />
+
+    <div className="mt-6 flex justify-center gap-4 flex-wrap">
+      <button
+        onClick={downloadPNG}
+        className="rounded-xl bg-green-600 text-white px-6 py-3 font-semibold hover:bg-green-700 transition"
+      >
+        تنزيل PNG
+      </button>
+
+      <button
+        onClick={downloadSVG}
+        className="rounded-xl bg-gray-800 text-white px-6 py-3 font-semibold hover:bg-gray-900 transition"
+      >
+        تنزيل SVG
+      </button>
+
+      <button
+        onClick={downloadBusinessCard}
+        className="rounded-xl bg-purple-600 text-white px-6 py-3 font-semibold hover:bg-purple-700 transition"
+      >
+        تنزيل بطاقة عمل عمودية (جاهزة للطباعة)
+      </button>
+
+    </div>
+  </div>
+)}
+
+{/* SEO CONTENT */}
+<div className="mt-20 space-y-6 text-gray-700 leading-relaxed">
+
+  <h2 className="text-2xl font-semibold text-gray-900">
+    لماذا تستخدم رمز QR مخصص لعملك؟
+  </h2>
+
+  <p>
+    يساعد رمز QR المخصص على بناء الثقة وزيادة معدل المسح من قبل العملاء.
+    عندما يرى العملاء اسم نشاطك التجاري وشعارك مدمجين داخل رمز QR،
+    يبدو الأمر أكثر احترافية وأماناً. غالباً ما تبدو رموز QR العامة
+    مجهولة المصدر، لكن تصميم رمز QR مخصص يعزز هوية العلامة التجارية
+    ويزيد من مصداقيتها.
+  </p>
+
+  <p>
+    تستخدم الشركات اليوم رموز QR لروابط الحجز، القوائم الرقمية،
+    صفحات تقييمات Google، نماذج التواصل، حسابات وسائل التواصل الاجتماعي
+    والعروض الترويجية. إضافة هوية علامتك التجارية إلى رمز QR تضمن أنه
+    حتى لو تمت مشاركة الصورة، تبقى هوية نشاطك التجاري مرتبطة بها.
+  </p>
+
+  <h2 className="text-2xl font-semibold text-gray-900">
+    أفضل الممارسات لإنشاء رموز QR فعّالة
+  </h2>
+
+  <ul className="list-disc pl-6 space-y-3">
+    <li>استخدم عبارات واضحة مثل "امسح للحجز الآن".</li>
+    <li>اختبر رمز QR دائماً قبل طباعته.</li>
+    <li>ضع الرمز في مكان يسهل على العملاء رؤيته.</li>
+    <li>استخدم ملفات عالية الدقة عند الطباعة.</li>
+    <li>تأكد من وجود تباين قوي بين الألوان لسهولة المسح.</li>
+  </ul>
+
+  <p>
+    يقوم مولد الرموز لدينا بإنشاء رموز QR عالية الدقة ومناسبة للطباعة
+    مع هوامش صحيحة لضمان أفضل توافق مع الهواتف الذكية. كما يتيح
+    تنسيق SVG إمكانية التكبير إلى أي حجم دون فقدان الجودة، مما يجعله
+    مثالياً للافتات الكبيرة أو واجهات المتاجر.
+  </p>
+
+  <p>
+    سواء كنت صاحب صالون، شركة تنظيف، مطعماً، وكيل عقارات،
+    مدرباً أو مقدم خدمات، فإن رمز QR احترافي يمكن أن يسهل
+    تفاعل العملاء ويزيد من فرص التحويل.
+  </p>
+
+</div>
+		
+				{/* FAQ Section */}
+<div className="mt-20">
+  <h2 className="text-3xl font-bold text-gray-900 mb-8">
+    FAQ
+  </h2>
+
+  <div className="space-y-4">
+    {faqs.map((faq, index) => (
+      <div
+        key={index}
+        className="border border-gray-200 rounded-xl p-6 bg-white shadow-sm"
+      >
+        <button
+          onClick={() => toggleFaq(index)}
+          className="w-full flex justify-between items-center text-left"
+        >
+          <span className="text-lg font-medium text-gray-900">
+            {faq.question}
+          </span>
+
+          <span
+            className={`text-2xl font-bold transition-transform duration-300 ${
+              openFaq === index ? "rotate-45" : ""
+            }`}
+          >
+            +
+          </span>
+        </button>
+
+        <div
+          className={`overflow-hidden transition-all duration-300 ${
+            openFaq === index ? "max-h-96 mt-4" : "max-h-0"
+          }`}
+        >
+          <p className="text-gray-700 leading-relaxed">
+            {faq.answer}
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+{/* CTA */}
+<div className="mt-16 p-8 bg-gray-50 rounded-2xl text-center">
+  <h3 className="text-2xl font-semibold text-gray-900">
+    هل تحتاج إلى موقع حجز لربطه برمز QR الخاص بك؟
+  </h3>
+
+  <p className="mt-4 text-gray-600">
+    أنشئ موقع حجز احترافي وولّد رموز QR تتيح للعملاء
+    مسح الرمز والحجز فوراً بكل سهولة.
+  </p>
+
+  <button
+    onClick={() => router.push("/setup")}
+    className="mt-6 rounded-xl bg-indigo-600 text-white px-8 py-3 font-semibold hover:bg-indigo-700 transition"
+  >
+    إنشاء موقع الحجز الخاص بك
+  </button>
+</div>
+
+      </div>
+    </main>
+  );
+}
