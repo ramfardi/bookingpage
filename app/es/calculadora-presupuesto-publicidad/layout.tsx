@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     "Calculadora gratuita de presupuesto publicitario para pequeñas empresas de servicios. Estima cuánto deberías gastar en publicidad según el precio de tu servicio, visitas mensuales y margen de beneficio.",
   keywords: [
     "calculadora presupuesto publicidad",
+	"presupuesto de publicidad",
     "calculadora presupuesto marketing",
     "presupuesto publicidad pequeña empresa",
     "cuánto gastar en publicidad",

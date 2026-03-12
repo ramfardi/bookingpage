@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   keywords: [
     "générateur de code QR",
     "code QR gratuit",
+	"créer un qr code carte de visite gratuit",
     "code QR carte de visite",
     "code QR imprimable",
     "téléchargement code QR PNG",
