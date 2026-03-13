@@ -101,26 +101,32 @@ const faqs = [
 		light: "#ffffff",
 	  },
 	});
+	const font = new FontFace(
+	  "GreatVibes",
+	  "url(https://fonts.gstatic.com/s/greatvibes/v17/RWmMoKWR9v4ksMfaWd_JN9XFiaQ.woff2)"
+	);
 
+	await font.load();
+	document.fonts.add(font);
 
       ctx.drawImage(qrCanvas, 0, 350, size, size);
 
       // Business Name (top)
       if (businessName) {
         ctx.fillStyle = "#000000";
-        ctx.font = "bold 80px Arial";
+        ctx.font = "bold 140px GreatVibes";
         ctx.textAlign = "center";
-        ctx.fillText(businessName, size / 2, 120);
+        ctx.fillText(businessName, size / 2, 320);
       }
 	  
 	  // Services block (between name and QR)
 		if (services) {
-		  const serviceList = services.split(",");
-		  ctx.font = "55px Arial";
+		  const serviceList = services.split("|");
+		  ctx.font = "70px Playfair";
 		  ctx.fillStyle = "#333333";
 		  ctx.textAlign = "center";
 
-		  let serviceY = 180;
+		  let serviceY = 450;
 
 		  serviceList.forEach((service) => {
 			ctx.fillText(service.trim(), size / 2, serviceY);
@@ -130,9 +136,9 @@ const faqs = [
 
 
       // Phone & Email (bottom)
-      ctx.font = "60px Arial";
+      ctx.font = "80px Playfair";
       ctx.fillStyle = "#000000";
-      let bottomY = size + 260;
+      let bottomY = size + 220;
 
       if (phone) {
         ctx.fillText(phone, size / 2, bottomY);
@@ -157,7 +163,7 @@ const faqs = [
 		logoImg.onload = () => {
 		  const logoSize = size * 0.18; // smaller = safer
 		  const x = size / 2 - logoSize / 2;
-		  const y = 200 + size / 2 - logoSize / 2;
+		  const y = 200 + size / 2 - logoSize / 4;
 
 		  // Large white background for safety
 		  ctx.fillStyle = "#ffffff";
@@ -289,11 +295,11 @@ if (logoFile) {
   ctx.font = "28px Arial";
   ctx.fillStyle = "#000000";
 
-  let bottomY = 720;
+  let bottomY = 600;
 
   if (phone) {
     ctx.fillText(phone, cardWidth / 2, bottomY);
-    bottomY += 40;
+    bottomY += 80;
   }
 
   if (email) {
@@ -482,12 +488,14 @@ return (
                 Download SVG
               </button>
 			  
-			  <button
-			  onClick={downloadBusinessCard}
-			  className="rounded-xl bg-purple-600 text-white px-6 py-3 font-semibold hover:bg-purple-700 transition"
-			>
-			  Download Vertical Business Card (Print Ready)
-			</button>
+{/* 
+<button
+  onClick={downloadBusinessCard}
+  className="rounded-xl bg-purple-600 text-white px-6 py-3 font-semibold hover:bg-purple-700 transition"
+>
+  Download Vertical Business Card (Print Ready)
+</button>
+*/}
 
             </div>
           </div>
