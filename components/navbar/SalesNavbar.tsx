@@ -55,6 +55,13 @@ export default function SalesNavbar() {
           >
             Business Guide
           </button>
+		  
+		            <button
+            onClick={() => router.push("/tools")}
+            className="text-sm font-medium text-gray-700 hover:text-black"
+          >
+            Tools
+          </button>
 
           <button
             onClick={() => router.push("/setup")}
@@ -105,6 +112,16 @@ export default function SalesNavbar() {
             className="py-3 text-base font-medium text-left"
           >
             Business Guide
+          </button>
+		  
+		            <button
+            onClick={() => {
+              setOpen(false);
+              router.push("/tools");
+            }}
+            className="py-3 text-base font-medium text-left"
+          >
+            Tools
           </button>
 
           <button
