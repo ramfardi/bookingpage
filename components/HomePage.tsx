@@ -107,21 +107,30 @@ export default function HomePage({
           )}
 
           <div className="mt-10 flex justify-center">
-            {mode === "client" ? (
-              <button
-                onClick={handleBookAppointment}
-                className="rounded-xl bg-white text-black px-8 py-4 font-semibold"
-              >
-                Book appointment
-              </button>
-            ) : (
-              <button
-                onClick={() => router.push("/setup")}
-                className="rounded-xl bg-indigo-600 text-white px-8 py-4 font-semibold"
-              >
-                Create your booking site
-              </button>
-            )}
+{mode === "client" ? (
+  <button
+    onClick={handleBookAppointment}
+    className="rounded-xl bg-white text-black px-8 py-4 font-semibold"
+  >
+    Book appointment
+  </button>
+) : (
+  <div className="flex flex-col items-center gap-4">
+    <button
+      onClick={() => router.push("/setup")}
+      className="rounded-xl bg-indigo-600 text-white px-8 py-4 font-semibold"
+    >
+      Create your booking site
+    </button>
+
+    <button
+      onClick={() => router.push("/instagram_setup")}
+      className="rounded-xl bg-black text-white px-8 py-4 font-semibold"
+    >
+      Create your Instagram bio link
+    </button>
+  </div>
+)}
           </div>
         </motion.div>
 
