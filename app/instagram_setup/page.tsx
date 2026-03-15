@@ -277,6 +277,13 @@ subdomain: form.instagram.toLowerCase(),
               setForm({ ...form, businessName: e.target.value })
             }
           />
+		            <input
+            className="w-full border p-3 rounded-md"
+            placeholder="Booking email"
+            type="email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+          />
 
 		<div>
 		  <input
