@@ -78,6 +78,8 @@ export default function SetupPage() {
 const [form, setForm] = useState({
   instagram: "",
   email: "",
+  businessName: "",
+  subdomain: "",
 });
 
 /* ---------------- CONTENT ---------------- */
