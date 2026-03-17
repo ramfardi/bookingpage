@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 import type { LandingConfig } from "@/app/lib/landingConfig";
+import Link from "next/link";
 
 export default function PricingPage() {
   const router = useRouter();
@@ -27,7 +28,6 @@ export default function PricingPage() {
     load();
   }, []);
 
-  // Prevent hydration mismatch
   if (!customer) return null;
 
   /* =======================
@@ -37,12 +37,15 @@ export default function PricingPage() {
     return (
       <main className="min-h-screen bg-white px-6 py-24 flex justify-center">
         <div className="w-full max-w-3xl text-center">
+
+          {/* SEO IMPROVED TITLE */}
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-            Simple, transparent pricing
+            Affordable Booking Website Pricing for Small Businesses
           </h1>
 
           <p className="mt-4 text-lg text-gray-600">
-            One-time payment. No subscriptions. No surprises.
+            Create a professional booking website with a simple one-time payment.
+            No subscriptions. No hidden fees. Built for service businesses.
           </p>
 
           {/* Pricing Card */}
@@ -55,9 +58,7 @@ export default function PricingPage() {
               <span className="text-5xl font-extrabold text-gray-900">
                 $39.90
               </span>
-              <span className="ml-2 text-lg text-gray-500">
-                CAD
-              </span>
+              <span className="ml-2 text-lg text-gray-500">CAD</span>
             </div>
 
             <p className="mt-2 text-gray-600">
@@ -81,7 +82,7 @@ export default function PricingPage() {
                 <li>✔️ Edit and update your website anytime</li>
                 <li>✔️ Changes apply instantly to the same link</li>
                 <li>✔️ No monthly or hidden fees</li>
-				<li>✔️ 24/7 Support </li>
+                <li>✔️ 24/7 Support</li>
               </ul>
             </div>
 
@@ -98,6 +99,95 @@ export default function PricingPage() {
               </p>
             </div>
           </div>
+
+          {/* WHO IT'S FOR */}
+          <div className="mt-16 text-left">
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Who is this for?
+            </h2>
+
+            <ul className="mt-6 grid grid-cols-2 gap-4 text-gray-700">
+              <li>• Hair salons</li>
+              <li>• Cleaning businesses</li>
+              <li>• Freelancers</li>
+              <li>• Coaches</li>
+              <li>• Home services</li>
+              <li>• Personal trainers</li>
+            </ul>
+          </div>
+
+          {/* COMPARISON */}
+          <div className="mt-16 text-left">
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Why choose SimpleBookMe?
+            </h2>
+
+            <p className="mt-4 text-gray-700 leading-relaxed">
+              Most website builders charge monthly fees. With SimpleBookMe,
+              you pay once and own your booking website. No subscriptions,
+              no hidden costs, and no ongoing payments.
+            </p>
+          </div>
+
+          {/* INTERNAL LINKS */}
+          <div className="mt-16 text-left">
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Free tools to grow your business
+            </h2>
+
+            <ul className="mt-4 space-y-2 text-indigo-600">
+              <li>
+                <Link href="/qr-code-generator" className="hover:underline">
+                  QR Code Generator
+                </Link>
+              </li>
+              <li>
+                <Link href="/advertising-budget-calculator" className="hover:underline">
+                  Advertising Budget Calculator
+                </Link>
+              </li>
+              <li>
+                <Link href="/service-price-calculator" className="hover:underline">
+                  Service Price Calculator
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* FAQ */}
+          <div className="mt-20 text-left">
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Frequently Asked Questions
+            </h2>
+
+            <div className="mt-6 space-y-4 text-gray-700">
+              <div>
+                <strong>Is this really a one-time payment?</strong>
+                <p>Yes. You pay once and there are no recurring fees.</p>
+              </div>
+
+              <div>
+                <strong>Are there any hidden costs?</strong>
+                <p>No. What you see is what you pay.</p>
+              </div>
+
+              <div>
+                <strong>Can I update my website later?</strong>
+                <p>Yes. You can edit your content anytime.</p>
+              </div>
+
+              <div>
+                <strong>Do I need technical skills?</strong>
+                <p>No. The platform is designed for non-technical users.</p>
+              </div>
+
+              <div>
+                <strong>Can I test before buying?</strong>
+                <p>Yes. You can preview and test everything before purchasing.</p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </main>
     );
@@ -105,13 +195,11 @@ export default function PricingPage() {
 
   /* =======================
      CLIENT PRICING PAGE
-     (UNCHANGED)
      ======================= */
 
   const customerConfig = customer as CustomerConfig;
   const pricing = customerConfig.pricing;
 
-  // Extra safety (important)
   if (!pricing || !pricing.rows || pricing.rows.length === 0) {
     return (
       <main className="min-h-screen px-6 py-24 text-center">
@@ -151,12 +239,8 @@ export default function PricingPage() {
             <tbody>
               {pricing.rows.map((row) => (
                 <tr key={row.id} className="border-t">
-                  <td className="p-4 font-medium">
-                    {row.name}
-                  </td>
-                  <td className="p-4 whitespace-nowrap">
-                    {row.price}
-                  </td>
+                  <td className="p-4 font-medium">{row.name}</td>
+                  <td className="p-4 whitespace-nowrap">{row.price}</td>
                   <td className="p-4 text-gray-600">
                     {row.includes || "—"}
                   </td>
