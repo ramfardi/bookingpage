@@ -30,7 +30,19 @@ export default function ToolsPage() {
       link: "/advertising-budget-calculator",
       description:
         "Estimate how much you should spend on advertising based on your service price and profit margin. Helps small businesses plan marketing budgets without risking profitability."
-    }
+    },
+	{
+  title: "Instagram Booking Link Generator",
+  link: "/instagram_setup",
+  description:
+    "Create a booking link for your Instagram bio and turn followers into customers. Let clients view your services, pricing, and book appointments directly from your profile."
+},
+{
+  title: "Google Review QR Code Generator",
+  link: "/google_review_qr",
+  description:
+    "Generate a QR code that sends customers directly to your Google review page. Perfect for increasing reviews and building trust for your business."
+}
   ];
 
   return (
