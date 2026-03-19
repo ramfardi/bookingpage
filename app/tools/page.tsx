@@ -42,6 +42,12 @@ export default function ToolsPage() {
   link: "/google_review_qr",
   description:
     "Generate a QR code that sends customers directly to your Google review page. Perfect for increasing reviews and building trust for your business."
+},
+{
+  title: "Availability Calendar Generator",
+  link: "/calendar",
+  description:
+    "Create Instagram-ready availability calendars with your working hours, services, and contact details. Perfect for sharing your schedule and letting clients know when you're available."
 }
   ];
 
