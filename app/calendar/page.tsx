@@ -226,15 +226,6 @@ if (email) {
     ctx.fillText(businessName, size / 2, 100);
   }
 
-  // QR
-  const qrCanvas = document.createElement("canvas");
-
-  await QRCode.toCanvas(qrCanvas, inputUrl, {
-    width: 500,
-    margin: 4,
-  });
-
-  ctx.drawImage(qrCanvas, size / 2 - 250, 200, 500, 500);
 
   // Services + price
   const validServices = servicePrices.filter(
