@@ -48,6 +48,12 @@ export default function ToolsPage() {
   link: "/calendar",
   description:
     "Create Instagram-ready availability calendars with your working hours, services, and contact details. Perfect for sharing your schedule and letting clients know when you're available."
+},
+{
+  title: "Promo Flyer Generator (Instagram & Story)",
+  link: "/flyer",
+  description:
+    "Create high-converting promo flyers for Instagram and TikTok in seconds. Add discounts, offers, and contact details, then download a ready-to-post PNG designed to attract clients and boost bookings."
 }
   ];
 
