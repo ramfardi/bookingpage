@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Google Review QR Code Generator (Free PNG & SVG) | SimpleBookMe",
+  title: "Free Google Review QR Code Generator (Free PNG & SVG) | SimpleBookMe",
   description:
     "Generate a QR code that sends customers directly to your Google review page. Download high-resolution PNG or SVG QR codes to increase reviews and build trust for your business.",
 
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary",
-    title: "Google Review QR Code Generator",
+    title: "Free Google Review QR Code Generator",
     description:
       "Generate QR codes that help customers leave Google reviews instantly.",
   },

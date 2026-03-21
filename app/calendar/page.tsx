@@ -14,6 +14,8 @@ const DAYS = [
   "Sunday",
 ];
 
+
+
 export default function AvailabilityGeneratorPage() {
   const router = useRouter();
 
@@ -24,6 +26,48 @@ export default function AvailabilityGeneratorPage() {
     "Thursday",
     "Friday",
   ]);
+  
+    const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const toggleFaq = (index: number) => {
+  setOpenFaq(openFaq === index ? null : index);
+};
+const faqs = [
+  {
+    question: "What is an Instagram story availability calendar?",
+    answer:
+      "An Instagram story availability calendar is a visual schedule that shows your working hours, available time slots, and services in a clean, shareable format designed specifically for Instagram Stories."
+  },
+  {
+    question: "Why should I post my availability on Instagram Stories?",
+    answer:
+      "Posting your availability makes it easy for customers to see when you are free and encourages faster bookings. It reduces back-and-forth messages and helps clients take action immediately."
+  },
+  {
+    question: "Who should use an availability calendar?",
+    answer:
+      "Availability calendars are ideal for service-based businesses such as hairstylists, nail artists, cleaners, barbers, personal trainers, and freelancers who take bookings on a weekly basis."
+  },
+  {
+    question: "How often should I post my weekly availability?",
+    answer:
+      "Most businesses post their availability at the start of the week and update it as slots fill. Consistent posting helps customers stay informed and increases booking opportunities."
+  },
+  {
+    question: "Can I customize my availability calendar design?",
+    answer:
+      "Yes. You can customize colors, fonts, services, and layout to match your brand and create a professional-looking Instagram story that stands out."
+  },
+  {
+    question: "What size should the calendar be for Instagram Stories?",
+    answer:
+      "Instagram Stories are optimized for a 9:16 aspect ratio, typically 1080×1920 pixels. This ensures your calendar looks sharp and fills the screen properly on mobile devices."
+  },
+  {
+    question: "Can I include booking links or contact information?",
+    answer:
+      "Yes. You can include your booking link, phone number, or Instagram handle so customers know exactly how to book after viewing your availability."
+  }
+];
 
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("17:00");
@@ -412,7 +456,105 @@ if (email) {
 
           </div>
         )}
+		
+		{/* SEO CONTENT */}
+<div className="mt-20 space-y-6 text-gray-700 leading-relaxed">
 
+  <h2 className="text-2xl font-semibold text-gray-900">
+    Why Use a Weekly Availability Calendar?
+  </h2>
+
+  <p>
+    A weekly availability calendar makes it easy for customers to instantly see when you are available and book your services without unnecessary back-and-forth messages. Instead of answering the same questions repeatedly, you can share a clear visual schedule that communicates your availability in seconds.
+  </p>
+
+  <p>
+    This is especially powerful for service-based businesses like hairstylists, cleaners, nail artists, barbers, and freelancers. By posting your availability regularly, you create urgency, improve communication, and increase bookings directly from platforms like Instagram.
+  </p>
+
+  <h2 className="text-2xl font-semibold text-gray-900">
+    Designed for Instagram & Fast Booking
+  </h2>
+
+  <p>
+    Our generator creates Instagram Story-ready calendars in a perfect 1080×1920 format, allowing you to share your weekly schedule with just one tap. The output is a high-quality PNG image that looks clean, professional, and easy to read on mobile devices.
+  </p>
+
+  <p>
+    Because it is optimized for social media, your availability becomes a powerful marketing tool. Customers can quickly view your open slots and take action immediately, helping you fill your schedule faster.
+  </p>
+
+  <h2 className="text-2xl font-semibold text-gray-900">
+    Flexible and Customizable for Any Business
+  </h2>
+
+  <ul className="list-disc pl-6 space-y-3">
+    <li>Choose any combination of days in the week to match your schedule.</li>
+    <li>Closed days are automatically greyed out for clear visibility.</li>
+    <li>Add unlimited services with pricing directly on the calendar.</li>
+    <li>Optionally include your business name, phone number, and email.</li>
+    <li>Generate clean, professional PNG images ready for sharing.</li>
+  </ul>
+
+  <p>
+    This flexibility allows you to create a calendar that truly reflects your business. Whether you offer multiple services or have varying availability each week, you can customize everything in seconds.
+  </p>
+
+  <h2 className="text-2xl font-semibold text-gray-900">
+    Fast, Simple, and Effective
+  </h2>
+
+  <p>
+    The tool is designed to be fast and easy to use. You can generate a complete weekly availability calendar in just a few seconds without any design skills. No complicated setup, no editing software, and no wasted time.
+  </p>
+
+  <p>
+    By combining speed, clarity, and professional design, this availability calendar helps you communicate better with your customers, reduce friction in booking, and ultimately grow your business more efficiently.
+  </p>
+
+</div>
+				{/* FAQ Section */}
+<div className="mt-20">
+  <h2 className="text-3xl font-bold text-gray-900 mb-8">
+    FAQ
+  </h2>
+
+  <div className="space-y-4">
+    {faqs.map((faq, index) => (
+      <div
+        key={index}
+        className="border border-gray-200 rounded-xl p-6 bg-white shadow-sm"
+      >
+        <button
+          onClick={() => toggleFaq(index)}
+          className="w-full flex justify-between items-center text-left"
+        >
+          <span className="text-lg font-medium text-gray-900">
+            {faq.question}
+          </span>
+
+          <span
+            className={`text-2xl font-bold transition-transform duration-300 ${
+              openFaq === index ? "rotate-45" : ""
+            }`}
+          >
+            +
+          </span>
+        </button>
+
+        <div
+          className={`overflow-hidden transition-all duration-300 ${
+            openFaq === index ? "max-h-96 mt-4" : "max-h-0"
+          }`}
+        >
+          <p className="text-gray-700 leading-relaxed">
+            {faq.answer}
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
         {/* CTA */}
         <div className="mt-16 p-8 bg-gray-50 rounded-2xl text-center">
           <h3 className="text-2xl font-semibold">

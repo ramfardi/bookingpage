@@ -25,6 +25,48 @@ export default function PromoFlyerPage() {
   const [extra, setExtra] = useState("Haircut");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  
+    const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const toggleFaq = (index: number) => {
+  setOpenFaq(openFaq === index ? null : index);
+};
+const faqs = [
+  {
+    question: "What is a promo flyer generator?",
+    answer:
+      "A promo flyer generator helps you quickly create professional promotional images for your business. You can design flyers with discounts, services, and contact details without needing any graphic design skills."
+  },
+  {
+    question: "Can I customize the discount percentage on the flyer?",
+    answer:
+      "Yes. You can enter any promotion percentage such as 10%, 20%, or even custom offers like 'Buy 1 Get 1 Free'. This allows you to create flexible promotions based on your business needs."
+  },
+  {
+    question: "Can I include my phone number and email on the flyer?",
+    answer:
+      "Yes. You can add your phone number and email so customers can easily contact you after seeing your promotion. This helps increase response rates and conversions."
+  },
+  {
+    question: "Can I specify the duration of the promotion?",
+    answer:
+      "Yes. You can include a time frame such as 'Valid until Sunday' or specific dates. This creates urgency and encourages customers to act quickly."
+  },
+  {
+    question: "Can I add multiple services to the flyer?",
+    answer:
+      "Yes. You can list one or multiple services included in the promotion, such as haircuts, cleaning packages, or beauty treatments, making your offer clear and attractive."
+  },
+  {
+    question: "Is the flyer ready for Instagram and social media?",
+    answer:
+      "Yes. The flyer is generated in a high-quality PNG format optimized for Instagram and social media. It is sized perfectly for mobile viewing, making it easy to post as a story or share with your audience instantly."
+  },
+  {
+    question: "Do I need design experience to create a flyer?",
+    answer:
+      "No. The tool is designed to be simple and fast, allowing you to generate professional-looking promotional flyers in seconds without any design skills."
+  }
+];
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
@@ -236,7 +278,113 @@ export default function PromoFlyerPage() {
             </button>
           </div>
         )}
+		
+{/* SEO CONTENT */}
+<div className="mt-20 space-y-6 text-gray-700 leading-relaxed">
 
+  <h2 className="text-2xl font-semibold text-gray-900">
+    Why Use a Promo Flyer Generator?
+  </h2>
+
+  <p>
+    A promo flyer generator helps you create professional, high-converting promotional content in seconds without needing design skills. Instead of spending time on complex tools, you can instantly generate clean, visually appealing flyers that highlight your offers, services, and contact details.
+  </p>
+
+  <p>
+    This is especially valuable for service-based businesses like salons, cleaners, barbers, and freelancers who rely on consistent promotion. A well-designed flyer clearly communicates your offer and encourages customers to take action immediately.
+  </p>
+
+  <h2 className="text-2xl font-semibold text-gray-900">
+    Powerful Features for Flexible Promotions
+  </h2>
+
+  <ul className="list-disc pl-6 space-y-3">
+    <li>Enter any promotion percentage such as 10%, 20%, or custom offers.</li>
+    <li>Add one or multiple services included in the promotion.</li>
+    <li>Include a clear time frame like “Valid this week” or specific dates.</li>
+    <li>Add your phone number and email for direct customer contact.</li>
+    <li>Generate Instagram-ready flyers in high-quality PNG format.</li>
+  </ul>
+
+  <p>
+    These features allow you to fully customize your promotion and create a flyer that reflects your business. Whether you are running a limited-time discount or promoting new services, you can adapt the flyer to your exact needs.
+  </p>
+
+  <h2 className="text-2xl font-semibold text-gray-900">
+    Designed for Social Media and Fast Sharing
+  </h2>
+
+  <p>
+    The generated flyer is optimized for Instagram and mobile viewing, making it easy to post as a story or share with your audience instantly. The PNG format ensures high quality and sharp visuals across all devices and platforms.
+  </p>
+
+  <p>
+    Because it is designed for quick sharing, you can create and publish promotions in minutes. This allows you to react to slow booking periods, fill empty slots, and keep your audience engaged.
+  </p>
+
+  <h2 className="text-2xl font-semibold text-gray-900">
+    How to Use Promo Flyers Effectively
+  </h2>
+
+  <ul className="list-disc pl-6 space-y-3">
+    <li>Post your flyer on Instagram Stories at least 2–3 times per week.</li>
+    <li>Use urgency with time-limited offers to increase conversions.</li>
+    <li>Update your promotion regularly to keep content fresh.</li>
+    <li>Share flyers in DMs or groups to reach existing customers.</li>
+    <li>Combine flyers with booking links for faster action.</li>
+  </ul>
+
+  <p>
+    Consistency is key. Businesses that regularly post promotional flyers stay top-of-mind and generate more bookings over time. Even small updates to your offers can significantly increase engagement.
+  </p>
+
+  <p>
+    With a fast, flexible, and easy-to-use flyer generator, you can create professional promotions anytime and turn your social media into a powerful booking channel.
+  </p>
+
+</div>
+				{/* FAQ Section */}
+<div className="mt-20">
+  <h2 className="text-3xl font-bold text-gray-900 mb-8">
+    FAQ
+  </h2>
+
+  <div className="space-y-4">
+    {faqs.map((faq, index) => (
+      <div
+        key={index}
+        className="border border-gray-200 rounded-xl p-6 bg-white shadow-sm"
+      >
+        <button
+          onClick={() => toggleFaq(index)}
+          className="w-full flex justify-between items-center text-left"
+        >
+          <span className="text-lg font-medium text-gray-900">
+            {faq.question}
+          </span>
+
+          <span
+            className={`text-2xl font-bold transition-transform duration-300 ${
+              openFaq === index ? "rotate-45" : ""
+            }`}
+          >
+            +
+          </span>
+        </button>
+
+        <div
+          className={`overflow-hidden transition-all duration-300 ${
+            openFaq === index ? "max-h-96 mt-4" : "max-h-0"
+          }`}
+        >
+          <p className="text-gray-700 leading-relaxed">
+            {faq.answer}
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
         {/* CTA */}
         <div className="mt-16 p-8 bg-gray-50 rounded-2xl text-center">
           <h3 className="text-2xl font-semibold">
