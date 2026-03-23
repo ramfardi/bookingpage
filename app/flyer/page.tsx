@@ -4,28 +4,69 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-import { Poppins } from "next/font/google";
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-});
-
+// =========================
+// 🎨 TEMPLATES WITH LAYOUT
+// =========================
 const templates = [
-  { name: "Soft Peach", file: "/templates/flyer1.png" }
+  {
+    name: "Soft Peach",
+    file: "/templates/flyer1.png",
+    layout: {
+      circle: { x: 540, y: 370 },
+      rect: { x: 470, y: 910 },
+      tag: { x: 200, y: 1420 },
+      contact: { x: 720, y: 1600 },
+    },
+  },
+  {
+    name: "Flower pink",
+    file: "/templates/flyer2.png",
+    layout: {
+      circle: { x: 540, y: 350 },
+      rect: { x: 470, y: 900 },
+      tag: { x: 220, y: 1400 },
+      contact: { x: 700, y: 1447 },
+    },
+  },
+  
+    {
+    name: "Flower violet",
+    file: "/templates/flyer3.png",
+    layout: {
+      circle: { x: 540, y: 350 },
+      rect: { x: 470, y: 900 },
+      tag: { x: 220, y: 1400 },
+      contact: { x: 700, y: 1520 },
+    },
+  },
+      {
+    name: "Beauty1",
+    file: "/templates/beauty1.png",
+    layout: {
+      circle: { x: 540, y: 330 },
+      rect: { x: 470, y: 800 },
+      tag: { x: 600, y: 1000 },
+      contact: { x: 418, y: 1600 },
+    },
+  },
+        {
+    name: "HairSalon1",
+    file: "/templates/hairsalon1.png",
+    layout: {
+      circle: { x: 540, y: 330 },
+      rect: { x: 460, y: 820 },
+      tag: { x: 610, y: 1000 },
+      contact: { x: 423, y: 1600 },
+    },
+  },
 ];
 
 export default function PromoFlyerPage() {
   const router = useRouter();
 
-  const [selectedTemplate, setSelectedTemplate] = useState(templates[0].file);
+  // ✅ USE INDEX (IMPORTANT)
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const [percentage, setPercentage] = useState("50");
-  const [period, setPeriod] = useState("This Week Only");
-  const [extra, setExtra] = useState("Haircut");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  
     const [openFaq, setOpenFaq] = useState<number | null>(null);
   const toggleFaq = (index: number) => {
   setOpenFaq(openFaq === index ? null : index);
@@ -68,104 +109,105 @@ const faqs = [
   }
 ];
 
+  const [percentage, setPercentage] = useState("50");
+  const [period, setPeriod] = useState("This Week Only");
+  const [extra, setExtra] = useState("Haircut");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
- const generateFlyer = async () => {
-  const width = 1080;
-  const height = 1920;
+  const generateFlyer = async () => {
+    const width = 1080;
+    const height = 1920;
 
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-  canvas.width = width;
-  canvas.height = height;
+    canvas.width = width;
+    canvas.height = height;
 
-  const baseImg = new Image();
-  baseImg.src = selectedTemplate;
-  await baseImg.decode();
+    // ✅ SELECT TEMPLATE
+    const selectedTemplate = templates[selectedIndex];
+    const layout = selectedTemplate.layout;
 
-  ctx.drawImage(baseImg, 0, 0, width, height);
+    const baseImg = new Image();
+    baseImg.src = selectedTemplate.file;
+    await baseImg.decode();
 
-  // =========================
-  // 🎯 ANCHOR POSITIONS (FIXED)
-  // =========================
-  const circleX = width / 2;
-  const circleY = 370;
+    ctx.drawImage(baseImg, 0, 0, width, height);
 
-  const rectX = width / 2.3;
-  const rectY = 910;
+    // =========================
+    // 🎯 COORDINATES FROM TEMPLATE
+    // =========================
+    const circleX = layout.circle.x;
+    const circleY = layout.circle.y;
 
-  const tagX = 200;
-  const tagY = 1420;
+    const rectX = layout.rect.x;
+    const rectY = layout.rect.y;
 
-  const contactX = width / 1.5;
-  const contactY = 1600;
-  
-  	const font = new FontFace(
-	  "GreatVibes",
-	  "url(https://fonts.gstatic.com/s/greatvibes/v17/RWmMoKWR9v4ksMfaWd_JN9XFiaQ.woff2)"
-	);
+    const tagX = layout.tag.x;
+    const tagY = layout.tag.y;
 
-  // =========================
-  // % OFF (CIRCLE CENTER)
-  // =========================
-  ctx.textAlign = "center";
-  ctx.fillStyle = "#1f2937";
+    const contactX = layout.contact.x;
+    const contactY = layout.contact.y;
 
-  ctx.font = "bold 140px Playfair";
-  ctx.fillText(`${percentage}%`, circleX, circleY);
+    // =========================
+    // % OFF
+    // =========================
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#1f2937";
 
-  ctx.font = "bold 140px Playfair";
-  ctx.fillText("OFF", circleX, circleY + 130);
+    ctx.font = "bold 140px Playfair";
+    ctx.fillText(`${percentage}%`, circleX, circleY);
 
-  // =========================
-  // PERIOD (RECTANGLE CENTER)
-  // =========================
-  ctx.font = "bold 60px Arial";
-  ctx.fillStyle = "#1f2937";
-  ctx.fillText(period, rectX, rectY);
+    ctx.fillText("OFF", circleX, circleY + 130);
 
-  // =========================
-  // EXTRA (TAG CENTER)
-  // =========================
- 
-  ctx.textAlign = "center";
-  ctx.font = "bold 50px Arial";
-  ctx.fillStyle = "#6b7280";
+    // =========================
+    // PERIOD
+    // =========================
+    ctx.font = "bold 60px Arial";
+    ctx.fillStyle = "#1f2937";
 
-  ctx.fillText(extra, tagX, tagY);
-  
+    ctx.fillText(period, rectX, rectY);
 
-  // =========================
-  // CONTACT (BOTTOM CENTER)
-  // =========================
-  ctx.textAlign = "center";
-  ctx.font = "36px Arial";
-  ctx.fillStyle = "#1f2937";
+    // =========================
+    // EXTRA
+    // =========================
+    ctx.font = "bold 50px Arial";
+    ctx.fillStyle = "#6b7280";
 
-  let y = contactY;
+    ctx.fillText(extra, tagX, tagY);
 
-  if (phone) {
-    ctx.fillText(phone, contactX+100, y);
-  }
+    // =========================
+    // CONTACT
+    // =========================
+    ctx.font = "36px Arial";
+    ctx.fillStyle = "#1f2937";
 
-  if (email) {
-    ctx.fillText(email, contactX+100, y+230);
-  }
+    let y = contactY;
 
-  // =========================
-  // WATERMARK
-  // =========================
-  ctx.textAlign = "left";
-  ctx.font = "26px Arial";
-  ctx.fillStyle = "#9ca3af";
+    if (phone) {
+      ctx.fillText(phone, contactX + 100, y);
+    }
 
-  ctx.fillText("simplebookme.com", 40, height - 40);
+    if (email) {
+      ctx.fillText(email, contactX + 100, y + 230);
+    }
 
-  const dataUrl = canvas.toDataURL("image/png");
-  setImageUrl(dataUrl);
-};
+    // =========================
+    // WATERMARK
+    // =========================
+    ctx.textAlign = "left";
+    ctx.font = "26px Arial";
+    ctx.fillStyle = "#9ca3af";
+
+    ctx.fillText("simplebookme.com", 40, height - 40);
+
+    const dataUrl = canvas.toDataURL("image/png");
+    setImageUrl(dataUrl);
+  };
 
   const downloadImage = () => {
     if (!imageUrl) return;
@@ -189,28 +231,26 @@ const faqs = [
         <h1 className="text-4xl font-bold text-gray-900">
           Promo Flyer Generator
         </h1>
-		
+
 <p className="mt-6 text-lg text-gray-600 leading-relaxed max-w-3xl">
   Create professional promotional flyers in seconds without any design experience. This tool helps small service businesses design eye-catching offers for Instagram, TikTok, and social media. Simply enter your discount, time period, and contact details, and generate a clean, high-converting flyer ready to post. Each template is optimized for mobile viewing, ensuring your message is clear and engaging. Use it to promote limited-time offers, attract new clients, and increase bookings. Download high-resolution PNG images instantly and share them online or print them for your business.
 </p>
-
         {/* INPUT */}
         <div className="mt-10 bg-gray-50 p-8 rounded-2xl border space-y-6">
-		
-
 
           {/* TEMPLATE SELECT */}
           <div>
             <label className="block text-sm font-medium">
               Choose Template
             </label>
+
             <select
-              value={selectedTemplate}
-              onChange={(e) => setSelectedTemplate(e.target.value)}
+              value={selectedIndex}
+              onChange={(e) => setSelectedIndex(Number(e.target.value))}
               className="mt-2 w-full border rounded-lg px-4 py-3"
             >
-              {templates.map((t) => (
-                <option key={t.file} value={t.file}>
+              {templates.map((t, i) => (
+                <option key={i} value={i}>
                   {t.name}
                 </option>
               ))}
@@ -278,7 +318,7 @@ const faqs = [
             </button>
           </div>
         )}
-		
+
 {/* SEO CONTENT */}
 <div className="mt-20 space-y-6 text-gray-700 leading-relaxed">
 
