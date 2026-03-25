@@ -5,7 +5,8 @@ export const metadata: Metadata = {
   description:
     "Create high-converting promo flyers for Instagram, TikTok, and social media in seconds. Customize discount offers, add contact details, and download ready-to-post PNG images for your business.",
   keywords: [
-    "promo flyer generator",
+    "promo flyer maker",
+	"free flyer maker",
     "instagram flyer maker",
     "instagram story flyer",
     "sale post generator",

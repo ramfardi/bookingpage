@@ -229,11 +229,11 @@ const faqs = [
         </div>
 
         <h1 className="text-4xl font-bold text-gray-900">
-          Promo Flyer Generator
+          Free Flyer Maker
         </h1>
 
 <p className="mt-6 text-lg text-gray-600 leading-relaxed max-w-3xl">
-  Create professional promotional flyers in seconds without any design experience. This tool helps small service businesses design eye-catching offers for Instagram, TikTok, and social media. Simply enter your discount, time period, and contact details, and generate a clean, high-converting flyer ready to post. Each template is optimized for mobile viewing, ensuring your message is clear and engaging. Use it to promote limited-time offers, attract new clients, and increase bookings. Download high-resolution PNG images instantly and share them online or print them for your business.
+  Create professional promotional flyers in seconds.Instagram, TikTok ready. 
 </p>
         {/* INPUT */}
         <div className="mt-10 bg-gray-50 p-8 rounded-2xl border space-y-6">
