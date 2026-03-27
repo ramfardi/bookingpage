@@ -261,11 +261,18 @@ export default function AdvertisingGuidePage() {
           <h3 className="mt-8 text-lg font-semibold text-gray-900">
             Flyers
           </h3>
-
-          <p className="mt-6 text-gray-700 leading-relaxed">
+		  
+		  		<p className="mt-6 text-gray-700 leading-relaxed">
             Flyers can work in specific neighborhoods, especially for
-            cleaning and home services.
-          </p>
+            cleaning and home services.. You can also create a{" "}
+		  <Link
+			href="/flyer"
+			className="text-indigo-600 font-medium hover:underline"
+		  >
+			customized flyer/promo image (best for instagram story/post)
+		  </Link>{" "}
+		  to announce discounts.
+		</p>
 
           <h3 className="mt-8 text-lg font-semibold text-gray-900">
             Local Partnerships

@@ -252,12 +252,20 @@ export default function PricingGuidePage() {
           <h2 className="mt-16 text-2xl font-semibold text-gray-900">
             Final Thoughts
           </h2>
-
-          <p className="mt-6 text-gray-700 leading-relaxed">
-            Proper pricing is not about being cheap or expensive. It is about
+		  
+		  		  		<p className="mt-6 text-gray-700 leading-relaxed">
+           Proper pricing is not about being cheap or expensive. It is about
             being sustainable. Calculate your numbers, test your market, and
-            adjust strategically.
-          </p>
+            adjust strategically. You can use{" "}
+		  <Link
+			href="/service-price-calculator"
+			className="text-indigo-600 font-medium hover:underline"
+		  >
+			service price calculator
+		  </Link>{" "}
+		  to have a beter idea about pricing your sevice.
+		</p>
+
 
           {/* CTA */}
           <div className="mt-14 p-8 bg-gray-50 rounded-2xl text-center">
