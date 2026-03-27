@@ -362,7 +362,7 @@ return (
         </div>
 
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-          Free Branded QR Code Generator for Businesses
+          Free QR Code Generator (PNG & SVG) for Business Cards & Branding
         </h1>
 
         <p className="mt-6 text-lg text-gray-600 leading-relaxed">
