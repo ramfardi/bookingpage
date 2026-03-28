@@ -69,8 +69,17 @@ const faqs = [
   }
 ];
 
-  const [startTime, setStartTime] = useState("09:00");
-  const [endTime, setEndTime] = useState("17:00");
+const [dayTimes, setDayTimes] = useState<
+  Record<string, { start: string; end: string }>
+>({
+  Monday: { start: "09:00", end: "17:00" },
+  Tuesday: { start: "09:00", end: "17:00" },
+  Wednesday: { start: "09:00", end: "17:00" },
+  Thursday: { start: "09:00", end: "17:00" },
+  Friday: { start: "09:00", end: "17:00" },
+  Saturday: { start: "09:00", end: "17:00" },
+  Sunday: { start: "09:00", end: "17:00" },
+});
 
   const [businessName, setBusinessName] = useState("");
   const [phone, setPhone] = useState("");
@@ -88,6 +97,20 @@ const faqs = [
         : [...prev, day]
     );
   };
+  
+  const updateDayTime = (
+  day: string,
+  field: "start" | "end",
+  value: string
+) => {
+  setDayTimes((prev) => ({
+    ...prev,
+    [day]: {
+      ...prev[day],
+      [field]: value,
+    },
+  }));
+};
   
   const updateServicePrice = (
   index: number,
@@ -178,10 +201,16 @@ const addServiceRow = () => {
       ctx.textAlign = "right";
       ctx.font = "40px Arial";
 
-      if (isOpen) {
-        ctx.fillStyle = "#4f46e5";
-        ctx.fillText(`${startTime} - ${endTime}`, x + w - 40, y + 75);
-      } else {
+if (isOpen) {
+  const times = dayTimes[day];
+
+  ctx.fillStyle = "#4f46e5";
+  ctx.fillText(
+    `${times.start} - ${times.end}`,
+    x + w - 40,
+    y + 75
+  );
+} else {
         ctx.fillStyle = "#9ca3af";
         ctx.fillText("Closed", x + w - 40, y + 75);
       }
@@ -341,28 +370,41 @@ if (email) {
             </div>
           </div>
 
-          {/* Time */}
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm">Start Time</label>
-              <input
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className="mt-2 w-full border rounded-lg px-4 py-3"
-              />
-            </div>
+{/* Per Day Time */}
+<div>
+  <label className="block font-medium mb-2">
+    Set Hours Per Day
+  </label>
 
-            <div>
-              <label className="block text-sm">End Time</label>
-              <input
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                className="mt-2 w-full border rounded-lg px-4 py-3"
-              />
-            </div>
-          </div>
+  <div className="space-y-4">
+    {selectedDays.map((day) => (
+      <div
+        key={day}
+        className="grid grid-cols-3 gap-4 items-center"
+      >
+        <span className="font-medium">{day}</span>
+
+        <input
+          type="time"
+          value={dayTimes[day].start}
+          onChange={(e) =>
+            updateDayTime(day, "start", e.target.value)
+          }
+          className="border rounded-lg px-3 py-2"
+        />
+
+        <input
+          type="time"
+          value={dayTimes[day].end}
+          onChange={(e) =>
+            updateDayTime(day, "end", e.target.value)
+          }
+          className="border rounded-lg px-3 py-2"
+        />
+      </div>
+    ))}
+  </div>
+</div>
 
           {/* Optional */}
           <input
