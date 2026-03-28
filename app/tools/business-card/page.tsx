@@ -55,6 +55,7 @@ function drawInstagramIcon(ctx: CanvasRenderingContext2D, x: number, y: number) 
 
 export default function BusinessCardPage() {
   const [businessName, setBusinessName] = useState("");
+  const router = useRouter();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
