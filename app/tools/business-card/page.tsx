@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import QRCode from "qrcode";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 function drawEmailIcon(ctx: CanvasRenderingContext2D, x: number, y: number) {
   ctx.save();
