@@ -54,6 +54,12 @@ export default function ToolsPage() {
   link: "/flyer",
   description:
     "Create high-converting promo flyers for Instagram and TikTok in seconds. Add discounts, offers, and contact details, then download a ready-to-post PNG designed to attract clients and boost bookings."
+},
+{
+  title: "Free Business Card Generator with QR Code",
+  link: "/tools/business-card",
+  description:
+    "Generate professional business cards with QR codes in seconds. Download a print-ready 3.5×2 design with your name, contact details, and booking link to attract more clients."
 }
   ];
 
