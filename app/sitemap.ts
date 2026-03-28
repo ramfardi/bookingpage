@@ -8,6 +8,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/",
     "/about",
     "/pricing",
+	"/tools",
+	"/qr-code-generator",
+	"/instagram_setup",
+	"/google_review_qr",
+	"/flyer",
+	"/calendar",
+	"/google_review_qr",
+	"/cleaning-pricing-calculator",
+	"/advertising-budget-calculator",
+	"/service-price-calculator",
 
     // Category landing pages
     "/cleaning",
@@ -21,6 +31,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/guide/pricing-guide",
     "/guide/payment-methods",
     "/guide/getting-first-clients",
+	
   ];
 
   return staticPages.map((path) => ({
@@ -33,6 +44,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority:
       path === "/" ? 1 :
       path.startsWith("/guide") ? 0.8 :
+	  path.startsWith("/tools") ? 0.9 :
       path === "/cleaning" ? 0.9 :
       path === "/beauty" ? 0.9 :
       path === "/home_services" ? 0.9 :
