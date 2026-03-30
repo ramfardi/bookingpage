@@ -53,24 +53,22 @@ return (
       {/* CARD */}
       <div className="bg-white p-6 rounded-2xl shadow-sm border">
 
+        {/* DAYS */}
         <div className="space-y-3">
-          {data.selectedDays.map((day: string) => {
+          {data.selectedDays.map((day: string) => (
+            <div
+              key={day}
+              className="flex justify-between items-center p-4 rounded-lg border bg-gray-50 hover:bg-gray-100 transition"
+            >
+              <span className="font-medium text-gray-800">
+                {day}
+              </span>
 
-            return (
-              <div
-                key={day}
-              >
-                <span className="font-medium text-gray-800">
-                  {day}
-
-                </span>
-
-                <span className="text-indigo-600 font-medium">
-                  {data.dayTimes[day].start} - {data.dayTimes[day].end}
-                </span>
-              </div>
-            );
-          })}
+              <span className="text-indigo-600 font-medium">
+                {data.dayTimes[day].start} - {data.dayTimes[day].end}
+              </span>
+            </div>
+          ))}
         </div>
 
         {/* FOOTER */}
