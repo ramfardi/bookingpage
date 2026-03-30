@@ -55,30 +55,14 @@ return (
 
         <div className="space-y-3">
           {data.selectedDays.map((day: string) => {
-            const today = new Date().toLocaleDateString("en-US", {
-              weekday: "long",
-            });
-
-            const isToday = day === today;
 
             return (
               <div
                 key={day}
-                className={`flex justify-between items-center p-4 rounded-lg border transition
-                  ${
-                    isToday
-                      ? "bg-indigo-50 border-indigo-200"
-                      : "bg-gray-50 hover:bg-gray-100"
-                  }
-                `}
               >
                 <span className="font-medium text-gray-800">
                   {day}
-                  {isToday && (
-                    <span className="ml-2 text-xs text-indigo-500">
-                      (Today)
-                    </span>
-                  )}
+
                 </span>
 
                 <span className="text-indigo-600 font-medium">
