@@ -10,6 +10,7 @@ export default function AvailabilityGeneratorPage() {
   const [selectedDays, setSelectedDays] = useState<string[]>([
     "Monday","Tuesday","Wednesday","Thursday","Friday",
   ]);
+  const router = useRouter();
 
   const [dayTimes, setDayTimes] = useState<
     Record<string, { start: string; end: string }>
