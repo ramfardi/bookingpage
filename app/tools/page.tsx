@@ -60,6 +60,12 @@ export default function ToolsPage() {
   link: "/tools/business-card",
   description:
     "Generate professional business cards with QR codes in seconds. Download a print-ready 3.5×2 design with your name, contact details, and booking link to attract more clients."
+},
+{
+  title: "Availability Calendar & Link Generator",
+  link: "/availability",
+  description:
+    "Generate a dynamic weekly availability calendar and share it with a simple link. Perfect for freelancers and service businesses to display working hours and accept inquiries."
 }
   ];
 
