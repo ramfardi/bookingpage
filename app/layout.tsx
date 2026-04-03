@@ -42,6 +42,16 @@ export const metadata: Metadata = {
     siteName: "SimpleBookMe",
     type: "website",
   },
+  
+    icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon_192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [
+      { url: "/favicon_180.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 
   twitter: {
     card: "summary_large_image",
