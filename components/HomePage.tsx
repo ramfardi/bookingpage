@@ -7,6 +7,8 @@ import type { CustomerConfig } from "@/app/lib/customerConfig";
 import type { LandingConfig } from "@/app/lib/landingConfig";
 import { useRouter } from "next/navigation";
 
+import { ArrowRight, Instagram } from "lucide-react";
+
 export default function HomePage({
   activeCustomer,
 }: {
@@ -88,22 +90,37 @@ export default function HomePage({
           className="relative z-10 max-w-4xl px-6"
         >
           {landing && (
-            <>
-              <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">
-                {landing.header1}{" "}
-                <span className="text-indigo-400">
-                  {landing.header2}
-                </span>
-              </h1>
+<>
+  {/* OVERLAY WRAPPER (important for readability) */}
+  <div className="relative w-full flex justify-center px-6">
 
-              <p className="mt-6 text-lg opacity-90">
-                {landing.subheader1}
-              </p>
+    {/* Glass / dark overlay */}
+    <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] rounded-3xl" />
 
-              <p className="mt-2 text-base opacity-80 font-semibold">
-                {landing.subheader2}
-              </p>
-            </>
+    {/* CONTENT */}
+    <div className="relative z-10 max-w-4xl text-center py-16 px-6">
+
+      {/* HEADLINE */}
+      <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-white">
+        {landing.header1}{" "}
+        <span className="bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent">
+          {landing.header2}
+        </span>
+      </h1>
+
+      {/* SUBHEADER 1 */}
+      <p className="mt-6 text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed">
+        {landing.subheader1}
+      </p>
+
+      {/* SUBHEADER 2 */}
+      <p className="mt-3 text-base md:text-lg text-indigo-300 font-semibold">
+        {landing.subheader2}
+      </p>
+
+    </div>
+  </div>
+</>
           )}
 
           <div className="mt-10 flex justify-center">
@@ -115,21 +132,41 @@ export default function HomePage({
     Book appointment
   </button>
 ) : (
-  <div className="flex flex-col items-center gap-4">
-    <button
-      onClick={() => router.push("/setup")}
-      className="rounded-xl bg-indigo-600 text-white px-8 py-4 font-semibold"
-    >
-      Create your booking site
-    </button>
+<div className="flex flex-col items-center gap-5">
 
-    <button
-      onClick={() => router.push("/instagram_setup")}
-      className="rounded-xl bg-black text-white px-8 py-4 font-semibold"
-    >
-      Create your Instagram bio link
-    </button>
-  </div>
+  {/* PRIMARY CTA */}
+  <button
+    onClick={() => router.push("/setup")}
+    className="group flex items-center gap-2 rounded-2xl bg-indigo-600 text-white px-10 py-4 font-semibold shadow-md hover:bg-indigo-700 hover:shadow-lg transition-all"
+  >
+    Create your booking site
+    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+  </button>
+
+  {/* SECONDARY CTA */}
+  <button
+    onClick={() => router.push("/instagram_setup")}
+    className="flex items-center gap-2 rounded-2xl bg-white text-gray-900 px-10 py-4 font-semibold border shadow-sm hover:bg-gray-50 hover:shadow-md transition-all"
+  >
+    <Instagram className="w-5 h-5 text-pink-500" />
+    Create your Instagram bio link
+  </button>
+  
+    {/* FREE TOOL CTA */}
+  <button
+    onClick={() => router.push("/availability")}
+    className="flex items-center gap-2 rounded-2xl bg-indigo-50 text-indigo-700 px-10 py-4 font-semibold border border-indigo-200 shadow-sm hover:bg-indigo-100 hover:shadow-md transition-all"
+  >
+    <ArrowRight className="w-5 h-5" />
+    Create availability page
+
+    {/* FREE badge */}
+    <span className="ml-2 text-xs bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-2 py-0.5 rounded-full">
+      FREE
+    </span>
+  </button>
+
+</div>
 )}
           </div>
         </motion.div>
