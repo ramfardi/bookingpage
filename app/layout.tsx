@@ -2,6 +2,8 @@ import "./globals.css";
 import Navbar from "@/components/navbar/Navbar";
 import { Providers } from "./providers";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+
 
 
 export const metadata: Metadata = {
@@ -70,11 +72,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
+const host = (await headers()).get("host") || "";
+
+// adjust this if needed
+const isSubdomain =
+  host !== "simplebookme.com" &&
+  !host.startsWith("www.");
+
   return (
     <html lang="en">
       <head>
@@ -98,7 +108,7 @@ export default function RootLayout({
       <body className="bg-gradient-to-br from-indigo-50 via-white to-purple-50">
         <Providers>
           {/* Navbar is client-side and resolves mode async */}
-          <Navbar />
+          {!isSubdomain && <Navbar />}
 
           {/* Offset for fixed navbar height */}
           <main className="pt-16 min-h-screen">
