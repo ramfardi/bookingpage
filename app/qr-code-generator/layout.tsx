@@ -1,32 +1,31 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Free QR Code Generator (PNG & SVG Download) | SimpleBookMe",
+  title: "Google Review QR Code Generator (Find Your Business Instantly) | SimpleBookMe",
   description:
-    "Generate high-resolution QR codes for your website, booking page, Google reviews, or social media. Download printable PNG or scalable SVG files for business cards and marketing materials.",
-  keywords: [
-    "QR code generator",
-    "free QR code generator",
-	"qr code png",
-    "QR code for business card",
-    "printable QR code",
-    "QR code PNG download",
-    "QR code SVG download",
-    "QR code for website",
-    "QR code for booking link",
-    "business QR code generator",
-  ],
+  "Generate a Google review QR code instantly by searching your business name. No login required. Create branded QR codes, download printable designs, and get more customer reviews.",
+keywords: [
+  "google review qr code generator",
+  "qr code for google reviews",
+  "how to get google review link",
+  "generate google review qr code free",
+  "qr code for business reviews",
+  "google review link generator",
+  "qr code to get more reviews",
+  "review qr code for small business",
+  "scan to leave review qr code",
+],
   alternates: {
     canonical: "https://simplebookme.com/qr-code-generator",
   },
-  openGraph: {
-    title: "Free QR Code Generator (PNG & SVG Download)",
-    description:
-      "Create high-resolution, print-ready QR codes for business cards, flyers, and websites. Download as PNG or SVG.",
-    url: "https://simplebookme.com/qr-code-generator",
-    siteName: "SimpleBookMe",
-    type: "website",
-  },
+openGraph: {
+  title: "Google Review QR Code Generator (Search Your Business Instantly)",
+  description:
+    "Find your business and generate a Google review QR code in seconds. Create printable cards and increase customer reviews.",
+  url: "https://simplebookme.com/google_review_qr",
+  siteName: "SimpleBookMe",
+  type: "website",
+},
   twitter: {
     card: "summary",
     title: "Free QR Code Generator",
@@ -44,5 +43,30 @@ export default function QRCodeGeneratorLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "Google Review QR Code Generator",
+            applicationCategory: "BusinessApplication",
+            operatingSystem: "Web",
+            description:
+              "Generate Google review QR codes by searching your business name. Create branded, printable QR designs to increase customer reviews.",
+            url: "https://simplebookme.com/google_review_qr",
+            offers: {
+              "@type": "Offer",
+              price: "0",
+              priceCurrency: "USD",
+            },
+          }),
+        }}
+      />
+
+      {children}
+    </>
+  );
 }

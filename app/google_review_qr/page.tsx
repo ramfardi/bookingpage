@@ -62,57 +62,160 @@ const faqs = [
   }
 ];
 
-  const generateQR = async () => {
-    if (!inputUrl) return;
+const generateQR = async () => {
+  if (!inputUrl) return;
 
-    setLoading(true);
+  setLoading(true);
+  const yOffset = 80; // adjust this value (try 50–150)
+  
+  	const font = new FontFace(
+	  "GreatVibes",
+	  "url(https://fonts.gstatic.com/s/greatvibes/v17/RWmMoKWR9v4ksMfaWd_JN9XFiaQ.woff2)"
+	);
 
-    try {
-      const size = 1200;
+  try {
+    const width = 1000;
+    const height = 1400;
 
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-      canvas.width = size;
-      canvas.height = size + 200;
+    canvas.width = width;
+    canvas.height = height;
 
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // =========================
+    // BACKGROUND
+    // =========================
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
 
-      const qrCanvas = document.createElement("canvas");
+    ctx.textAlign = "center";
+await font.load();
+document.fonts.add(font);
+    // =========================
+    // TOP: THANK YOU TEXT
+    // =========================
+    ctx.fillStyle = "#111827";
+    ctx.font = "bold 68px GreatVibes";
+    ctx.fillText("Thanks for your business!", width / 2, 120+yOffset);
 
-      await QRCode.toCanvas(qrCanvas, inputUrl, {
-        width: size,
-        margin: 4,
-        errorCorrectionLevel: "H",
-      });
+    // =========================
+    // QR CODE
+    // =========================
+    const qrCanvas = document.createElement("canvas");
 
-      ctx.drawImage(qrCanvas, 0, 200, size, size);
+    await QRCode.toCanvas(qrCanvas, inputUrl, {
+      width: 600,
+      margin: 2,
+      errorCorrectionLevel: "H",
+    });
 
-      // Business Name
-      if (businessName) {
-        ctx.fillStyle = "#000000";
-        ctx.font = "bold 60px Poppins";
-        ctx.textAlign = "center";
-        ctx.fillText(businessName, size / 2, 100);
-      }
+    ctx.drawImage(qrCanvas, width / 2 - 300, 250, 600, 600);
 
-      const png = canvas.toDataURL("image/png");
-      setPngDataUrl(png);
+    // =========================
+    // REVIEW MESSAGE
+    // =========================
+    ctx.fillStyle = "#374151";
+    ctx.font = "30px Poppins";
 
-      const svg = await QRCode.toString(inputUrl, {
-        type: "svg",
-      });
+    const text = [
+      "Scan this QR code to",
+      "leave us a review on",
+    ];
 
-      setSvgData(svg);
+    text.forEach((line, i) => {
+      ctx.fillText(line, width / 2, 950 + i * 40 -60);
+    });
 
-    } catch (err) {
-      console.error(err);
+    // =========================
+    // GOOGLE TEXT (COLORED)
+    // =========================
+const googleText = "Google";
+const colors = [
+  "#4285F4",
+  "#EA4335",
+  "#FBBC05",
+  "#4285F4",
+  "#34A853",
+  "#EA4335",
+];
+
+ctx.font = "bold 80px Arial";
+
+let totalWidth = 0;
+const letterWidths = [];
+const letterSpacing = 6;
+
+for (let i = 0; i < googleText.length; i++) {
+  const w = ctx.measureText(googleText[i]).width;
+  letterWidths.push(w);
+  totalWidth += w;
+}
+
+// Add spacing
+totalWidth += letterSpacing * (googleText.length - 1);
+
+// Add EXTRA spacing for the "l → e" pair
+const extraSpacing = 10;
+totalWidth += extraSpacing;
+
+let startX = 20+(width - totalWidth) / 2;
+
+for (let i = 0; i < googleText.length; i++) {
+  ctx.fillStyle = colors[i];
+
+  ctx.fillText(
+    googleText[i],
+    startX,
+    1100 + yOffset + 30
+  );
+
+  // normal spacing
+  let spacing = letterSpacing;
+
+  // add extra spacing AFTER "l"
+  if (googleText[i] === "l") {
+    spacing += extraSpacing;
+  }
+
+  startX += letterWidths[i] + spacing;
+}
+
+    // =========================
+    // STARS ⭐⭐⭐⭐⭐
+    // =========================
+    ctx.fillStyle = "#fbbf24";
+    ctx.font = "60px Arial";
+    ctx.fillText("★★★★★", 20+width / 2-20, 1180+yOffset+20);
+
+    // =========================
+    // BUSINESS NAME (OPTIONAL TOP)
+    // =========================
+    if (businessName) {
+      ctx.fillStyle = "#000000";
+      ctx.font = "bold 40px Poppins";
+      ctx.fillText(businessName, width / 2, 60+yOffset);
     }
 
-    setLoading(false);
-  };
+    // =========================
+    // EXPORT
+    // =========================
+    const png = canvas.toDataURL("image/png");
+    setPngDataUrl(png);
+
+    const svg = await QRCode.toString(inputUrl, {
+      type: "svg",
+    });
+
+    setSvgData(svg);
+
+  } catch (err) {
+    console.error(err);
+  }
+
+  setLoading(false);
+};
 
   const downloadPNG = () => {
     if (!pngDataUrl) return;
