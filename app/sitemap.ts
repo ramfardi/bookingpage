@@ -18,11 +18,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
 	"/cleaning-pricing-calculator",
 	"/advertising-budget-calculator",
 	"/service-price-calculator",
+	"/availability",
 
     // Category landing pages
     "/cleaning",
     "/beauty",
-    "/home_services",
 
     // Guide hub
     "/guide",
@@ -31,6 +31,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/guide/pricing-guide",
     "/guide/payment-methods",
     "/guide/getting-first-clients",
+	
+	"/fr/calculateur-budget-publicitaire",
+	"/fr/generateur-code-qr",
+	"/es/calculadora-presupuesto-publicidad",
+	"/es/generador-codigo-qr",
+	"/fa/generator-qr-code",
+	"/ar/generator-qr-code",
+	
 	
   ];
 
@@ -47,7 +55,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 	  path.startsWith("/tools") ? 0.9 :
       path === "/cleaning" ? 0.9 :
       path === "/beauty" ? 0.9 :
-      path === "/home_services" ? 0.9 :
       0.7,
   }));
 }
