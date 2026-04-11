@@ -129,7 +129,12 @@ export default function HomePage({
       </section>
 
 
-<section className="w-full">
+
+      {/* ================= SALES ONLY ================= */}
+      {mode === "sales" && (
+        <>
+		
+		<section className="w-full">
   <div className="grid grid-cols-1 md:grid-cols-3">
 
     {/* IMAGE 1 */}
@@ -161,10 +166,6 @@ export default function HomePage({
 
   </div>
 </section>
-
-      {/* ================= SALES ONLY ================= */}
-      {mode === "sales" && (
-        <>
           {/* -------- FEATURES -------- */}
           <section className="w-full bg-gradient-to-b from-white to-indigo-50 py-32">
             <div className="mx-auto max-w-6xl px-8">
