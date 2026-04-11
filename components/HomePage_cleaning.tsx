@@ -11,6 +11,13 @@ import Link from "next/link";
 
 import { Playfair_Display, Inter } from "next/font/google";
 
+
+const images = [
+  "/cleaning_landing/image1.png",
+  "/cleaning_landing/image2.png",
+  "/cleaning_landing/image3.png",
+];
+
 const playfair = Playfair_Display({
   subsets: ["latin"],
   weight: ["400", "600", "700"],
@@ -19,6 +26,85 @@ const playfair = Playfair_Display({
 const inter = Inter({
   subsets: ["latin"],
 });
+
+
+export function ImageCarousel() {
+  const [index, setIndex] = useState(0);
+  const [open, setOpen] = useState(false);
+
+  const next = () => setIndex((prev) => (prev + 1) % images.length);
+  const prev = () =>
+    setIndex((prev) => (prev - 1 + images.length) % images.length);
+
+  return (
+    <section className="w-full">
+      <div className="relative w-full h-[300px] md:h-[800px] overflow-hidden">
+
+        {/* IMAGE */}
+        <motion.img
+          key={index}
+          src={images[index]}
+          alt="Cleaning preview"
+          className="w-full h-full object-cover cursor-pointer"
+          initial={{ opacity: 0.5, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
+          onClick={() => setOpen(true)}
+        />
+
+        {/* LEFT BUTTON */}
+        <button
+          onClick={prev}
+          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 text-white px-3 py-2 rounded-full hover:bg-black/60"
+        >
+          ←
+        </button>
+
+        {/* RIGHT BUTTON */}
+        <button
+          onClick={next}
+          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 text-white px-3 py-2 rounded-full hover:bg-black/60"
+        >
+          →
+        </button>
+
+        {/* DOTS */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+          {images.map((_, i) => (
+            <div
+              key={i}
+              onClick={() => setIndex(i)}
+              className={`w-3 h-3 rounded-full cursor-pointer ${
+                i === index ? "bg-white" : "bg-white/50"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* MODAL (ENLARGE IMAGE) */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setOpen(false)}
+          >
+            <motion.img
+              src={images[index]}
+              className="max-w-[90%] max-h-[90%] object-contain rounded-xl"
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.8 }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
+  );
+}
 
 export default function HomePage({
   activeCustomer,
@@ -61,7 +147,6 @@ export default function HomePage({
 
   function handleBookAppointment() {
     
-	const router = useRouter();
 	
 	if (mode !== "client") {
       router.push("/setup");
@@ -137,36 +222,9 @@ export default function HomePage({
       {mode === "sales" && (
         <>
 		
-		<section className="w-full">
-  <div className="grid grid-cols-1 md:grid-cols-3">
-
-    {/* IMAGE 1 */}
-    <div className="w-full h-[400px] md:h-[500px] overflow-hidden">
-      <img
-        src="/cleaning_landing/image1.png"
-        alt="Cleaning service 1"
-        className="w-full h-full object-cover object-center"
-      />
-    </div>
-
-    {/* IMAGE 2 */}
-    <div className="w-full h-[400px] md:h-[500px] overflow-hidden">
-      <img
-        src="/cleaning_landing/image2.png"
-        alt="Cleaning service 2"
-        className="w-full h-full object-cover object-center"
-      />
-    </div>
-
-    {/* IMAGE 3 */}
-    <div className="w-full h-[200px] md:h-[500px] overflow-hidden">
-      <img
-        src="/cleaning_landing/image3.png"
-        alt="Cleaning service 3"
-        className="w-full h-full object-cover object-center"
-      />
-    </div>
-
+<section className="w-full bg-gray-50 py-16">
+  <div className="max-w-6xl mx-auto px-6">
+    <ImageCarousel />
   </div>
 </section>
           {/* -------- FEATURES -------- */}
