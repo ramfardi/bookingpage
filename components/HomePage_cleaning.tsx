@@ -60,12 +60,15 @@ export default function HomePage({
   const landing = customer.landing;
 
   function handleBookAppointment() {
-    if (mode !== "client") {
+    
+	const router = useRouter();
+	
+	if (mode !== "client") {
       router.push("/setup");
       return;
     }
 
-	const router = useRouter();
+	
     const customerConfig = customer as CustomerConfig;
     const booking = customerConfig.booking;
 
