@@ -126,7 +126,7 @@ const isAvailable = (day: string, hour: string) => {
 
   <div className="flex items-center gap-2">
     <div className="w-4 h-4 bg-gray-200 rounded" />
-    <span className="text-gray-600">Busy</span>
+    <span className="text-gray-600">Not Available</span>
   </div>
 </div>
           {/* FOOTER */}
