@@ -72,51 +72,59 @@ const isAvailable = (day: string, hour: string) => {
           </div>
         </div>
 
-        {/* GRID CARD */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border overflow-x-auto">
+{/* GRID CARD */}
+<div className="bg-white p-6 rounded-2xl shadow-sm border overflow-x-auto">
 
-          <table className="w-full border-collapse text-sm">
+  <table className="w-full text-sm table-fixed border-separate border-spacing-1">
 
-            {/* HEADER ROW */}
-            <thead>
-              <tr>
-                <th className="p-2 text-left text-gray-500">Time</th>
-                {allDays.map((day) => (
-                  <th key={day} className="p-2 text-center text-gray-700 font-medium">
-                    {day}
-                  </th>
-                ))}
-              </tr>
-            </thead>
+    {/* HEADER ROW */}
+    <thead>
+      <tr>
+        <th className="w-20 p-2 text-left text-gray-500">Time</th>
 
-            {/* BODY */}
-            <tbody>
-              {hours.map((hour) => (
-                <tr key={hour}>
-                  {/* TIME COLUMN */}
-                  <td className="p-2 text-gray-500">{hour}</td>
+        {allDays.map((day) => (
+          <th
+            key={day}
+            className="p-2 text-center text-gray-700 font-medium"
+          >
+            {day.slice(0, 3)}
+          </th>
+        ))}
+      </tr>
+    </thead>
 
-                  {/* DAY CELLS */}
-                  {allDays.map((day) => {
-                    const available = isAvailable(day, hour);
+    {/* BODY */}
+    <tbody>
+      {hours.map((hour) => (
+        <tr key={hour}>
+          {/* TIME COLUMN */}
+          <td className="p-2 text-gray-500 whitespace-nowrap">
+            {hour}
+          </td>
 
-                    return (
-                      <td key={day + hour} className="p-1">
-                        <div
-                          className={`h-8 rounded-md ${
-                            available
-                              ? "bg-green-500"
-                              : "bg-gray-200"
-                          }`}
-                        />
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
+          {/* DAY CELLS */}
+          {allDays.map((day) => {
+            const available = isAvailable(day, hour);
 
-          </table>
+            return (
+              <td key={day + hour} className="p-1">
+                <div
+                  className={`w-full h-10 rounded-md transition ${
+                    available
+                      ? "bg-green-500"
+                      : "bg-gray-200"
+                  }`}
+                />
+              </td>
+            );
+          })}
+        </tr>
+      ))}
+    </tbody>
+
+  </table>
+
+</div>
 {/* LEGEND */}
 <div className="flex items-center justify-center gap-6 mt-6 text-sm">
   <div className="flex items-center gap-2">
