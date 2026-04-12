@@ -257,7 +257,7 @@ export default function HomePage({
                   {
                     title: "The Quote Generator",
                     desc: "Stop quoting over phone. Let customers get instant prices based on the room count and square footage.",
-					link: "/cleaning-pricing-calculator",
+					link: "/cleaning/quote-gen",
                   },
                   {
                     title: "The Live Availibility Calendar",
