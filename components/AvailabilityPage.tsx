@@ -75,12 +75,12 @@ const isAvailable = (day: string, hour: string) => {
         {/* GRID CARD */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border overflow-x-auto">
 
-          <table className="w-full border-collapse text-sm">
+          <table className="w-full border-collapse text-sm table-fixed">
 
             {/* HEADER ROW */}
             <thead>
               <tr>
-                <th className="p-2 text-left text-gray-500">Time</th>
+                <th className="w-20 p-2 text-left text-gray-500">Time</th>
                 {allDays.map((day) => (
                   <th key={day} className="p-2 text-center text-gray-700 font-medium">
                     {day}
@@ -103,7 +103,7 @@ const isAvailable = (day: string, hour: string) => {
                     return (
                       <td key={day + hour} className="p-1">
                         <div
-                          className={`h-8 rounded-md ${
+                          className={`w-full h-8 rounded-md ${
                             available
                               ? "bg-green-500"
                               : "bg-gray-200"
