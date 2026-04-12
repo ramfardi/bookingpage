@@ -44,79 +44,81 @@ export default function AvailabilityPage({ data }: Props) {
         </div>
 
         {/* GRID CARD */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border overflow-x-auto">
+<div className="bg-white p-6 rounded-2xl shadow-sm border">
 
-          {/* LEGEND */}
-          <div className="flex justify-center gap-6 mb-4 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-green-500 rounded-sm"></div>
-              <span className="text-gray-600">Available</span>
-            </div>
+  {/* LEGEND */}
+  <div className="flex justify-center gap-6 mb-4 text-sm">
+    <div className="flex items-center gap-2">
+      <div className="w-4 h-4 bg-green-500 rounded-sm"></div>
+      <span className="text-gray-600">Available</span>
+    </div>
 
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-gray-200 rounded-sm"></div>
-              <span className="text-gray-600">Busy</span>
-            </div>
-          </div>
+    <div className="flex items-center gap-2">
+      <div className="w-4 h-4 bg-gray-200 rounded-sm"></div>
+      <span className="text-gray-600">Busy</span>
+    </div>
+  </div>
 
-          <table className="w-full border-collapse text-sm table-fixed">
+  {/* SCROLL CONTAINER */}
+  <div className="w-full overflow-x-auto">
+    <div className="min-w-[800px]">
 
-            {/* HEADER ROW */}
-            <thead>
-              <tr>
-                <th className="p-2 text-left text-gray-500 w-20">Time</th>
-                {allDays.map((day) => (
-                  <th
-                    key={day}
-                    className="p-2 text-center text-gray-700 font-medium"
-                  >
-                    {day}
-                  </th>
-                ))}
-              </tr>
-            </thead>
+      <table className="w-full border-collapse text-sm table-fixed">
 
-            {/* BODY */}
-            <tbody>
-              {hours.map((hour) => (
-                <tr key={hour}>
-                  {/* TIME COLUMN */}
-                  <td className="p-2 text-gray-500 w-20">{hour}</td>
+        {/* HEADER */}
+        <thead>
+          <tr>
+            <th className="p-2 text-left text-gray-500 w-20">Time</th>
+            {allDays.map((day) => (
+              <th key={day} className="p-2 text-center text-gray-700 font-medium">
+                {day}
+              </th>
+            ))}
+          </tr>
+        </thead>
 
-                  {/* DAY CELLS */}
-                  {allDays.map((day) => {
-                    const available = isAvailable(day, hour);
+        {/* BODY */}
+        <tbody>
+          {hours.map((hour) => (
+            <tr key={hour}>
+              <td className="p-2 text-gray-500">{hour}</td>
 
-                    return (
-                      <td key={day + hour} className="p-1">
-                        <div
-                          className={`w-full h-8 rounded-md ${
-                            available
-                              ? "bg-green-500"
-                              : "bg-gray-200"
-                          }`}
-                        />
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
+              {allDays.map((day) => {
+                const available = isAvailable(day, hour);
 
-          </table>
+                return (
+                  <td key={day + hour} className="p-1">
+                    <div
+                      className={`w-full h-10 rounded-md ${
+                        available
+                          ? "bg-green-500"
+                          : "bg-gray-200"
+                      }`}
+                    />
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
 
-          {/* FOOTER */}
-          <div className="mt-6 pt-6 border-t text-center space-y-2">
-            <p className="text-sm text-gray-500">
-              Contact to book an appointment
-            </p>
+      </table>
 
-            <p className="text-xs text-gray-400">
-              Powered by SimpleBookMe
-            </p>
-          </div>
+    </div>
+  </div>
 
-        </div>
+  {/* FOOTER */}
+  <div className="mt-6 pt-6 border-t text-center space-y-2">
+    <p className="text-sm text-gray-500">
+      Contact to book an appointment
+    </p>
+
+    <p className="text-xs text-gray-400">
+      Powered by SimpleBookMe
+    </p>
+  </div>
+
+</div>
 
       </div>
     </main>
