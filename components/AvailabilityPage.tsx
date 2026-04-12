@@ -3,8 +3,8 @@ type Props = {
 };
 
 export default function AvailabilityPage({ data }: Props) {
-  const allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const selectedDays: string[] = data?.selectedDays || [];
+  const allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   // Generate hours (8 AM → 8 PM)
   const hours = Array.from({ length: 13 }, (_, i) => {
@@ -12,7 +12,7 @@ export default function AvailabilityPage({ data }: Props) {
     return `${hour.toString().padStart(2, "0")}:00`;
   });
 
-  // Check availability
+  // Check availability safely
   const isAvailable = (day: string, hour: string) => {
     if (!selectedDays.includes(day)) return false;
 
@@ -81,7 +81,7 @@ export default function AvailabilityPage({ data }: Props) {
               {hours.map((hour) => (
                 <tr key={hour}>
                   {/* TIME COLUMN */}
-                  <td className="p-2 text-gray-500">{hour}</td>
+                  <td className="p-2 text-gray-500 w-20">{hour}</td>
 
                   {/* DAY CELLS */}
                   {allDays.map((day) => {
