@@ -14,8 +14,8 @@ export default function AvailabilityPage({ data }: Props) {
 ];
 const selectedDays: string[] = data?.selectedDays || [];
 
-const hours = Array.from({ length: 17 }, (_, i) => {
-  const hour = 8 + i;
+const hours = Array.from({ length: 20 }, (_, i) => {
+  const hour = 5 + i;
   const normalized = hour === 24 ? 0 : hour; // convert 24 → 00 for midnight
   return `${normalized.toString().padStart(2, "0")}:00`;
 });
