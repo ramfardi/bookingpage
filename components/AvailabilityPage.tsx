@@ -3,7 +3,15 @@ type Props = {
 };
 
 export default function AvailabilityPage({ data }: Props) {
-  const allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const allDays = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
 const selectedDays: string[] = data?.selectedDays || [];
 
 const hours = Array.from({ length: 17 }, (_, i) => {
