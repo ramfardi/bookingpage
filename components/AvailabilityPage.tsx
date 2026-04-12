@@ -50,7 +50,7 @@ const isAvailable = (day: string, hour: string) => {
   const s = toNumber(start);
   const e = toNumber(end);
 
-  return h >= s && h < e;
+  return h >= s && h <= e;
 };
 
   return (
