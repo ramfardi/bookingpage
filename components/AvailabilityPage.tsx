@@ -85,18 +85,7 @@ const hours = Array.from({ length: 17 }, (_, i) => {
             </tbody>
 
           </table>
-{/* LEGEND */}
-<div className="flex items-center justify-center gap-6 mt-6 text-sm">
-  <div className="flex items-center gap-2">
-    <div className="w-4 h-4 bg-green-500 rounded" />
-    <span className="text-gray-600">Available</span>
-  </div>
 
-  <div className="flex items-center gap-2">
-    <div className="w-4 h-4 bg-gray-200 rounded" />
-    <span className="text-gray-600">Busy</span>
-  </div>
-</div>
           {/* FOOTER */}
           <div className="mt-6 pt-6 border-t text-center space-y-2">
             <p className="text-sm text-gray-500">
