@@ -1,24 +1,25 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Cleaning Business Website & Booking System | SimpleBookMe",
+  title: "Cleaning Business Website, Quote Generator & Booking System | SimpleBookMe",
   description:
-    "Create a professional cleaning service website with online booking. Perfect for house cleaning, maid services, and commercial cleaners. Show services, pricing, and accept appointments online with no monthly fees.",
+    "Create a complete online system for your cleaning business. Generate instant cleaning quotes, share a live weekly availability calendar, and accept bookings with built-in email notifications. Includes free tools like QR codes to help grow your business.",
 
   keywords: [
     "cleaning business website",
-    "cleaning booking website",
-    "house cleaning booking system",
-    "maid service booking website",
-    "cleaning service scheduling",
-    "cleaning website builder",
+    "cleaning quote generator",
+    "cleaning availability calendar",
+    "cleaning booking system",
+    "house cleaning booking website",
+    "maid service scheduling",
+    "cleaning service pricing tool",
     "cleaning appointment booking",
-    "website for cleaning business",
-    "cleaning company website",
+    "cleaning quote link",
+    "availability calendar for cleaning business",
     "online booking for cleaning services",
-    "cleaning business scheduling system",
-    "cleaning service website builder",
-    "cleaning booking page",
+    "cleaning website builder",
+    "cleaning business tools",
+    "QR code for cleaning business",
     "cleaning service website no monthly fee",
   ],
 
@@ -27,9 +28,9 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    title: "Cleaning Business Website & Booking System | SimpleBookMe",
+    title: "Cleaning Business Tools: Quotes, Availability & Booking | SimpleBookMe",
     description:
-      "Build a professional website for your cleaning business and accept bookings online. Perfect for house cleaners, maid services, and commercial cleaning companies.",
+      "All-in-one platform for cleaning businesses. Let customers generate quotes, check your availability, and book appointments online. Includes free tools like QR codes to attract more clients.",
     url: "https://simplebookme.com/cleaning",
     siteName: "SimpleBookMe",
     type: "website",
@@ -37,9 +38,9 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary",
-    title: "Cleaning Business Website Builder",
+    title: "Cleaning Business Tools & Booking System",
     description:
-      "Create a cleaning service website with online booking and scheduling.",
+      "Quote generator, availability calendar, and booking website for cleaning services.",
   },
 
   robots: {
