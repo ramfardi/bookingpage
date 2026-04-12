@@ -3,7 +3,8 @@ type Props = {
 };
 
 export default function AvailabilityPage({ data }: Props) {
-  const days: string[] = data?.selectedDays || [];
+  const allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const selectedDays: string[] = data?.selectedDays || [];
 
 const hours = Array.from({ length: 17 }, (_, i) => {
   const hour = 8 + i;
@@ -11,15 +12,17 @@ const hours = Array.from({ length: 17 }, (_, i) => {
   return `${normalized.toString().padStart(2, "0")}:00`;
 });
 
-  // Helper to check if hour is inside range
-  const isAvailable = (day: string, hour: string) => {
-    const start = data?.dayTimes?.[day]?.start;
-    const end = data?.dayTimes?.[day]?.end;
+const isAvailable = (day: string, hour: string) => {
+  // ❗ If day not selected → always false
+  if (!selectedDays.includes(day)) return false;
 
-    if (!start || !end) return false;
+  const start = data?.dayTimes?.[day]?.start;
+  const end = data?.dayTimes?.[day]?.end;
 
-    return hour >= start && hour < end;
-  };
+  if (!start || !end) return false;
+
+  return hour >= start && hour <= end;
+};
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-6 flex justify-center">
@@ -49,7 +52,7 @@ const hours = Array.from({ length: 17 }, (_, i) => {
             <thead>
               <tr>
                 <th className="p-2 text-left text-gray-500">Time</th>
-                {days.map((day) => (
+                {allDays.map((day) => (
                   <th key={day} className="p-2 text-center text-gray-700 font-medium">
                     {day}
                   </th>
@@ -65,7 +68,7 @@ const hours = Array.from({ length: 17 }, (_, i) => {
                   <td className="p-2 text-gray-500">{hour}</td>
 
                   {/* DAY CELLS */}
-                  {days.map((day) => {
+                  {allDays.map((day) => {
                     const available = isAvailable(day, hour);
 
                     return (
