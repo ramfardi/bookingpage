@@ -1,7 +1,9 @@
 import HomePage from "@/components/HomePage";
 import AvailabilityPage from "@/components/AvailabilityPage";
+import CleaningGetQuotePage from "@/components/CleaningGetQuotePage";
 import { headers } from "next/headers";
 import { getSiteFromHost } from "./lib/getSiteFromHost";
+import { getSiteCleaningQuote } from "./lib/getSiteCleaningQuote";
 
 import type { Metadata } from "next";
 
@@ -21,17 +23,21 @@ export const metadata: Metadata = {
 export default async function Page() {
   const host = (await headers()).get("host") || "";
 
-  // 🔥 detect subdomain
-  const site = await getSiteFromHost(host);
 
-  // ✅ If NO subdomain → show your normal homepage
-  if (!site) {
-    return <HomePage />;
+  // 🔥 try both
+  const site = await getSiteFromHost(host);
+  const siteCleaning = await getSiteCleaningQuote(host);
+
+  // 🔥 PRIORITY 1: cleaning quote
+  if (siteCleaning) {
+    return <CleaningGetQuotePage data={siteCleaning.data} />;
   }
 
-  // ✅ If subdomain → show availability
-  const data = site.data;
+  // 🔥 PRIORITY 2: availability
+  if (site) {
+    return <AvailabilityPage data={site.data} />;
+  }
 
-  // ✅ subdomain → availability page
-  return <AvailabilityPage data={site.data} />;
+  // 🔥 fallback: homepage
+  return <HomePage />;
 }
