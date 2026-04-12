@@ -3,8 +3,7 @@ type Props = {
 };
 
 export default function AvailabilityPage({ data }: Props) {
-  const selectedDays: string[] = data?.selectedDays || [];
-  const allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const days: string[] = data?.selectedDays || [];
 
   // Generate hours (8 AM → 8 PM)
   const hours = Array.from({ length: 13 }, (_, i) => {
@@ -12,10 +11,8 @@ export default function AvailabilityPage({ data }: Props) {
     return `${hour.toString().padStart(2, "0")}:00`;
   });
 
-  // Check availability safely
+  // Helper to check if hour is inside range
   const isAvailable = (day: string, hour: string) => {
-    if (!selectedDays.includes(day)) return false;
-
     const start = data?.dayTimes?.[day]?.start;
     const end = data?.dayTimes?.[day]?.end;
 
@@ -44,81 +41,63 @@ export default function AvailabilityPage({ data }: Props) {
         </div>
 
         {/* GRID CARD */}
-<div className="bg-white p-6 rounded-2xl shadow-sm border">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border overflow-x-auto">
 
-  {/* LEGEND */}
-  <div className="flex justify-center gap-6 mb-4 text-sm">
-    <div className="flex items-center gap-2">
-      <div className="w-4 h-4 bg-green-500 rounded-sm"></div>
-      <span className="text-gray-600">Available</span>
-    </div>
+          <table className="w-full border-collapse text-sm">
 
-    <div className="flex items-center gap-2">
-      <div className="w-4 h-4 bg-gray-200 rounded-sm"></div>
-      <span className="text-gray-600">Busy</span>
-    </div>
-  </div>
+            {/* HEADER ROW */}
+            <thead>
+              <tr>
+                <th className="p-2 text-left text-gray-500">Time</th>
+                {days.map((day) => (
+                  <th key={day} className="p-2 text-center text-gray-700 font-medium">
+                    {day}
+                  </th>
+                ))}
+              </tr>
+            </thead>
 
-  {/* SCROLL CONTAINER */}
-  <div className="w-full overflow-x-auto">
-    <div className="min-w-[800px]">
+            {/* BODY */}
+            <tbody>
+              {hours.map((hour) => (
+                <tr key={hour}>
+                  {/* TIME COLUMN */}
+                  <td className="p-2 text-gray-500">{hour}</td>
 
-      <table className="w-full border-collapse text-sm table-fixed">
+                  {/* DAY CELLS */}
+                  {days.map((day) => {
+                    const available = isAvailable(day, hour);
 
-        {/* HEADER */}
-        <thead>
-          <tr>
-            <th className="p-2 text-left text-gray-500 w-20">Time</th>
-            {allDays.map((day) => (
-              <th key={day} className="p-2 text-center text-gray-700 font-medium">
-                {day}
-              </th>
-            ))}
-          </tr>
-        </thead>
+                    return (
+                      <td key={day + hour} className="p-1">
+                        <div
+                          className={`h-8 rounded-md ${
+                            available
+                              ? "bg-green-500"
+                              : "bg-gray-200"
+                          }`}
+                        />
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
 
-        {/* BODY */}
-        <tbody>
-          {hours.map((hour) => (
-            <tr key={hour}>
-              <td className="p-2 text-gray-500">{hour}</td>
+          </table>
 
-              {allDays.map((day) => {
-                const available = isAvailable(day, hour);
+          {/* FOOTER */}
+          <div className="mt-6 pt-6 border-t text-center space-y-2">
+            <p className="text-sm text-gray-500">
+              Contact to book an appointment
+            </p>
 
-                return (
-                  <td key={day + hour} className="p-1">
-                    <div
-                      className={`w-full h-10 rounded-md ${
-                        available
-                          ? "bg-green-500"
-                          : "bg-gray-200"
-                      }`}
-                    />
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
+            <p className="text-xs text-gray-400">
+              Powered by SimpleBookMe
+            </p>
+          </div>
 
-      </table>
-
-    </div>
-  </div>
-
-  {/* FOOTER */}
-  <div className="mt-6 pt-6 border-t text-center space-y-2">
-    <p className="text-sm text-gray-500">
-      Contact to book an appointment
-    </p>
-
-    <p className="text-xs text-gray-400">
-      Powered by SimpleBookMe
-    </p>
-  </div>
-
-</div>
+        </div>
 
       </div>
     </main>
