@@ -12,8 +12,25 @@ const hours = Array.from({ length: 17 }, (_, i) => {
   return `${normalized.toString().padStart(2, "0")}:00`;
 });
 
+const toNumber = (time: string) => {
+  if (!time) return -1;
+
+  // supports "08:00"
+  if (time.includes(":")) {
+    return parseInt(time.split(":")[0], 10);
+  }
+
+  // supports "8 AM / PM"
+  const [h, period] = time.split(" ");
+  let hour = parseInt(h, 10);
+
+  if (period === "PM" && hour !== 12) hour += 12;
+  if (period === "AM" && hour === 12) hour = 0;
+
+  return hour;
+};
+
 const isAvailable = (day: string, hour: string) => {
-  // ❗ If day not selected → always false
   if (!selectedDays.includes(day)) return false;
 
   const start = data?.dayTimes?.[day]?.start;
@@ -21,7 +38,11 @@ const isAvailable = (day: string, hour: string) => {
 
   if (!start || !end) return false;
 
-  return hour >= start && hour <= end;
+  const h = toNumber(hour);
+  const s = toNumber(start);
+  const e = toNumber(end);
+
+  return h >= s && h < e;
 };
 
   return (
