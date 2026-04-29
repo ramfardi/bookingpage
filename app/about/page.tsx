@@ -119,7 +119,7 @@ export default function AboutPage() {
               </ul>
             </div>
 
-            {/* SUPPORT */}
+            {/* SUPPORT */}{/*
             <div className="pt-10 text-center">
               <p className="text-lg text-gray-700 mb-3">
                 Need help or have questions? Contact our support team:
@@ -136,7 +136,7 @@ export default function AboutPage() {
                   className="h-6"
                 />
               </a>
-            </div>
+            </div>*/}
           </div>
         </section>
 
