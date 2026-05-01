@@ -103,7 +103,7 @@ export default function AboutPage() {
           )}
 
           {/* GALLERY */}
-          {about?.gallery?.length > 0 && (
+          {about?.gallery && about.gallery.length > 0 && (
             <div>
               <h2 className="text-2xl font-semibold mb-6">
                 Sample Work
