@@ -16,26 +16,6 @@ export default function SitePage({
   const [siteId, setSiteId] = useState<string | null>(null);
   const [customer, setCustomer] = useState<CustomerConfig | null>(null);
   const [saving, setSaving] = useState(false);
-  
-	useEffect(() => {
-	  if (!customer) return;
-	  if (customer.pricing?.items?.length) return;
-	  if (!customer.services?.length) return;
-
-	  setCustomer((prev) => ({
-		...prev!,
-		pricing: {
-		  ...prev!.pricing,
-		  items: prev!.services.map((service) => ({
-			label: service,
-			description: "",
-			price: "$0",
-		  })),
-		},
-	  }));
-	}, [customer?.pricing?.items]);
-
-
 
   /* ---------------- RESOLVE PARAMS ---------------- */
   useEffect(() => {
@@ -61,34 +41,67 @@ export default function SitePage({
     load();
   }, [siteId]);
 
+  /* ---------------- NORMALIZE PRICING ---------------- */
+  const normalizedItems =
+    customer?.pricing?.items?.length
+      ? customer.pricing.items
+      : customer?.pricing?.rows?.length
+      ? customer.pricing.rows.map((row: any) => ({
+          label: row?.name || "",
+          description: row?.includes || "",
+          price: row?.price || "",
+        }))
+      : customer?.services?.length
+      ? customer.services.map((service: string) => ({
+          label: service,
+          description: "",
+          price: "",
+        }))
+      : [];
+
+  /* ---------------- ENSURE ITEMS EXIST ---------------- */
+  useEffect(() => {
+    if (!customer) return;
+
+    if (customer.pricing?.items?.length) return;
+
+    if (normalizedItems.length === 0) return;
+
+    setCustomer((prev) => ({
+      ...prev!,
+      pricing: {
+        ...prev!.pricing,
+        items: normalizedItems,
+      },
+    }));
+  }, [customer]);
+
   if (!customer) {
     return <div className="p-10">Loading editor…</div>;
   }
 
   /* ---------------- SAVE ---------------- */
-	async function saveChanges() {
-	  if (!siteId || !customer) return;
+  async function saveChanges() {
+    if (!siteId || !customer) return;
 
-	  setSaving(true);
+    setSaving(true);
 
-	  const res = await fetch(`/api/site/${siteId}`, {
-		method: "PUT",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({
-		  data: customer,
-		}),
-	  });
+    const res = await fetch(`/api/site/${siteId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        data: customer,
+      }),
+    });
 
-	  setSaving(false);
+    setSaving(false);
 
-	  if (!res.ok) {
-		const text = await res.text();
-		console.error("Save failed:", text);
-		alert("Save failed. Please try again.");
-	  }
-	}
-
-
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("Save failed:", text);
+      alert("Save failed. Please try again.");
+    }
+  }
 
   return (
     <div className="flex h-screen">
@@ -164,140 +177,130 @@ export default function SitePage({
             />
           </section>
 
-{/* -------- SERVICES & PRICING -------- */}
-<section className="mb-8">
-  <h3 className="font-medium mb-3">Services & Pricing</h3>
+          {/* -------- SERVICES & PRICING -------- */}
+          <section className="mb-8">
+            <h3 className="font-medium mb-3">Services & Pricing</h3>
 
-  {(
-    customer.pricing?.items?.length
-      ? customer.pricing.items
-      : customer.pricing?.rows?.length
-      ? customer.pricing.rows.map((row: any) => ({
-          label: row.name,
-          description: row.includes,
-          price: row.price,
-        }))
-      : customer.services?.length
-      ? customer.services.map((service: string) => ({
-          label: service,
-          description: "",
-          price: "",
-        }))
-      : []
-  ).map((item: any, index: number) => (
-    <div
-      key={index}
-      className="border rounded-md p-3 mb-3 space-y-2"
-    >
-      {/* Service name */}
-      <input
-        className="w-full border rounded-md p-2"
-        placeholder="Service name"
-        value={item.label ?? ""}
-        onChange={(e) => {
-          const items = [...(customer.pricing.items ?? [])];
-          items[index] = { ...items[index], label: e.target.value };
+            {normalizedItems.map((item: any, index: number) => (
+              <div
+                key={index}
+                className="border rounded-md p-3 mb-3 space-y-2"
+              >
+                {/* Service name */}
+                <input
+                  className="w-full border rounded-md p-2"
+                  placeholder="Service name"
+                  value={item.label ?? ""}
+                  onChange={(e) => {
+                    const items = [...normalizedItems];
+                    items[index] = {
+                      ...items[index],
+                      label: e.target.value,
+                    };
 
-          setCustomer({
-            ...customer,
-            pricing: {
-              ...customer.pricing,
-              items,
-            },
-          });
-        }}
-      />
+                    setCustomer({
+                      ...customer,
+                      pricing: {
+                        ...customer.pricing,
+                        items,
+                      },
+                    });
+                  }}
+                />
 
-      {/* Description */}
-      <textarea
-        className="w-full border rounded-md p-2 text-sm"
-        rows={2}
-        placeholder="Service description"
-        value={item.description ?? ""}
-        onChange={(e) => {
-          const items = [...(customer.pricing.items ?? [])];
-          items[index] = {
-            ...items[index],
-            description: e.target.value,
-          };
+                {/* Description */}
+                <textarea
+                  className="w-full border rounded-md p-2 text-sm"
+                  rows={2}
+                  placeholder="Service description"
+                  value={item.description ?? ""}
+                  onChange={(e) => {
+                    const items = [...normalizedItems];
+                    items[index] = {
+                      ...items[index],
+                      description: e.target.value,
+                    };
 
-          setCustomer({
-            ...customer,
-            pricing: {
-              ...customer.pricing,
-              items,
-            },
-          });
-        }}
-      />
+                    setCustomer({
+                      ...customer,
+                      pricing: {
+                        ...customer.pricing,
+                        items,
+                      },
+                    });
+                  }}
+                />
 
-      {/* Price + Remove */}
-      <div className="flex gap-2 items-center">
-        <input
-          className="flex-1 border rounded-md p-2"
-          placeholder="Price (e.g. $50)"
-          value={item.price ?? ""}
-          onChange={(e) => {
-            const items = [...(customer.pricing.items ?? [])];
-            items[index] = { ...items[index], price: e.target.value };
+                {/* Price + Remove */}
+                <div className="flex gap-2 items-center">
+                  <input
+                    className="flex-1 border rounded-md p-2"
+                    placeholder="Price (e.g. $50)"
+                    value={item.price ?? ""}
+                    onChange={(e) => {
+                      const items = [...normalizedItems];
+                      items[index] = {
+                        ...items[index],
+                        price: e.target.value,
+                      };
 
-            setCustomer({
-              ...customer,
-              pricing: {
-                ...customer.pricing,
-                items,
-              },
-            });
-          }}
-        />
+                      setCustomer({
+                        ...customer,
+                        pricing: {
+                          ...customer.pricing,
+                          items,
+                        },
+                      });
+                    }}
+                  />
 
-        <button
-          type="button"
-          className="text-red-600 hover:text-red-700 px-2"
-          onClick={() => {
-            if (!confirm("Remove this service?")) return;
+                  <button
+                    type="button"
+                    className="text-red-600 hover:text-red-700 px-2"
+                    onClick={() => {
+                      if (!confirm("Remove this service?")) return;
 
-            const items = [...(customer.pricing.items ?? [])];
-            items.splice(index, 1);
+                      const items = [...normalizedItems];
+                      items.splice(index, 1);
 
-            setCustomer({
-              ...customer,
-              pricing: {
-                ...customer.pricing,
-                items,
-              },
-            });
-          }}
-        >
-          ✕
-        </button>
-      </div>
-    </div>
-  ))}
+                      setCustomer({
+                        ...customer,
+                        pricing: {
+                          ...customer.pricing,
+                          items,
+                        },
+                      });
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))}
 
-  <button
-    type="button"
-    className="text-sm text-indigo-600 font-medium"
-    onClick={() =>
-      setCustomer({
-        ...customer,
-        pricing: {
-          ...customer.pricing,
-          items: [
-            ...(customer.pricing.items ?? []),
-            {
-              label: "New service",
-              description: "",
-              price: "",
-            },
-          ],
-        },
-      })
-    }
-  >
-    + Add service
-  </button>
-</section>
+            <button
+              type="button"
+              className="text-sm text-indigo-600 font-medium"
+              onClick={() =>
+                setCustomer({
+                  ...customer,
+                  pricing: {
+                    ...customer.pricing,
+                    items: [
+                      ...normalizedItems,
+                      {
+                        label: "New service",
+                        description: "",
+                        price: "",
+                      },
+                    ],
+                  },
+                })
+              }
+            >
+              + Add service
+            </button>
+          </section>
 
           {/* -------- ABOUT -------- */}
           <section className="mb-8">
