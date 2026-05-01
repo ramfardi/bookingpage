@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams, usePathname } from "next/navigation";
 import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 import type { LandingConfig } from "@/app/lib/landingConfig";
@@ -12,8 +13,30 @@ export default function AboutPage() {
 
   const [mode, setMode] = useState<"sales" | "client">("sales");
 
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  const modeParam = searchParams.get("mode");
+  const isPreview = pathname.startsWith("/site/") && modeParam === "preview";
+
+  const siteId = pathname.startsWith("/site/")
+    ? pathname.split("/")[2]
+    : null;
+
   useEffect(() => {
     async function load() {
+      // ✅ PREVIEW MODE (IMPORTANT FIX)
+      if (isPreview && siteId) {
+        const res = await fetch(`/api/site/${siteId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setCustomer(data);
+          setMode("client");
+        }
+        return;
+      }
+
+      // ✅ LIVE MODE (subdomain)
       const hostname = window.location.hostname;
       const result = await getCustomerConfigFromHost(hostname);
 
@@ -22,9 +45,16 @@ export default function AboutPage() {
     }
 
     load();
-  }, []);
+  }, [isPreview, siteId]);
 
-  if (!customer || mode !== "client") return null;
+  // ✅ Prevent blank page crash
+  if (!customer) {
+    return <div className="p-10">Loading…</div>;
+  }
+
+  if (mode !== "client") {
+    return null;
+  }
 
   const customerConfig = customer as CustomerConfig;
   const { about, heroImage, businessName } = customerConfig;
@@ -44,7 +74,7 @@ export default function AboutPage() {
 
         <div className="relative z-10 px-6 max-w-3xl">
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-            {about.title}
+            {about?.title || "About Us"}
           </h1>
         </div>
       </section>
@@ -54,11 +84,11 @@ export default function AboutPage() {
         <div className="max-w-3xl mx-auto space-y-16">
           {/* DESCRIPTION */}
           <p className="text-lg text-gray-700 leading-relaxed">
-            {about.description}
+            {about?.description || ""}
           </p>
 
           {/* HIGHLIGHTS */}
-          {about.highlights?.length > 0 && (
+          {about?.highlights?.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {about.highlights.map((item) => (
                 <div
@@ -72,8 +102,8 @@ export default function AboutPage() {
             </div>
           )}
 
-          {/* SAMPLE WORK / GALLERY */}
-          {about.gallery && about.gallery.length > 0 && (
+          {/* GALLERY */}
+          {about?.gallery?.length > 0 && (
             <div>
               <h2 className="text-2xl font-semibold mb-6">
                 Sample Work
