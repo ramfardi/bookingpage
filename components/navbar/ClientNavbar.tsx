@@ -29,7 +29,7 @@ export default function ClientNavbar({
   const base = isSiteRoute && siteId ? `/site/${siteId}` : "";
 
   // 🔐 Payment bar ONLY in preview AND explicitly unpaid
-  const showPaymentBanner = isPreview && isPaid === false;
+  const showPaymentBanner = false;//isPreview && isPaid === false;
 
   return (
     <>
