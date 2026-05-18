@@ -8,7 +8,9 @@ import type { CustomerConfig } from "@/app/lib/customerConfig";
 
 export default function Navbar() {
   const [mode, setMode] = useState<"sales" | "client">("sales");
-  const [isPaid, setIsPaid] = useState<boolean | undefined>(undefined);
+  // const [isPaid, setIsPaid] = useState<boolean | undefined>(undefined);
+  
+  const [isPaid, setIsPaid] = useState<boolean>(true);
 
   useEffect(() => {
     async function load() {
@@ -19,7 +21,8 @@ export default function Navbar() {
 
       if (result.mode === "client") {
         const customer = result.config as CustomerConfig;
-        setIsPaid(customer.isPaid);
+        //setIsPaid(customer.isPaid);
+		setIsPaid(true);
       }
     }
 
