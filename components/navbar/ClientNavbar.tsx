@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
+
+import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
+import type { CustomerConfig } from "@/app/lib/customerConfig";
 
 export default function ClientNavbar({
   isPaid,
@@ -10,16 +13,17 @@ export default function ClientNavbar({
   isPaid?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   // 🔑 Explicit mode handling
-  const mode = searchParams.get("mode"); // "preview" | null
+  const mode = searchParams.get("mode");
 
   // Route type detection
   const isSiteRoute = pathname.startsWith("/site/");
   const isPreview = isSiteRoute && mode === "preview";
-  const isAdmin = isSiteRoute && mode !== "preview";
 
   const siteId = isSiteRoute ? pathname.split("/")[2] : null;
 
@@ -29,11 +33,50 @@ export default function ClientNavbar({
   const base = isSiteRoute && siteId ? `/site/${siteId}` : "";
 
   // 🔐 Payment bar ONLY in preview AND explicitly unpaid
-  const showPaymentBanner = false;//isPreview && isPaid === false;
+  const showPaymentBanner = false;
+
+  // Booking logic
+  const [customerKey, setCustomerKey] = useState<string | null>(null);
+  const [bookingLink, setBookingLink] = useState<string | null>(null);
+  const [isExternalBooking, setIsExternalBooking] = useState(false);
+
+  useEffect(() => {
+    async function load() {
+      const hostname = window.location.hostname;
+
+      const result = await getCustomerConfigFromHost(hostname);
+
+      setCustomerKey(result.key);
+
+      if (result.mode === "client") {
+        const customer = result.config as CustomerConfig;
+
+        setIsExternalBooking(!!customer.booking?.is_external);
+
+        setBookingLink(customer.booking?.bookingLink || null);
+      }
+    }
+
+    load();
+  }, []);
+
+  function handleBookAppointment() {
+    if (isExternalBooking && bookingLink) {
+      window.location.href = bookingLink;
+      return;
+    }
+
+    if (customerKey) {
+      router.push(`/site/${customerKey}/booking`);
+      return;
+    }
+
+    router.push(`${base}/booking`);
+  }
 
   return (
     <>
-      {/* 🔔 PAYMENT BANNER (PREVIEW ONLY) */}
+      {/* 🔔 PAYMENT BANNER */}
       {showPaymentBanner && (
         <div className="fixed top-0 left-0 right-0 z-[60] bg-indigo-600 text-white">
           <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between text-sm">
@@ -53,7 +96,7 @@ export default function ClientNavbar({
 
       {/* NAVBAR */}
       <nav
-        className={`fixed left-0 right-0 z-50 bg-white/90 backdrop-blur border-b ${
+        className={`fixed left-0 right-0 z-[9999] bg-white/90 backdrop-blur border-b ${
           showPaymentBanner ? "top-10" : "top-0"
         }`}
       >
@@ -68,12 +111,12 @@ export default function ClientNavbar({
 
           {/* Desktop menu */}
           <div className="hidden md:flex items-center gap-8">
-            <Link
-              href={`${base}/booking`}
+            <button
+              onClick={handleBookAppointment}
               className="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
             >
               Book appointment
-            </Link>
+            </button>
 
             <Link
               href={`${base}/pricing`}
@@ -119,13 +162,15 @@ export default function ClientNavbar({
               Pricing
             </Link>
 
-            <Link
-              href={`${base}/booking`}
+            <button
+              onClick={() => {
+                setOpen(false);
+                handleBookAppointment();
+              }}
               className="py-3 text-base font-medium text-center bg-indigo-600 text-white rounded-lg"
-              onClick={() => setOpen(false)}
             >
               Book appointment
-            </Link>
+            </button>
 
             {/* Upsell only in PREVIEW */}
             {isPreview && isPaid === false && (
