@@ -85,6 +85,9 @@ export default function SetupPage() {
 
 	const [useDefaultHero, setUseDefaultHero] = useState(true);
 	const [useDefaultAbout, setUseDefaultAbout] = useState(true);
+	
+	const [createdSiteId, setCreatedSiteId] = useState<string | null>(null);
+	const [createdSubdomain, setCreatedSubdomain] = useState<string | null>(null);
 
 	const [landing, setLanding] = useState(template.defaultData.landing);
 
@@ -201,8 +204,10 @@ const [booking, setBooking] = useState<{
 	  return;
 	}
 
-    const { siteId } = await res.json();
-    window.location.href = `/site/${siteId}?mode=preview`;
+	const { siteId } = await res.json();
+
+	setCreatedSiteId(siteId);
+	setCreatedSubdomain(form.subdomain.toLowerCase());
   }
 
   /* ---------------- UI HELPERS ---------------- */
@@ -235,7 +240,72 @@ const [booking, setBooking] = useState<{
   }
 
   /* ---------------- RENDER ---------------- */
+if (createdSiteId && createdSubdomain) {
+  const privateUrl = `${window.location.origin}/site/${createdSiteId}?mode=preview`;
+  const publicUrl = `https://${createdSubdomain}.simplebookme.com`;
 
+  return (
+    <div className="max-w-2xl mx-auto py-20 px-4 text-center">
+      <div className="bg-white rounded-3xl shadow-xl border p-8">
+        <h1 className="text-3xl font-bold text-gray-900">
+          Your website is ready 🎉
+        </h1>
+
+        <p className="mt-4 text-gray-600">
+          Save this private link. You can use it anytime to view and edit your website.
+        </p>
+
+        <div className="mt-8 text-left">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Private edit link
+          </label>
+
+          <div className="flex gap-2">
+            <input
+              readOnly
+              value={privateUrl}
+              className="flex-1 border rounded-xl p-3 text-sm bg-gray-50"
+            />
+
+            <button
+              type="button"
+              onClick={() => navigator.clipboard.writeText(privateUrl)}
+              className="bg-indigo-600 text-white px-4 rounded-xl font-semibold"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-6 text-left">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Public website
+          </label>
+
+          <input
+            readOnly
+            value={publicUrl}
+            className="w-full border rounded-xl p-3 text-sm bg-gray-50"
+          />
+        </div>
+
+        <p className="mt-6 text-sm text-red-600">
+          Do not share the private edit link with customers. Share only the public website link.
+        </p>
+
+        <button
+          type="button"
+          onClick={() => {
+            window.location.href = `/site/${createdSiteId}?mode=preview`;
+          }}
+          className="mt-8 bg-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition"
+        >
+          View your website
+        </button>
+      </div>
+    </div>
+  );
+}
   return (
     <div className="max-w-2xl mx-auto py-20 px-4">
       <h1 className="text-3xl font-bold text-center mb-6">
