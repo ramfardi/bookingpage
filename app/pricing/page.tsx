@@ -50,20 +50,26 @@ export default function PricingPage() {
 
           {/* Pricing Card */}
           <div className="mt-12 rounded-3xl border shadow-sm p-10">
-            <div className="text-sm uppercase tracking-wide text-gray-500">
+            {/*<div className="text-sm uppercase tracking-wide text-gray-500">
               One-time fee
-            </div>
+            </div>*/}
 
-            <div className="mt-4 flex justify-center items-end">
+            {/*<div className="mt-4 flex justify-center items-end">
               <span className="text-5xl font-extrabold text-gray-900">
                 $39.90
               </span>
               <span className="ml-2 text-lg text-gray-500">CAD</span>
+            </div>*/}
+			
+			<div className="mt-4 flex justify-center items-end">
+              <span className="text-5xl font-extrabold text-gray-900">
+                FREE (Limited time offer)
+              </span>
             </div>
 
-            <p className="mt-2 text-gray-600">
+            {/*<p className="mt-2 text-gray-600">
               No monthly or recurring fees
-            </p>
+            </p>*/}
 
             <div className="my-8 border-t" />
 
