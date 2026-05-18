@@ -66,12 +66,12 @@ export default function ClientNavbar({
       return;
     }
 
-    if (customerKey) {
-      router.push(`/site/${customerKey}/booking`);
-      return;
-    }
+	if (base) {
+	  router.push(`${base}/booking`);
+	  return;
+	}
 
-    router.push(`${base}/booking`);
+	router.push("/booking");
   }
 
   return (
