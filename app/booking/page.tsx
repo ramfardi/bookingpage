@@ -30,6 +30,17 @@ export default function BookingPage() {
 
     load();
   }, []);
+  
+  useEffect(() => {
+  if (!customer || mode !== "client") return;
+
+  const customerConfig = customer as CustomerConfig;
+  const services = customerConfig.services || [];
+
+  if (selectedService && !services.includes(selectedService)) {
+    setSelectedService("");
+  }
+}, [customer, mode, selectedService]);
 
   // Loading state
   if (!customer) {
@@ -44,17 +55,8 @@ export default function BookingPage() {
   if (mode !== "client") {
     return null;
   }
-
-useEffect(() => {
-  if (!customer || mode !== "client") return;
-
+  
   const customerConfig = customer as CustomerConfig;
-  const services = customerConfig.services || [];
-
-  if (selectedService && !services.includes(selectedService)) {
-    setSelectedService("");
-  }
-}, [customer, mode, selectedService]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
