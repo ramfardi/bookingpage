@@ -61,9 +61,7 @@ export default function HomePage({
       window.location.href = booking.bookingLink;
       return;
     }
-
-    if (!customerKey) return;
-    router.push(`/site/${customerKey}/booking`);
+	router.push("/booking");
   }
 
   return (
