@@ -108,7 +108,8 @@ const isSubdomain =
       <body className="bg-gradient-to-br from-indigo-50 via-white to-purple-50">
         <Providers>
           {/* Navbar is client-side and resolves mode async */}
-          {!isSubdomain && <Navbar />}
+          //{!isSubdomain && <Navbar />}
+		  <Navbar />
 
           {/* Offset for fixed navbar height */}
           <main className="pt-16 min-h-screen">
