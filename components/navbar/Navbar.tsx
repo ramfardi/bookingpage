@@ -7,7 +7,7 @@ import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 
 export default function Navbar() {
-  const [mode, setMode] = useState<"sales" | "client">("sales");
+  const [mode, setMode] = useState<"sales" | "client" | null>(null);
   // const [isPaid, setIsPaid] = useState<boolean | undefined>(undefined);
   
   const [isPaid, setIsPaid] = useState<boolean>(true);
@@ -28,6 +28,11 @@ export default function Navbar() {
 
     load();
   }, []);
+
+
+  if (mode === null) {
+    return null;
+  }
 
   // 🔒 SINGLE DECISION POINT
   if (mode === "client") {
