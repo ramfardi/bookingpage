@@ -45,17 +45,16 @@ export default function BookingPage() {
     return null;
   }
 
-  const customerConfig = customer as CustomerConfig;
+useEffect(() => {
+  if (!customer || mode !== "client") return;
 
-  // ✅ FIX: reset service if it was removed
-  useEffect(() => {
-    if (
-      selectedService &&
-      !customerConfig.services.includes(selectedService)
-    ) {
-      setSelectedService("");
-    }
-  }, [customerConfig.services, selectedService]);
+  const customerConfig = customer as CustomerConfig;
+  const services = customerConfig.services || [];
+
+  if (selectedService && !services.includes(selectedService)) {
+    setSelectedService("");
+  }
+}, [customer, mode, selectedService]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -150,7 +149,7 @@ export default function BookingPage() {
             className="w-full border rounded-xl p-3"
           >
             <option value="">Select service</option>
-            {customerConfig.services.map((service) => (
+            {(customerConfig.services || []).map((service) => (
               <option key={service} value={service}>
                 {service}
               </option>
