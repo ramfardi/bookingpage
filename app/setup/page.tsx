@@ -205,6 +205,16 @@ const [booking, setBooking] = useState<{
 	}
 
 	const { siteId } = await res.json();
+	
+	await fetch("/api/send-site-created-email", {
+	  method: "POST",
+	  headers: { "Content-Type": "application/json" },
+	  body: JSON.stringify({
+		email: form.email,
+		siteId,
+		subdomain: form.subdomain.toLowerCase(),
+	  }),
+	});
 
 	setCreatedSiteId(siteId);
 	setCreatedSubdomain(form.subdomain.toLowerCase());
