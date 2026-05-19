@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import HomePage from "@/components/HomePage";
-import type { CustomerConfig } from "@/app/lib/customerConfig";
+import type { CustomerConfig, ScheduleDay } from "@/app/lib/customerConfig";
 
 export default function SitePage({
   params,
@@ -584,7 +584,7 @@ async function saveChanges() {
         className="w-full border rounded-md p-2 text-sm"
         rows={3}
         placeholder={`Enter available times, one per line\nExample:\n09:00\n09:30\n10:00`}
-        value={(customer.schedule?.days?.[day] || []).join("\n")}
+        value={(customer.schedule?.days?.[day as ScheduleDay] || []).join("\n")}
         onChange={(e) => {
           const times = e.target.value
             .split("\n")
@@ -603,7 +603,7 @@ async function saveChanges() {
               }),
               days: {
                 ...(customer.schedule?.days || {}),
-                [day]: times,
+                [day as ScheduleDay]: times,
               },
             },
           });
