@@ -13,7 +13,7 @@ type ServiceItem = {
   price?: string;
 };
 
-type Step = "basic" | "content" | "services" | "booking" | "review";
+type Step = "basic" | "content" | "services" | "booking" | "schedule" | "review";
 
 /* ---------------- ACCENT CLASSES (SAFE FOR TAILWIND) ---------------- */
 
@@ -80,6 +80,22 @@ export default function SetupPage() {
     email: "",
     subdomain: "",
   });
+  
+  const [schedule, setSchedule] = useState({
+  enabled: true,
+  startHour: "08:00",
+  endHour: "20:00",
+  intervalMinutes: 30,
+  days: {
+    Mon: [],
+    Tue: [],
+    Wed: [],
+    Thu: [],
+    Fri: [],
+    Sat: [],
+    Sun: [],
+  } as Record<string, string[]>,
+});
 
 /* ---------------- CONTENT ---------------- */
 
@@ -177,21 +193,7 @@ const [booking, setBooking] = useState<{
       booking,
       deposit,
 	  
-	  schedule: {
-	  enabled: true,
-	  startHour: "08:00",
-	  endHour: "20:00",
-	  intervalMinutes: 30,
-	  days: {
-		Mon: [],
-		Tue: [],
-		Wed: [],
-		Thu: [],
-		Fri: [],
-		Sat: [],
-		Sun: [],
-	  },
-	},
+		schedule,
 	  
 	    isPaid: true,
   paidAt: new Date().toISOString(),
@@ -239,7 +241,7 @@ const [booking, setBooking] = useState<{
 
   /* ---------------- UI HELPERS ---------------- */
 
-  const steps: Step[] = ["basic", "content", "services", "booking", "review"];
+	const steps: Step[] = ["basic", "content", "services", "booking", "schedule", "review"];
 
   function StepIndicator() {
     return (
@@ -744,6 +746,91 @@ onClick={() => {
 		  </section>
 		)}
 
+{/* SCHEDULE */}
+{step === "schedule" && (
+  <section className="space-y-6">
+    <h2 className="text-xl font-semibold">Weekly schedule</h2>
+
+    <p className="text-sm text-gray-500">
+      Add the times you are available. Enter one time per line for each day.
+    </p>
+
+    <label className="flex items-center gap-3">
+      <input
+        type="checkbox"
+        checked={schedule.enabled}
+        onChange={(e) =>
+          setSchedule({
+            ...schedule,
+            enabled: e.target.checked,
+          })
+        }
+      />
+      Show schedule page on my website
+    </label>
+
+    <div className="grid grid-cols-2 gap-3">
+      <div>
+        <label className="text-sm text-gray-600">Start time</label>
+        <input
+          type="time"
+          step={1800}
+          className="w-full border p-3 rounded-md"
+          value={schedule.startHour}
+          onChange={(e) =>
+            setSchedule({
+              ...schedule,
+              startHour: e.target.value,
+            })
+          }
+        />
+      </div>
+
+      <div>
+        <label className="text-sm text-gray-600">End time</label>
+        <input
+          type="time"
+          step={1800}
+          className="w-full border p-3 rounded-md"
+          value={schedule.endHour}
+          onChange={(e) =>
+            setSchedule({
+              ...schedule,
+              endHour: e.target.value,
+            })
+          }
+        />
+      </div>
+    </div>
+
+    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+      <div key={day} className="border rounded-md p-4">
+        <h3 className="font-medium mb-2">{day}</h3>
+
+        <textarea
+          className="w-full border p-3 rounded-md text-sm"
+          rows={3}
+          placeholder={`Example:\n09:00\n09:30\n10:00`}
+          value={(schedule.days[day] || []).join("\n")}
+          onChange={(e) => {
+            const times = e.target.value
+              .split("\n")
+              .map((x) => x.trim())
+              .filter(Boolean);
+
+            setSchedule({
+              ...schedule,
+              days: {
+                ...schedule.days,
+                [day]: times,
+              },
+            });
+          }}
+        />
+      </div>
+    ))}
+  </section>
+)}
 
 
       {/* REVIEW */}
