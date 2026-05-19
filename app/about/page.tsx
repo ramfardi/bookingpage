@@ -198,24 +198,26 @@ export default function AboutPage() {
             </div>
           )}
 
-          {about.gallery && about.gallery.length > 0 && (
-            <div>
-              <h2 className="text-2xl font-semibold mb-6">
-                Sample Work
-              </h2>
+{/*
+{about.gallery && about.gallery.length > 0 && (
+  <div>
+    <h2 className="text-2xl font-semibold mb-6">
+      Sample Work
+    </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {about.gallery.map((img) => (
-                  <img
-                    key={img}
-                    src={img}
-                    alt="Sample work"
-                    className="rounded-xl object-cover w-full h-56"
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      {about.gallery.map((img) => (
+        <img
+          key={img}
+          src={img}
+          alt="Sample work"
+          className="rounded-xl object-cover w-full h-56"
+        />
+      ))}
+    </div>
+  </div>
+)}
+*/}
         </div>
       </section>
 
