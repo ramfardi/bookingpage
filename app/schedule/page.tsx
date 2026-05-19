@@ -5,7 +5,10 @@ import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 import type { LandingConfig } from "@/app/lib/landingConfig";
 
-const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
+
+type ScheduleDay = (typeof dayLabels)[number];
 
 function timeToMinutes(time: string) {
   const [h, m] = time.split(":").map(Number);
@@ -96,7 +99,8 @@ export default function SchedulePage() {
                   </div>
 
                   {slots.map((slot) => {
-                    const available = schedule.days?.[day]?.includes(slot);
+                    const available =
+						schedule.days?.[day as ScheduleDay]?.includes(slot);
 
                     return (
                       <div
