@@ -39,13 +39,21 @@ export default function SchedulePage() {
 
   const customerConfig = customer as CustomerConfig;
 
-  const schedule = customerConfig.schedule || {
-    enabled: false,
-    startHour: "08:00",
-    endHour: "20:00",
-    intervalMinutes: 30,
-    days: {},
-  };
+const schedule = {
+  enabled: customerConfig.schedule?.enabled ?? false,
+  startHour: customerConfig.schedule?.startHour || "08:00",
+  endHour: customerConfig.schedule?.endHour || "20:00",
+  intervalMinutes: customerConfig.schedule?.intervalMinutes || 30,
+  days: {
+    Mon: customerConfig.schedule?.days?.Mon || [],
+    Tue: customerConfig.schedule?.days?.Tue || [],
+    Wed: customerConfig.schedule?.days?.Wed || [],
+    Thu: customerConfig.schedule?.days?.Thu || [],
+    Fri: customerConfig.schedule?.days?.Fri || [],
+    Sat: customerConfig.schedule?.days?.Sat || [],
+    Sun: customerConfig.schedule?.days?.Sun || [],
+  },
+};
 
   const slots = useMemo(() => {
     const start = timeToMinutes(schedule.startHour || "08:00");
@@ -99,8 +107,7 @@ export default function SchedulePage() {
                   </div>
 
                   {slots.map((slot) => {
-                    const available =
-						schedule.days?.[day as ScheduleDay]?.includes(slot);
+					const available = schedule.days[day].includes(slot);
 
                     return (
                       <div
