@@ -436,6 +436,70 @@ async function saveChanges() {
 			
 			
           </section>
+		  
+		  
+		  <section className="mb-8">
+  <h3 className="font-medium mb-3">Gallery</h3>
+
+  {(customer.about.gallery || []).map((url, index) => (
+    <div key={index} className="flex gap-2 mb-2">
+      <input
+        className="flex-1 border rounded-md p-2"
+        placeholder="Google Drive image link"
+        value={url}
+        onChange={(e) => {
+          const updated = [...(customer.about.gallery || [])];
+          updated[index] = e.target.value;
+
+          setCustomer({
+            ...customer,
+            about: {
+              ...customer.about,
+              gallery: updated,
+            },
+          });
+        }}
+      />
+
+      <button
+        type="button"
+        className="text-red-600 px-2"
+        onClick={() => {
+          setCustomer({
+            ...customer,
+            about: {
+              ...customer.about,
+              gallery: (customer.about.gallery || []).filter(
+                (_, i) => i !== index
+              ),
+            },
+          });
+        }}
+      >
+        ✕
+      </button>
+    </div>
+  ))}
+
+  <button
+    type="button"
+    className="text-indigo-600 text-sm font-medium"
+    onClick={() => {
+      setCustomer({
+        ...customer,
+        about: {
+          ...customer.about,
+          gallery: [
+            ...(customer.about.gallery || []),
+            "",
+          ],
+        },
+      });
+    }}
+  >
+    + Add image
+  </button>
+</section>
 
           <button
             onClick={saveChanges}

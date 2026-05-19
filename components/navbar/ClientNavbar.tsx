@@ -129,8 +129,15 @@ export default function ClientNavbar({
               href={`${base}/about`}
               className="py-3 text-base font-medium"
             >
-              About me
+              About
             </Link>
+			
+			<Link
+		  href={`${base}/gallery`}
+		  className="py-3 text-base font-medium"
+		>
+		  Gallery
+		</Link>
           </div>
 
           {/* Mobile menu button */}
@@ -151,8 +158,16 @@ export default function ClientNavbar({
               className="py-3 text-base font-medium"
               onClick={() => setOpen(false)}
             >
-              About me
+              About
             </Link>
+			
+			<Link
+			  href={`${base}/gallery`}
+			  className="py-3 text-base font-medium"
+			  onClick={() => setOpen(false)}
+			>
+			  Gallery
+			</Link>
 
             <Link
               href={`${base}/pricing`}
