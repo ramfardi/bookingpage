@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 import type { LandingConfig } from "@/app/lib/landingConfig";
@@ -55,18 +55,14 @@ const schedule = {
   },
 };
 
-  const slots = useMemo(() => {
-    const start = timeToMinutes(schedule.startHour || "08:00");
-    const end = timeToMinutes(schedule.endHour || "20:00");
-    const interval = schedule.intervalMinutes || 30;
+const slots: string[] = [];
+const start = timeToMinutes(schedule.startHour || "08:00");
+const end = timeToMinutes(schedule.endHour || "20:00");
+const interval = schedule.intervalMinutes || 30;
 
-    const result: string[] = [];
-    for (let t = start; t < end; t += interval) {
-      result.push(minutesToTime(t));
-    }
-
-    return result;
-  }, [schedule.startHour, schedule.endHour, schedule.intervalMinutes]);
+for (let t = start; t < end; t += interval) {
+  slots.push(minutesToTime(t));
+}
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 px-4 py-24">
