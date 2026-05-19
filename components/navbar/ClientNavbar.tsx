@@ -138,6 +138,13 @@ export default function ClientNavbar({
 		>
 		  Gallery
 		</Link>
+		
+		<Link
+		  href={`${base}/schedule`}
+		  className="py-3 text-base font-medium"
+		>
+		  Schedule
+		</Link>
           </div>
 
           {/* Mobile menu button */}
@@ -168,6 +175,14 @@ export default function ClientNavbar({
 			>
 			  Gallery
 			</Link>
+			
+			<Link
+		  href={`${base}/schedule`}
+		  className="py-3 text-base font-medium"
+		  onClick={() => setOpen(false)}
+		>
+		  Schedule
+		</Link>
 
             <Link
               href={`${base}/pricing`}

@@ -157,6 +157,7 @@ const [booking, setBooking] = useState<{
 
       landing,
       about,
+	  
 
       services: services
         .filter((s) => s.enabled)
@@ -175,6 +176,22 @@ const [booking, setBooking] = useState<{
 
       booking,
       deposit,
+	  
+	  schedule: {
+	  enabled: true,
+	  startHour: "08:00",
+	  endHour: "20:00",
+	  intervalMinutes: 30,
+	  days: {
+		Mon: [],
+		Tue: [],
+		Wed: [],
+		Thu: [],
+		Fri: [],
+		Sat: [],
+		Sun: [],
+	  },
+	},
 	  
 	    isPaid: true,
   paidAt: new Date().toISOString(),

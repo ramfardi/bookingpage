@@ -24,7 +24,22 @@ export type PricingSection = {
   items?: PricingItem[];
 };
 
+export type ScheduleDay =
+  | "Mon"
+  | "Tue"
+  | "Wed"
+  | "Thu"
+  | "Fri"
+  | "Sat"
+  | "Sun";
 
+export type ScheduleConfig = {
+  enabled: boolean;
+  startHour: string; // "08:00"
+  endHour: string;   // "20:00"
+  intervalMinutes: number; // 30
+  days: Partial<Record<ScheduleDay, string[]>>;
+};
 
 export type CustomerConfig = {
 
@@ -67,6 +82,8 @@ export type CustomerConfig = {
     bookingNotifications?: string;
     replyTo?: string;
   };
+  
+  schedule?: ScheduleConfig;
 
 	about: {
 	  title: string;

@@ -501,6 +501,118 @@ async function saveChanges() {
   </button>
 </section>
 
+<section className="mb-8">
+  <h3 className="font-medium mb-3">Schedule</h3>
+
+  <label className="flex items-center gap-2 mb-4">
+    <input
+      type="checkbox"
+      checked={customer.schedule?.enabled ?? true}
+      onChange={(e) =>
+        setCustomer({
+          ...customer,
+          schedule: {
+            ...(customer.schedule || {
+              startHour: "08:00",
+              endHour: "20:00",
+              intervalMinutes: 30,
+              days: {
+                Mon: [],
+                Tue: [],
+                Wed: [],
+                Thu: [],
+                Fri: [],
+                Sat: [],
+                Sun: [],
+              },
+            }),
+            enabled: e.target.checked,
+          },
+        })
+      }
+    />
+    Enable schedule page
+  </label>
+
+  <div className="grid grid-cols-2 gap-2 mb-4">
+    <input
+      type="time"
+      className="border rounded-md p-2"
+      value={customer.schedule?.startHour || "08:00"}
+      onChange={(e) =>
+        setCustomer({
+          ...customer,
+          schedule: {
+            ...(customer.schedule || {
+              enabled: true,
+              endHour: "20:00",
+              intervalMinutes: 30,
+              days: {},
+            }),
+            startHour: e.target.value,
+          },
+        })
+      }
+    />
+
+    <input
+      type="time"
+      className="border rounded-md p-2"
+      value={customer.schedule?.endHour || "20:00"}
+      onChange={(e) =>
+        setCustomer({
+          ...customer,
+          schedule: {
+            ...(customer.schedule || {
+              enabled: true,
+              startHour: "08:00",
+              intervalMinutes: 30,
+              days: {},
+            }),
+            endHour: e.target.value,
+          },
+        })
+      }
+    />
+  </div>
+
+  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+    <div key={day} className="mb-4 border rounded-md p-3">
+      <div className="font-medium mb-2">{day}</div>
+
+      <textarea
+        className="w-full border rounded-md p-2 text-sm"
+        rows={3}
+        placeholder={`Enter available times, one per line\nExample:\n09:00\n09:30\n10:00`}
+        value={(customer.schedule?.days?.[day] || []).join("\n")}
+        onChange={(e) => {
+          const times = e.target.value
+            .split("\n")
+            .map((x) => x.trim())
+            .filter(Boolean);
+
+          setCustomer({
+            ...customer,
+            schedule: {
+              ...(customer.schedule || {
+                enabled: true,
+                startHour: "08:00",
+                endHour: "20:00",
+                intervalMinutes: 30,
+                days: {},
+              }),
+              days: {
+                ...(customer.schedule?.days || {}),
+                [day]: times,
+              },
+            },
+          });
+        }}
+      />
+    </div>
+  ))}
+</section>
+
           <button
             onClick={saveChanges}
             disabled={saving}
