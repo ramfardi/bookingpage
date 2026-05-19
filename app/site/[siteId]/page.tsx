@@ -368,6 +368,73 @@ async function saveChanges() {
                 })
               }
             />
+			
+			<div className="mt-4 space-y-3">
+  <h4 className="text-sm font-medium text-gray-700">
+    Bullet points
+  </h4>
+
+  {(customer.about.highlights || []).map((highlight, index) => (
+    <div key={index} className="flex gap-2">
+      <input
+        className="flex-1 border rounded-md p-2 text-sm"
+        placeholder="Example: 10+ years experience"
+        value={highlight}
+        onChange={(e) => {
+          const updated = [...(customer.about.highlights || [])];
+          updated[index] = e.target.value;
+
+          setCustomer({
+            ...customer,
+            about: {
+              ...customer.about,
+              highlights: updated,
+            },
+          });
+        }}
+      />
+
+      <button
+        type="button"
+        className="text-red-600 px-2"
+        onClick={() => {
+          setCustomer({
+            ...customer,
+            about: {
+              ...customer.about,
+              highlights: (customer.about.highlights || []).filter(
+                (_, i) => i !== index
+              ),
+            },
+          });
+        }}
+      >
+        ✕
+      </button>
+    </div>
+  ))}
+
+  <button
+    type="button"
+    className="text-sm text-indigo-600 font-medium"
+    onClick={() => {
+      setCustomer({
+        ...customer,
+        about: {
+          ...customer.about,
+          highlights: [
+            ...(customer.about.highlights || []),
+            "",
+          ],
+        },
+      });
+    }}
+  >
+    + Add bullet point
+  </button>
+</div>
+			
+			
           </section>
 
           <button

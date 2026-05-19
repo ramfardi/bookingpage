@@ -461,22 +461,60 @@ if (createdSiteId && createdSubdomain) {
       }
     />
 
-    <textarea
-      className="w-full border p-3 rounded-md"
-      rows={3}
-      placeholder={`Highlights (one per line)\nExample:\n10+ years experience\nCertified professionals`}
-      disabled={useDefaultAbout}
-      value={about.highlights.join("\n")}
-      onChange={(e) =>
-        setAbout({
-          ...about,
-          highlights: e.target.value
-            .split("\n")
-            .map((l) => l.trim())
-            .filter(Boolean),
-        })
-      }
-    />
+<div className="space-y-3">
+  <label className="text-sm font-medium text-gray-700">
+    Bullet points
+  </label>
+
+  {about.highlights.map((highlight, index) => (
+    <div key={index} className="flex gap-2">
+      <input
+        className="flex-1 border p-3 rounded-md"
+        placeholder="Example: 10+ years experience"
+        disabled={useDefaultAbout}
+        value={highlight}
+        onChange={(e) => {
+          const updated = [...about.highlights];
+          updated[index] = e.target.value;
+
+          setAbout({
+            ...about,
+            highlights: updated,
+          });
+        }}
+      />
+
+      <button
+        type="button"
+        className="text-red-500 px-2"
+        onClick={() => {
+          setAbout({
+            ...about,
+            highlights: about.highlights.filter(
+              (_, i) => i !== index
+            ),
+          });
+        }}
+      >
+        Remove
+      </button>
+    </div>
+  ))}
+
+  <button
+    type="button"
+    disabled={useDefaultAbout}
+    className="text-indigo-600 font-medium"
+    onClick={() =>
+      setAbout({
+        ...about,
+        highlights: [...about.highlights, ""],
+      })
+    }
+  >
+    + Add bullet point
+  </button>
+</div>
   </div>
 
   {/* ---------------- GALLERY ---------------- */}
