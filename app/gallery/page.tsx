@@ -59,7 +59,7 @@ export default function GalleryPage() {
         {/* HEADER */}
         <div className="text-center mb-14">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-            Sample Work
+            Samples
           </h1>
 
           <p className="mt-4 text-gray-600 max-w-2xl mx-auto">

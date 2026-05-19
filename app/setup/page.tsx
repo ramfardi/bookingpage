@@ -305,9 +305,9 @@ if (createdSiteId && createdSubdomain) {
 
         <button
           type="button"
-          onClick={() => {
-            window.location.href = `/site/${createdSiteId}?mode=preview`;
-          }}
+onClick={() => {
+  window.location.href = `https://${createdSubdomain}.simplebookme.com`;
+}}
           className="mt-8 bg-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition"
         >
           View your website
