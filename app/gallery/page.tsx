@@ -6,10 +6,18 @@ import type { CustomerConfig } from "@/app/lib/customerConfig";
 import type { LandingConfig } from "@/app/lib/landingConfig";
 
 function normalizeGoogleDriveImage(url: string) {
-  const match = url.match(/\/d\/(.*?)\//);
+  // Format: https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+  const fileMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
 
-  if (match?.[1]) {
-    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+  if (fileMatch?.[1]) {
+    return `https://lh3.googleusercontent.com/d/${fileMatch[1]}`;
+  }
+
+  // Format: https://drive.google.com/open?id=FILE_ID
+  const openMatch = url.match(/[?&]id=([^&]+)/);
+
+  if (url.includes("drive.google.com") && openMatch?.[1]) {
+    return `https://lh3.googleusercontent.com/d/${openMatch[1]}`;
   }
 
   return url;
