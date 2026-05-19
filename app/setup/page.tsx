@@ -135,7 +135,7 @@ const [booking, setBooking] = useState<{
       template.defaultData.services.map((s: string) => ({
         id: crypto.randomUUID(),
         name: s,
-        enabled: true,
+        enabled: false,
       }))
     );
 
