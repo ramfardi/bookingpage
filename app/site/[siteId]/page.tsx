@@ -81,27 +81,59 @@ export default function SitePage({
   }
 
   /* ---------------- SAVE ---------------- */
-  async function saveChanges() {
-    if (!siteId || !customer) return;
+async function saveChanges() {
+  if (!siteId || !customer) return;
 
-    setSaving(true);
+  setSaving(true);
 
-    const res = await fetch(`/api/site/${siteId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        data: customer,
-      }),
-    });
+  const cleanedItems = normalizedItems.filter(
+    (item: any) => item.label?.trim()
+  );
 
-    setSaving(false);
+  const updatedCustomer = {
+    ...customer,
 
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("Save failed:", text);
-      alert("Save failed. Please try again.");
-    }
+    services: cleanedItems.map((item: any) => item.label),
+
+    pricing: {
+      ...customer.pricing,
+      title: customer.pricing?.title || "Pricing",
+
+      items: cleanedItems.map((item: any) => ({
+        label: item.label,
+        description: item.description || "",
+        price: item.price || "",
+      })),
+
+      rows: cleanedItems.map((item: any) => ({
+        id: crypto.randomUUID(),
+        name: item.label,
+        price: item.price || "",
+        includes: item.description || "",
+      })),
+    },
+  };
+
+  const res = await fetch(`/api/site/${siteId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      data: updatedCustomer,
+    }),
+  });
+
+  setSaving(false);
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("Save failed:", text);
+    alert("Save failed. Please try again.");
+    return;
   }
+
+  setCustomer(updatedCustomer);
+  alert("Changes saved");
+}
 
   return (
     <div className="flex h-screen">
