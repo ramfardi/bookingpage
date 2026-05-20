@@ -179,7 +179,7 @@ export default function HomePage({
 
         <div className="text-center mb-10">
 		<h2 className="text-4xl font-semibold italic text-gray-900 font-serif">
-		  What customers say
+		  testimonials
 		</h2>
         </div>
 
