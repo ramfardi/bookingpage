@@ -206,36 +206,40 @@ export default function HomePage({
             ))}
         </div>
 
-        {(customer as CustomerConfig).testimonials?.googleReviewLink && (
-          <div className="mt-12 flex flex-col md:flex-row items-center justify-center gap-6">
-            <a
-              href={(customer as CustomerConfig).testimonials?.googleReviewLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 rounded-xl bg-indigo-600 text-white px-6 py-3 font-semibold hover:bg-indigo-700 transition"
-            >
-              <span className="bg-white text-indigo-600 px-2 py-0.5 rounded font-bold">
-                G
-              </span>
-              Leave us a Google review
-            </a>
+		{(customer as CustomerConfig).testimonials?.googleReviewLink && (
+		  <div className="mt-12 flex flex-col items-center justify-center">
+			
+			{/* QR CODE */}
+			<div className="rounded-3xl bg-white border p-4 shadow-lg mb-5">
+			  <img
+				src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
+				  (customer as CustomerConfig).testimonials
+					?.googleReviewLink || ""
+				)}`}
+				alt="Google review QR code"
+				className="w-40 h-40"
+			  />
 
-            <div className="rounded-2xl bg-white border p-4 shadow-sm">
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(
-                  (customer as CustomerConfig).testimonials
-                    ?.googleReviewLink || ""
-                )}`}
-                alt="Google review QR code"
-                className="w-32 h-32"
-              />
+			  <p className="mt-3 text-sm text-gray-500 text-center">
+				Scan to leave a review
+			  </p>
+			</div>
 
-              <p className="mt-2 text-xs text-gray-500 text-center">
-                Scan to review
-              </p>
-            </div>
-          </div>
-        )}
+			{/* REVIEW BUTTON */}
+			<a
+			  href={(customer as CustomerConfig).testimonials?.googleReviewLink}
+			  target="_blank"
+			  rel="noopener noreferrer"
+			  className="inline-flex items-center gap-3 rounded-xl bg-indigo-600 text-white px-7 py-3 font-semibold hover:bg-indigo-700 transition shadow-md"
+			>
+			  <span className="bg-white text-indigo-600 px-2 py-0.5 rounded font-bold">
+				G
+			  </span>
+
+			  Leave us a Google review
+			</a>
+		  </div>
+		)}
       </div>
     </section>
   )}
