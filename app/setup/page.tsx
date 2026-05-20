@@ -581,7 +581,27 @@ onClick={() => {
 	  <div className="space-y-4 pt-6 border-t">
 		<h3 className="text-lg font-semibold">Sample work gallery</h3>
 		<p className="text-sm text-gray-500">
-		  Add image URLs showing your work. Uploads will be supported later.
+		  Add image links showing your work, completed projects, or portfolio.
+		  Upload your photos to Google Drive, then paste the share links here.
+
+		  <br />
+		  <br />
+
+		  To get a working image link:
+		  <br />
+		  1. Upload your photos to Google Drive
+		  <br />
+		  2. Right-click the image → Share
+		  <br />
+		  3. Change access to <strong>Anyone with the link</strong>
+		  <br />
+		  4. Copy the share link and paste it here
+
+		  <br />
+		  <br />
+
+		  Your images will appear in a beautiful gallery on your website.
+		  Direct uploads will be supported later.
 		</p>
 
 		{about.gallery.map((url, index) => (
