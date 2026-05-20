@@ -673,6 +673,81 @@ async function saveChanges() {
 </section>
 
 
+{/* Contact Information */}
+<section className="mb-8">
+  <h3 className="font-medium mb-3">Contact information</h3>
+
+  <p className="text-sm text-gray-500 mb-4">
+    This information will appear below testimonials on your homepage.
+  </p>
+
+  {/* ADDRESS */}
+  <div className="mb-4">
+    <label className="block text-sm text-gray-600 mb-1">
+      Address
+    </label>
+
+    <input
+      className="w-full border rounded-md p-2"
+      placeholder="Business address"
+      value={customer.contact?.address || ""}
+      onChange={(e) =>
+        setCustomer({
+          ...customer,
+          contact: {
+            ...(customer.contact || {}),
+            address: e.target.value,
+          },
+        })
+      }
+    />
+  </div>
+
+  {/* EMAIL */}
+  <div className="mb-4">
+    <label className="block text-sm text-gray-600 mb-1">
+      Email
+    </label>
+
+    <input
+      type="email"
+      className="w-full border rounded-md p-2"
+      placeholder="Contact email"
+      value={customer.contact?.email || ""}
+      onChange={(e) =>
+        setCustomer({
+          ...customer,
+          contact: {
+            ...(customer.contact || {}),
+            email: e.target.value,
+          },
+        })
+      }
+    />
+  </div>
+
+  {/* PHONE */}
+  <div>
+    <label className="block text-sm text-gray-600 mb-1">
+      Phone
+    </label>
+
+    <input
+      className="w-full border rounded-md p-2"
+      placeholder="Phone number"
+      value={customer.contact?.phone || ""}
+      onChange={(e) =>
+        setCustomer({
+          ...customer,
+          contact: {
+            ...(customer.contact || {}),
+            phone: e.target.value,
+          },
+        })
+      }
+    />
+  </div>
+</section>
 
 
 {/* Schedule */}
