@@ -23,6 +23,9 @@ export default function HomePage({
   const [customerKey, setCustomerKey] = useState<string | null>(null);
   const [mode, setMode] = useState<"sales" | "client">("sales");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  
+  const [typedSubheader1, setTypedSubheader1] = useState("");
+  const [typedSubheader2, setTypedSubheader2] = useState("");
 
   useEffect(() => {
     if (activeCustomer) {
@@ -43,6 +46,44 @@ export default function HomePage({
 
     load();
   }, []);
+  
+  useEffect(() => {
+  if (!customer || mode !== "client") return;
+
+  const landing = customer.landing;
+  const text1 = landing.subheader1 || "";
+  const text2 = landing.subheader2 || "";
+
+  setTypedSubheader1("");
+  setTypedSubheader2("");
+
+  let i = 0;
+  let j = 0;
+
+  const interval1 = setInterval(() => {
+    i++;
+
+    setTypedSubheader1(text1.slice(0, i));
+
+    if (i >= text1.length) {
+      clearInterval(interval1);
+
+      const interval2 = setInterval(() => {
+        j++;
+
+        setTypedSubheader2(text2.slice(0, j));
+
+        if (j >= text2.length) {
+          clearInterval(interval2);
+        }
+      }, 35);
+    }
+  }, 30);
+
+  return () => {
+    clearInterval(interval1);
+  };
+}, [customer, mode]);
 
   if (!customer) return null;
 
@@ -106,15 +147,15 @@ export default function HomePage({
         </span>
       </h1>
 
-      {/* SUBHEADER 1 */}
+      {/* SUBHEADER 1 
       <p className="mt-6 text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed">
         {landing.subheader1}
-      </p>
+      </p>*/}
 
-      {/* SUBHEADER 2 */}
+      {/* SUBHEADER 2 
       <p className="mt-3 text-base md:text-lg text-indigo-300 font-semibold">
         {landing.subheader2}
-      </p>
+      </p>*/}
 
     </div>
   </div>
@@ -123,12 +164,25 @@ export default function HomePage({
 
           <div className="mt-10 flex justify-center">
 {mode === "client" ? (
-  <button
-    onClick={handleBookAppointment}
-    className="rounded-xl bg-white text-black px-8 py-4 font-semibold"
-  >
-    Book appointment
-  </button>
+  <div className="flex flex-col items-center gap-6">
+    <button
+      onClick={handleBookAppointment}
+      className="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
+    >
+      Book appointment
+    </button>
+
+    <div className="max-w-3xl text-center">
+      <p className="text-lg md:text-xl text-gray-100 leading-relaxed min-h-[32px]">
+        {typedSubheader1}
+        <span className="animate-pulse">|</span>
+      </p>
+
+      <p className="mt-3 text-base md:text-lg text-indigo-200 font-semibold min-h-[28px]">
+        {typedSubheader2}
+      </p>
+    </div>
+  </div>
 ) : (
 <div className="flex flex-col items-center gap-5">
 
