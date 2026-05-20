@@ -528,20 +528,22 @@ async function saveChanges() {
       return slots;
     }
 
-    function getSchedule() {
-      return {
-        enabled: customer.schedule?.enabled ?? true,
-        startHour: customer.schedule?.startHour || "08:00",
-        endHour: customer.schedule?.endHour || "20:00",
-        intervalMinutes: customer.schedule?.intervalMinutes || 30,
+function getSchedule() {
+  const currentCustomer = customer!;
+
+  return {
+    enabled: currentCustomer.schedule?.enabled ?? true,
+    startHour: currentCustomer.schedule?.startHour || "08:00",
+    endHour: currentCustomer.schedule?.endHour || "20:00",
+    intervalMinutes: currentCustomer.schedule?.intervalMinutes || 30,
         days: {
-          Mon: customer.schedule?.days?.Mon || [],
-          Tue: customer.schedule?.days?.Tue || [],
-          Wed: customer.schedule?.days?.Wed || [],
-          Thu: customer.schedule?.days?.Thu || [],
-          Fri: customer.schedule?.days?.Fri || [],
-          Sat: customer.schedule?.days?.Sat || [],
-          Sun: customer.schedule?.days?.Sun || [],
+          Mon: currentCustomer.schedule?.days?.Mon || [],
+          Tue: currentCustomer.schedule?.days?.Tue || [],
+          Wed: currentCustomer.schedule?.days?.Wed || [],
+          Thu: currentCustomer.schedule?.days?.Thu || [],
+          Fri: currentCustomer.schedule?.days?.Fri || [],
+          Sat: currentCustomer.schedule?.days?.Sat || [],
+          Sun: currentCustomer.schedule?.days?.Sun || [],
         },
       };
     }
