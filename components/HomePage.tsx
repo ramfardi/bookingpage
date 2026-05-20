@@ -195,9 +195,9 @@ export default function HomePage({
                   ★★★★★
                 </div>
 
-                <p className="mt-4 text-gray-700 text-sm leading-relaxed">
-                  “{r.text}”
-                </p>
+			<p className="mt-4 text-gray-700 text-lg italic font-medium leading-relaxed">
+			  “{r.text}”
+			</p>
 
                 <p className="mt-5 font-semibold text-gray-900">
                   {r.name}
