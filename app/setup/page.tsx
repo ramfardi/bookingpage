@@ -28,20 +28,7 @@ function buildTimeSlots(startHour: string, endHour: string) {
   return slots;
 }
 
-function toggleTime(day: string, time: string) {
-  const current = schedule.days[day] || [];
-  const exists = current.includes(time);
 
-  setSchedule({
-    ...schedule,
-    days: {
-      ...schedule.days,
-      [day]: exists
-        ? current.filter((t) => t !== time)
-        : [...current, time].sort(),
-    },
-  });
-}
 
 /* ---------------- TYPES ---------------- */
 
@@ -113,7 +100,7 @@ export default function SetupPage() {
   const [step, setStep] = useState<Step>("basic");
 
   /* ---------------- BASIC ---------------- */
-
+  
   const [form, setForm] = useState({
     businessName: "",
     email: "",
@@ -135,6 +122,21 @@ export default function SetupPage() {
     Sun: [],
   } as Record<string, string[]>,
 });
+
+function toggleTime(day: string, time: string) {
+  const current = schedule.days[day] || [];
+  const exists = current.includes(time);
+
+  setSchedule({
+    ...schedule,
+    days: {
+      ...schedule.days,
+      [day]: exists
+        ? current.filter((t) => t !== time)
+        : [...current, time].sort(),
+    },
+  });
+};
 
 /* ---------------- CONTENT ---------------- */
 
