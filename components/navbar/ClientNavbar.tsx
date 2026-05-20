@@ -136,7 +136,7 @@ export default function ClientNavbar({
 		  href={`${base}/gallery`}
 		  className="py-3 text-base font-medium"
 		>
-		  Gallery
+		  Portfolio
 		</Link>
 		
 		<Link
@@ -173,7 +173,7 @@ export default function ClientNavbar({
 			  className="py-3 text-base font-medium"
 			  onClick={() => setOpen(false)}
 			>
-			  Gallery
+			  Portfolio
 			</Link>
 			
 			<Link

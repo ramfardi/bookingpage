@@ -52,7 +52,7 @@ export default function GalleryPage() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-14">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-            Samples
+            Portfolio
           </h1>
 
           <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
