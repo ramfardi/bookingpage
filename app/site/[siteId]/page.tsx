@@ -551,12 +551,14 @@ function getSchedule() {
     const schedule = getSchedule();
     const slots = buildTimeSlots(schedule.startHour, schedule.endHour);
 
-    function updateSchedule(nextSchedule: typeof schedule) {
-      setCustomer({
-        ...customer,
-        schedule: nextSchedule,
-      });
-    }
+	function updateSchedule(nextSchedule: CustomerConfig["schedule"]) {
+	  if (!customer) return;
+
+	  setCustomer({
+		...customer,
+		schedule: nextSchedule,
+	  } as CustomerConfig);
+	}
 
     function toggleTime(day: string, time: string) {
       const current = schedule.days[day as keyof typeof schedule.days] || [];
