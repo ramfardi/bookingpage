@@ -232,10 +232,16 @@ export default function HomePage({
 			  rel="noopener noreferrer"
 			  className="inline-flex items-center gap-3 rounded-xl bg-indigo-600 text-white px-7 py-3 font-semibold hover:bg-indigo-700 transition shadow-md"
 			>
-			  <span className="bg-white text-indigo-600 px-2 py-0.5 rounded font-bold">
-				G
-			  </span>
-
+<div className="bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-sm">
+  <span className="font-bold text-lg">
+    <span className="text-blue-500">G</span>
+    <span className="text-red-500">o</span>
+    <span className="text-yellow-500">o</span>
+    <span className="text-blue-500">g</span>
+    <span className="text-green-500">l</span>
+    <span className="text-red-500">e</span>
+  </span>
+</div>
 			  Leave us a review 😊
 			</a>
 		  </div>
