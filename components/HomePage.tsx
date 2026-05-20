@@ -252,6 +252,66 @@ export default function HomePage({
       </div>
     </section>
   )}
+  
+  
+  {mode === "client" &&
+  ((customer as CustomerConfig).contact?.address ||
+    (customer as CustomerConfig).contact?.email ||
+    (customer as CustomerConfig).contact?.phone) && (
+    <section className="bg-white px-6 py-20 border-t">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-stretch">
+        {(customer as CustomerConfig).contact?.address && (
+          <div className="rounded-3xl overflow-hidden border shadow-sm min-h-[320px]">
+            <iframe
+              title="Business location"
+              src={`https://www.google.com/maps?q=${encodeURIComponent(
+                (customer as CustomerConfig).contact?.address || ""
+              )}&output=embed`}
+              className="w-full h-full min-h-[320px]"
+              loading="lazy"
+            />
+          </div>
+        )}
+
+        <div className="rounded-3xl border shadow-sm p-8 bg-gray-50 flex flex-col justify-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">
+            Contact us
+          </h2>
+
+          {(customer as CustomerConfig).contact?.address && (
+            <p className="text-gray-700 mb-4">
+              <strong>Address:</strong><br />
+              {(customer as CustomerConfig).contact?.address}
+            </p>
+          )}
+
+          {(customer as CustomerConfig).contact?.email && (
+            <p className="text-gray-700 mb-4">
+              <strong>Email:</strong><br />
+              <a
+                href={`mailto:${(customer as CustomerConfig).contact?.email}`}
+                className="text-indigo-600"
+              >
+                {(customer as CustomerConfig).contact?.email}
+              </a>
+            </p>
+          )}
+
+          {(customer as CustomerConfig).contact?.phone && (
+            <p className="text-gray-700">
+              <strong>Phone:</strong><br />
+              <a
+                href={`tel:${(customer as CustomerConfig).contact?.phone}`}
+                className="text-indigo-600"
+              >
+                {(customer as CustomerConfig).contact?.phone}
+              </a>
+            </p>
+          )}
+        </div>
+      </div>
+    </section>
+  )}
       {/* ================= SALES ONLY ================= */}
       {mode === "sales" && (
         <>

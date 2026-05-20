@@ -96,6 +96,12 @@ export type CustomerConfig = {
   }[];
 };
 
+contact?: {
+  address?: string;
+  email?: string;
+  phone?: string;
+};
+
 	about: {
 	  title: string;
 	  description: string;

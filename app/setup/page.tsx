@@ -148,6 +148,12 @@ const [testimonials, setTestimonials] = useState({
   ],
 });
 
+const [contact, setContact] = useState({
+  address: "",
+  email: "",
+  phone: "",
+});
+
 /* ---------------- CONTENT ---------------- */
 
 	const [useDefaultHero, setUseDefaultHero] = useState(true);
@@ -246,6 +252,7 @@ const [booking, setBooking] = useState<{
 	  
 		schedule,
 		testimonials,
+		contact,
 	  
 	    isPaid: true,
   paidAt: new Date().toISOString(),
@@ -1005,6 +1012,53 @@ onClick={() => {
         />
       </div>
     ))}
+  </section>
+)}
+{/* CONTACT INFO */}
+{step === "booking" && (
+  <section className="space-y-6 border-t pt-8">
+    <h2 className="text-xl font-semibold">Contact information</h2>
+
+    <p className="text-sm text-gray-500">
+      Optional. If provided, this will appear on your homepage below testimonials.
+    </p>
+
+    <input
+      className="w-full border p-3 rounded-md"
+      placeholder="Business address"
+      value={contact.address}
+      onChange={(e) =>
+        setContact({
+          ...contact,
+          address: e.target.value,
+        })
+      }
+    />
+
+    <input
+      className="w-full border p-3 rounded-md"
+      placeholder="Contact email"
+      type="email"
+      value={contact.email}
+      onChange={(e) =>
+        setContact({
+          ...contact,
+          email: e.target.value,
+        })
+      }
+    />
+
+    <input
+      className="w-full border p-3 rounded-md"
+      placeholder="Phone number"
+      value={contact.phone}
+      onChange={(e) =>
+        setContact({
+          ...contact,
+          phone: e.target.value,
+        })
+      }
+    />
   </section>
 )}
 
