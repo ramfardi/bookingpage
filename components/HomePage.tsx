@@ -233,13 +233,16 @@ export default function HomePage({
 			  className="inline-flex items-center gap-3 rounded-xl bg-indigo-600 text-white px-7 py-3 font-semibold hover:bg-indigo-700 transition shadow-md"
 			>
 <div className="bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-sm">
-  <span className="font-bold text-lg">
-    <span className="text-blue-500">G</span>
-    <span className="text-red-500">o</span>
-    <span className="text-yellow-500">o</span>
-    <span className="text-blue-500">g</span>
-    <span className="text-green-500">l</span>
-    <span className="text-red-500">e</span>
+  <span
+    className="font-bold text-lg leading-none"
+    style={{
+      background:
+        "conic-gradient(#4285F4 0deg 90deg, #34A853 90deg 180deg, #FBBC05 180deg 270deg, #EA4335 270deg 360deg)",
+      WebkitBackgroundClip: "text",
+      color: "transparent",
+    }}
+  >
+    G
   </span>
 </div>
 			  Leave us a review 😊
