@@ -4,6 +4,45 @@ import { useEffect, useState } from "react";
 import { templates } from "@/app/templates";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 
+
+const scheduleDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+function buildTimeSlots(startHour: string, endHour: string) {
+  const [startH, startM] = startHour.split(":").map(Number);
+  const [endH, endM] = endHour.split(":").map(Number);
+
+  const start = startH * 60 + startM;
+  const end = endH * 60 + endM;
+
+  const slots: string[] = [];
+
+  for (let t = start; t < end; t += 30) {
+    const h = Math.floor(t / 60);
+    const m = t % 60;
+
+    slots.push(
+      `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`
+    );
+  }
+
+  return slots;
+}
+
+function toggleTime(day: string, time: string) {
+  const current = schedule.days[day] || [];
+  const exists = current.includes(time);
+
+  setSchedule({
+    ...schedule,
+    days: {
+      ...schedule.days,
+      [day]: exists
+        ? current.filter((t) => t !== time)
+        : [...current, time].sort(),
+    },
+  });
+}
+
 /* ---------------- TYPES ---------------- */
 
 type ServiceItem = {
@@ -752,7 +791,7 @@ onClick={() => {
     <h2 className="text-xl font-semibold">Weekly schedule</h2>
 
     <p className="text-sm text-gray-500">
-      Add the times you are available. Enter one time per line for each day.
+      Select the time blocks when you are available. Green means available.
     </p>
 
     <label className="flex items-center gap-3">
@@ -803,32 +842,76 @@ onClick={() => {
       </div>
     </div>
 
-    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-      <div key={day} className="border rounded-md p-4">
-        <h3 className="font-medium mb-2">{day}</h3>
+    <div className="space-y-5">
+      {scheduleDays.map((day) => {
+        const slots = buildTimeSlots(
+          schedule.startHour,
+          schedule.endHour
+        );
 
-        <textarea
-          className="w-full border p-3 rounded-md text-sm"
-          rows={3}
-          placeholder={`Example:\n09:00\n09:30\n10:00`}
-          value={(schedule.days[day] || []).join("\n")}
-          onChange={(e) => {
-            const times = e.target.value
-              .split("\n")
-              .map((x) => x.trim())
-              .filter(Boolean);
+        return (
+          <div key={day} className="border rounded-xl p-4 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold">{day}</h3>
 
-            setSchedule({
-              ...schedule,
-              days: {
-                ...schedule.days,
-                [day]: times,
-              },
-            });
-          }}
-        />
-      </div>
-    ))}
+              <button
+                type="button"
+                className="text-xs text-indigo-600 font-medium"
+                onClick={() =>
+                  setSchedule({
+                    ...schedule,
+                    days: {
+                      ...schedule.days,
+                      [day]: slots,
+                    },
+                  })
+                }
+              >
+                Select all
+              </button>
+            </div>
+
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+              {slots.map((slot) => {
+                const selected =
+                  schedule.days[day]?.includes(slot);
+
+                return (
+                  <button
+                    key={`${day}-${slot}`}
+                    type="button"
+                    onClick={() => toggleTime(day, slot)}
+                    className={`rounded-lg border px-3 py-2 text-sm transition ${
+                      selected
+                        ? "bg-emerald-500 text-white border-emerald-500"
+                        : "bg-gray-100 text-gray-700 border-gray-200"
+                    }`}
+                  >
+                    {slot}
+                  </button>
+                );
+              })}
+            </div>
+
+            <button
+              type="button"
+              className="mt-3 text-xs text-gray-500"
+              onClick={() =>
+                setSchedule({
+                  ...schedule,
+                  days: {
+                    ...schedule.days,
+                    [day]: [],
+                  },
+                })
+              }
+            >
+              Clear {day}
+            </button>
+          </div>
+        );
+      })}
+    </div>
   </section>
 )}
 
