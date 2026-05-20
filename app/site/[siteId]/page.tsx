@@ -500,6 +500,181 @@ async function saveChanges() {
     + Add image
   </button>
 </section>
+
+
+{/* Testimonials */}
+<section className="mb-8">
+  <h3 className="font-medium mb-3">Testimonials</h3>
+
+  <label className="flex items-center gap-2 mb-4">
+    <input
+      type="checkbox"
+      checked={customer.testimonials?.enabled ?? false}
+      onChange={(e) =>
+        setCustomer({
+          ...customer,
+          testimonials: {
+            enabled: e.target.checked,
+            googleReviewLink:
+              customer.testimonials?.googleReviewLink || "",
+            reviews:
+              customer.testimonials?.reviews || [
+                { name: "", text: "" },
+                { name: "", text: "" },
+                { name: "", text: "" },
+              ],
+          },
+        })
+      }
+    />
+    Enable testimonials section
+  </label>
+
+  <div className="mb-6">
+    <label className="block text-sm text-gray-600 mb-1">
+      Google review link
+    </label>
+
+    <input
+      className="w-full border rounded-md p-2"
+      placeholder="https://g.page/r/..."
+      value={customer.testimonials?.googleReviewLink || ""}
+      onChange={(e) =>
+        setCustomer({
+          ...customer,
+          testimonials: {
+            enabled:
+              customer.testimonials?.enabled ?? true,
+            googleReviewLink: e.target.value,
+            reviews:
+              customer.testimonials?.reviews || [],
+          },
+        })
+      }
+    />
+  </div>
+
+  {[0, 1, 2].map((index) => {
+    const review =
+      customer.testimonials?.reviews?.[index] || {
+        name: "",
+        text: "",
+      };
+
+    return (
+      <div
+        key={index}
+        className="border rounded-xl p-4 mb-4 bg-white"
+      >
+        <div className="font-medium text-sm mb-3">
+          Review #{index + 1}
+        </div>
+
+        <input
+          className="w-full border rounded-md p-2 mb-3"
+          placeholder="Customer name"
+          value={review.name}
+          onChange={(e) => {
+            const updated = [
+              ...(customer.testimonials?.reviews || [
+                { name: "", text: "" },
+                { name: "", text: "" },
+                { name: "", text: "" },
+              ]),
+            ];
+
+            updated[index] = {
+              ...updated[index],
+              name: e.target.value,
+            };
+
+            setCustomer({
+              ...customer,
+              testimonials: {
+                enabled:
+                  customer.testimonials?.enabled ?? true,
+                googleReviewLink:
+                  customer.testimonials?.googleReviewLink ||
+                  "",
+                reviews: updated,
+              },
+            });
+          }}
+        />
+
+        <textarea
+          className="w-full border rounded-md p-2 text-sm"
+          rows={4}
+          placeholder="Customer review"
+          value={review.text}
+          onChange={(e) => {
+            const updated = [
+              ...(customer.testimonials?.reviews || [
+                { name: "", text: "" },
+                { name: "", text: "" },
+                { name: "", text: "" },
+              ]),
+            ];
+
+            updated[index] = {
+              ...updated[index],
+              text: e.target.value,
+            };
+
+            setCustomer({
+              ...customer,
+              testimonials: {
+                enabled:
+                  customer.testimonials?.enabled ?? true,
+                googleReviewLink:
+                  customer.testimonials?.googleReviewLink ||
+                  "",
+                reviews: updated,
+              },
+            });
+          }}
+        />
+
+        <button
+          type="button"
+          className="mt-3 text-sm text-red-600"
+          onClick={() => {
+            const updated = [
+              ...(customer.testimonials?.reviews || [
+                { name: "", text: "" },
+                { name: "", text: "" },
+                { name: "", text: "" },
+              ]),
+            ];
+
+            updated[index] = {
+              name: "",
+              text: "",
+            };
+
+            setCustomer({
+              ...customer,
+              testimonials: {
+                enabled:
+                  customer.testimonials?.enabled ?? true,
+                googleReviewLink:
+                  customer.testimonials?.googleReviewLink ||
+                  "",
+                reviews: updated,
+              },
+            });
+          }}
+        >
+          Remove review
+        </button>
+      </div>
+    );
+  })}
+</section>
+
+
+
+
 {/* Schedule */}
 <section className="mb-8">
   <h3 className="font-medium mb-3">Schedule</h3>
