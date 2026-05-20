@@ -500,117 +500,198 @@ async function saveChanges() {
     + Add image
   </button>
 </section>
-
+{/* Schedule */}
 <section className="mb-8">
   <h3 className="font-medium mb-3">Schedule</h3>
 
-  <label className="flex items-center gap-2 mb-4">
-    <input
-      type="checkbox"
-      checked={customer.schedule?.enabled ?? true}
-      onChange={(e) =>
-        setCustomer({
-          ...customer,
-          schedule: {
-            ...(customer.schedule || {
-              startHour: "08:00",
-              endHour: "20:00",
-              intervalMinutes: 30,
-              days: {
-                Mon: [],
-                Tue: [],
-                Wed: [],
-                Thu: [],
-                Fri: [],
-                Sat: [],
-                Sun: [],
-              },
-            }),
-            enabled: e.target.checked,
-          },
-        })
+  {(() => {
+    const scheduleDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
+
+    function buildTimeSlots(startHour: string, endHour: string) {
+      const [startH, startM] = startHour.split(":").map(Number);
+      const [endH, endM] = endHour.split(":").map(Number);
+
+      const start = startH * 60 + startM;
+      const end = endH * 60 + endM;
+
+      const slots: string[] = [];
+
+      for (let t = start; t < end; t += 30) {
+        const h = Math.floor(t / 60);
+        const m = t % 60;
+
+        slots.push(
+          `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`
+        );
       }
-    />
-    Enable schedule page
-  </label>
 
-  <div className="grid grid-cols-2 gap-2 mb-4">
-    <input
-      type="time"
-      className="border rounded-md p-2"
-      value={customer.schedule?.startHour || "08:00"}
-      onChange={(e) =>
-        setCustomer({
-          ...customer,
-          schedule: {
-            ...(customer.schedule || {
-              enabled: true,
-              endHour: "20:00",
-              intervalMinutes: 30,
-              days: {},
-            }),
-            startHour: e.target.value,
-          },
-        })
-      }
-    />
+      return slots;
+    }
 
-    <input
-      type="time"
-      className="border rounded-md p-2"
-      value={customer.schedule?.endHour || "20:00"}
-      onChange={(e) =>
-        setCustomer({
-          ...customer,
-          schedule: {
-            ...(customer.schedule || {
-              enabled: true,
-              startHour: "08:00",
-              intervalMinutes: 30,
-              days: {},
-            }),
-            endHour: e.target.value,
-          },
-        })
-      }
-    />
-  </div>
+    function getSchedule() {
+      return {
+        enabled: customer.schedule?.enabled ?? true,
+        startHour: customer.schedule?.startHour || "08:00",
+        endHour: customer.schedule?.endHour || "20:00",
+        intervalMinutes: customer.schedule?.intervalMinutes || 30,
+        days: {
+          Mon: customer.schedule?.days?.Mon || [],
+          Tue: customer.schedule?.days?.Tue || [],
+          Wed: customer.schedule?.days?.Wed || [],
+          Thu: customer.schedule?.days?.Thu || [],
+          Fri: customer.schedule?.days?.Fri || [],
+          Sat: customer.schedule?.days?.Sat || [],
+          Sun: customer.schedule?.days?.Sun || [],
+        },
+      };
+    }
 
-  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-    <div key={day} className="mb-4 border rounded-md p-3">
-      <div className="font-medium mb-2">{day}</div>
+    const schedule = getSchedule();
+    const slots = buildTimeSlots(schedule.startHour, schedule.endHour);
 
-      <textarea
-        className="w-full border rounded-md p-2 text-sm"
-        rows={3}
-        placeholder={`Enter available times, one per line\nExample:\n09:00\n09:30\n10:00`}
-        value={(customer.schedule?.days?.[day as ScheduleDay] || []).join("\n")}
-        onChange={(e) => {
-          const times = e.target.value
-            .split("\n")
-            .map((x) => x.trim())
-            .filter(Boolean);
+    function updateSchedule(nextSchedule: typeof schedule) {
+      setCustomer({
+        ...customer,
+        schedule: nextSchedule,
+      });
+    }
 
-          setCustomer({
-            ...customer,
-            schedule: {
-              ...(customer.schedule || {
-                enabled: true,
-                startHour: "08:00",
-                endHour: "20:00",
-                intervalMinutes: 30,
-                days: {},
-              }),
-              days: {
-                ...(customer.schedule?.days || {}),
-                [day as ScheduleDay]: times,
-              },
-            },
-          });
-        }}
-      />
-    </div>
-  ))}
+    function toggleTime(day: string, time: string) {
+      const current = schedule.days[day as keyof typeof schedule.days] || [];
+      const exists = current.includes(time);
+
+      updateSchedule({
+        ...schedule,
+        days: {
+          ...schedule.days,
+          [day]: exists
+            ? current.filter((t) => t !== time)
+            : [...current, time].sort(),
+        },
+      });
+    }
+
+    return (
+      <div className="space-y-4">
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={schedule.enabled}
+            onChange={(e) =>
+              updateSchedule({
+                ...schedule,
+                enabled: e.target.checked,
+              })
+            }
+          />
+          Enable schedule page
+        </label>
+
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-xs text-gray-500">
+              Start time
+            </label>
+            <input
+              type="time"
+              step={1800}
+              className="w-full border rounded-md p-2"
+              value={schedule.startHour}
+              onChange={(e) =>
+                updateSchedule({
+                  ...schedule,
+                  startHour: e.target.value,
+                })
+              }
+            />
+          </div>
+
+          <div>
+            <label className="text-xs text-gray-500">
+              End time
+            </label>
+            <input
+              type="time"
+              step={1800}
+              className="w-full border rounded-md p-2"
+              value={schedule.endHour}
+              onChange={(e) =>
+                updateSchedule({
+                  ...schedule,
+                  endHour: e.target.value,
+                })
+              }
+            />
+          </div>
+        </div>
+
+        <p className="text-xs text-gray-500">
+          Click the time blocks when you are available. Green means available.
+        </p>
+
+        {scheduleDays.map((day) => (
+          <div key={day} className="border rounded-md p-3 bg-white">
+            <div className="flex items-center justify-between mb-2">
+              <div className="font-medium">{day}</div>
+
+              <button
+                type="button"
+                className="text-xs text-indigo-600 font-medium"
+                onClick={() =>
+                  updateSchedule({
+                    ...schedule,
+                    days: {
+                      ...schedule.days,
+                      [day]: slots,
+                    },
+                  })
+                }
+              >
+                Select all
+              </button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              {slots.map((slot) => {
+                const selected = schedule.days[day].includes(slot);
+
+                return (
+                  <button
+                    key={`${day}-${slot}`}
+                    type="button"
+                    onClick={() => toggleTime(day, slot)}
+                    className={`rounded-md border px-2 py-2 text-xs transition ${
+                      selected
+                        ? "bg-emerald-500 text-white border-emerald-500"
+                        : "bg-gray-100 text-gray-700 border-gray-200"
+                    }`}
+                  >
+                    {slot}
+                  </button>
+                );
+              })}
+            </div>
+
+            <button
+              type="button"
+              className="mt-2 text-xs text-gray-500"
+              onClick={() =>
+                updateSchedule({
+                  ...schedule,
+                  days: {
+                    ...schedule.days,
+                    [day]: [],
+                  },
+                })
+              }
+            >
+              Clear {day}
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+  })()}
 </section>
 
           <button
