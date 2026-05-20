@@ -121,91 +121,15 @@ export default function HomePage({
 </>
           )}
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-8">
-            {mode === "client" ? (
-              <>
-                {/* BOOK BUTTON */}
-                <button
-                  onClick={handleBookAppointment}
-                  className="rounded-xl bg-white text-black px-8 py-4 font-semibold shadow-lg hover:scale-[1.02] transition"
-                >
-                  Book appointment
-                </button>
-
-                {/* TESTIMONIALS */}
-                {(customer as CustomerConfig).testimonials?.enabled && (
-                  <div className="w-full max-w-5xl mt-4">
-                    <div className="grid md:grid-cols-3 gap-5">
-                      {(customer as CustomerConfig).testimonials?.reviews
-                        .filter((r) => r.name || r.text)
-                        .map((r, i) => (
-                          <div
-                            key={i}
-                            className="rounded-3xl bg-white/95 backdrop-blur border border-white/30 shadow-2xl p-6 text-left"
-                          >
-                            {/* STARS */}
-                            <div className="flex items-center gap-1 text-yellow-400 text-lg">
-                              ★★★★★
-                            </div>
-
-                            {/* REVIEW */}
-                            <p className="mt-4 text-gray-700 leading-relaxed text-sm">
-                              “{r.text}”
-                            </p>
-
-                            {/* NAME */}
-                            <div className="mt-5 font-semibold text-gray-900">
-                              {r.name}
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-
-                    {/* GOOGLE REVIEW CTA + QR */}
-                    {(customer as CustomerConfig).testimonials
-                      ?.googleReviewLink && (
-                      <div className="mt-8 flex flex-col md:flex-row items-center justify-center gap-6">
-                        {/* BUTTON */}
-                        <a
-                          href={
-                            (customer as CustomerConfig).testimonials
-                              ?.googleReviewLink
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-3 rounded-2xl bg-white text-gray-900 px-6 py-4 font-semibold shadow-xl hover:scale-[1.02] transition"
-                        >
-                          {/* GOOGLE LOGO */}
-                          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow border">
-                            <span className="text-blue-500 font-bold text-lg">
-                              G
-                            </span>
-                          </div>
-
-                          Leave a Google Review
-                        </a>
-
-                        {/* QR CODE */}
-                        <div className="rounded-2xl bg-white p-4 shadow-2xl">
-                          <img
-                            src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(
-                              (customer as CustomerConfig).testimonials
-                                ?.googleReviewLink || ""
-                            )}`}
-                            alt="Google review QR code"
-                            className="w-32 h-32"
-                          />
-
-                          <p className="mt-2 text-xs text-gray-500 text-center">
-                            Scan to review
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            ) : (
+          <div className="mt-10 flex justify-center">
+{mode === "client" ? (
+  <button
+    onClick={handleBookAppointment}
+    className="rounded-xl bg-white text-black px-8 py-4 font-semibold"
+  >
+    Book appointment
+  </button>
+) : (
 <div className="flex flex-col items-center gap-5">
 
   {/* PRIMARY CTA */}
@@ -247,7 +171,74 @@ export default function HomePage({
 
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />
       </section>
+{mode === "client" &&
+  (customer as CustomerConfig).testimonials?.enabled && (
+    <section className="bg-white px-6 py-20 border-t">
+      <div className="max-w-6xl mx-auto">
+        <div className="h-px bg-gray-200 mb-14" />
 
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold text-gray-900">
+            What customers say
+          </h2>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {(customer as CustomerConfig).testimonials?.reviews
+            .filter((r) => r.name || r.text)
+            .map((r, i) => (
+              <div
+                key={i}
+                className="rounded-2xl bg-gray-50 border p-6 shadow-sm"
+              >
+                <div className="text-yellow-400 text-lg">
+                  ★★★★★
+                </div>
+
+                <p className="mt-4 text-gray-700 text-sm leading-relaxed">
+                  “{r.text}”
+                </p>
+
+                <p className="mt-5 font-semibold text-gray-900">
+                  {r.name}
+                </p>
+              </div>
+            ))}
+        </div>
+
+        {(customer as CustomerConfig).testimonials?.googleReviewLink && (
+          <div className="mt-12 flex flex-col md:flex-row items-center justify-center gap-6">
+            <a
+              href={(customer as CustomerConfig).testimonials?.googleReviewLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 rounded-xl bg-indigo-600 text-white px-6 py-3 font-semibold hover:bg-indigo-700 transition"
+            >
+              <span className="bg-white text-indigo-600 px-2 py-0.5 rounded font-bold">
+                G
+              </span>
+              Leave us a Google review
+            </a>
+
+            <div className="rounded-2xl bg-white border p-4 shadow-sm">
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(
+                  (customer as CustomerConfig).testimonials
+                    ?.googleReviewLink || ""
+                )}`}
+                alt="Google review QR code"
+                className="w-32 h-32"
+              />
+
+              <p className="mt-2 text-xs text-gray-500 text-center">
+                Scan to review
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  )}
       {/* ================= SALES ONLY ================= */}
       {mode === "sales" && (
         <>
