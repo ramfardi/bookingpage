@@ -178,9 +178,9 @@ export default function HomePage({
         <div className="h-px bg-gray-200 mb-14" />
 
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-gray-900">
-            What customers say
-          </h2>
+		<h2 className="text-4xl font-semibold italic text-gray-900 font-serif">
+		  What customers say
+		</h2>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
