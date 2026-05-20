@@ -138,6 +138,16 @@ function toggleTime(day: string, time: string) {
   });
 };
 
+const [testimonials, setTestimonials] = useState({
+  enabled: false,
+  googleReviewLink: "",
+  reviews: [
+    { name: "", text: "" },
+    { name: "", text: "" },
+    { name: "", text: "" },
+  ],
+});
+
 /* ---------------- CONTENT ---------------- */
 
 	const [useDefaultHero, setUseDefaultHero] = useState(true);
@@ -235,6 +245,7 @@ const [booking, setBooking] = useState<{
       deposit,
 	  
 		schedule,
+		testimonials,
 	  
 	    isPaid: true,
   paidAt: new Date().toISOString(),
@@ -937,6 +948,65 @@ onClick={() => {
   </section>
 )}
 
+{/* TESTIMONIALS */}
+{step === "booking" && (
+  <section className="space-y-6 border-t pt-8">
+    <h2 className="text-xl font-semibold">Testimonials</h2>
+
+    <label className="flex items-center gap-3">
+      <input
+        type="checkbox"
+        checked={testimonials.enabled}
+        onChange={(e) =>
+          setTestimonials({
+            ...testimonials,
+            enabled: e.target.checked,
+          })
+        }
+      />
+      Show testimonials on my homepage
+    </label>
+
+    <input
+      className="w-full border p-3 rounded-md"
+      placeholder="Google review link"
+      value={testimonials.googleReviewLink}
+      onChange={(e) =>
+        setTestimonials({
+          ...testimonials,
+          googleReviewLink: e.target.value,
+        })
+      }
+    />
+
+    {testimonials.reviews.map((review, index) => (
+      <div key={index} className="border rounded-md p-4 space-y-3">
+        <input
+          className="w-full border p-3 rounded-md"
+          placeholder="Reviewer name"
+          value={review.name}
+          onChange={(e) => {
+            const updated = [...testimonials.reviews];
+            updated[index].name = e.target.value;
+            setTestimonials({ ...testimonials, reviews: updated });
+          }}
+        />
+
+        <textarea
+          className="w-full border p-3 rounded-md"
+          rows={3}
+          placeholder="Review text"
+          value={review.text}
+          onChange={(e) => {
+            const updated = [...testimonials.reviews];
+            updated[index].text = e.target.value;
+            setTestimonials({ ...testimonials, reviews: updated });
+          }}
+        />
+      </div>
+    ))}
+  </section>
+)}
 
       {/* REVIEW */}
       {step === "review" && (

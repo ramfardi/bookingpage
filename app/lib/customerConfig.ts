@@ -41,6 +41,8 @@ export type ScheduleConfig = {
   days: Partial<Record<ScheduleDay, string[]>>;
 };
 
+
+
 export type CustomerConfig = {
 
   templateId: "hairsalon" | "cleaning" |"beauty" | "fitness" | "home" |"accounting" | "pet" | "auto" | "photo";
@@ -84,6 +86,15 @@ export type CustomerConfig = {
   };
   
   schedule?: ScheduleConfig;
+  
+  testimonials?: {
+  enabled: boolean;
+  googleReviewLink?: string;
+  reviews: {
+    name: string;
+    text: string;
+  }[];
+};
 
 	about: {
 	  title: string;
