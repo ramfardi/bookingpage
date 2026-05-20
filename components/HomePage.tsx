@@ -236,7 +236,7 @@ export default function HomePage({
 				G
 			  </span>
 
-			  Leave us a Google review
+			  Leave us a review 😊
 			</a>
 		  </div>
 		)}
