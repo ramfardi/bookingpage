@@ -183,13 +183,13 @@ export default function HomePage({
 		</h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="flex flex-wrap justify-center gap-6">
           {(customer as CustomerConfig).testimonials?.reviews
             .filter((r) => r.name || r.text)
             .map((r, i) => (
               <div
                 key={i}
-                className="rounded-2xl bg-gray-50 border p-6 shadow-sm"
+                className="w-full max-w-sm rounded-2xl bg-gray-50 border p-6 shadow-sm text-center"
               >
                 <div className="text-yellow-400 text-lg">
                   ★★★★★
