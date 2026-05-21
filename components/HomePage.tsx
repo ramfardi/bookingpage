@@ -379,7 +379,7 @@ export default function HomePage({
     (customer as CustomerConfig).socialLinks?.x ||
     (customer as CustomerConfig).socialLinks?.linkedin
   ) && (
-    <div className="mt-8 pt-6 border-t">
+    <div className="mt-8 pt-6 pb-16 border-t">
       <h3 className="font-semibold text-gray-900 mb-4 text-center">
         Follow us
       </h3>
