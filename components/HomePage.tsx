@@ -232,17 +232,6 @@ useEffect(() => {
     >
       Book appointment
     </button>
-
-    <div className="max-w-3xl text-center">
-      <p className="text-lg md:text-xl text-gray-100 leading-relaxed min-h-[32px]">
-        {typedSubheader1}
-        <span className="animate-pulse">|</span>
-      </p>
-
-      <p className="mt-3 text-base md:text-lg text-indigo-200 font-semibold min-h-[28px]">
-        {typedSubheader2}
-      </p>
-    </div>
   </div>
 ) : (
 <div className="flex flex-col items-center gap-5">
