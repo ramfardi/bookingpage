@@ -4,8 +4,8 @@ import type { CustomerConfig } from "./customerConfig";
 const SALES_CONFIG: LandingConfig = {
   heroImage: "/images/hero-default.png",
   landing: {
-    header1: "Simple",
-    header2: "Booking",
+    header1: "Get Booked",
+    header2: "Online",
     subheader1: "Create a booking website in seconds",
     subheader2: "No monthly fee | Easy to use | Customizable",
   },

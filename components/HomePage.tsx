@@ -29,6 +29,42 @@ export default function HomePage({
   
   const [typedSubheader1, setTypedSubheader1] = useState("");
   const [typedSubheader2, setTypedSubheader2] = useState("");
+  
+  const [typedHeader1, setTypedHeader1] = useState("");
+  const [typedHeader2, setTypedHeader2] = useState("");
+  
+useEffect(() => {
+  if (!customer) return;
+
+  const text1 = customer.landing.header1 || "";
+  const text2 = customer.landing.header2 || "";
+
+  setTypedHeader1("");
+  setTypedHeader2("");
+
+  let i = 0;
+  let j = 0;
+
+  const interval1 = setInterval(() => {
+    i++;
+    setTypedHeader1(text1.slice(0, i));
+
+    if (i >= text1.length) {
+      clearInterval(interval1);
+
+      const interval2 = setInterval(() => {
+        j++;
+        setTypedHeader2(text2.slice(0, j));
+
+        if (j >= text2.length) {
+          clearInterval(interval2);
+        }
+      }, 100);
+    }
+  }, 80);
+
+  return () => clearInterval(interval1);
+}, [customer]);
 
   useEffect(() => {
     if (activeCustomer) {
@@ -50,8 +86,10 @@ export default function HomePage({
     load();
   }, []);
   
+
+  
   useEffect(() => {
-  if (!customer || mode !== "client") return;
+  if (!customer) return;
 
   const landing = customer.landing;
   const text1 = landing.subheader1 || "";
@@ -111,7 +149,7 @@ export default function HomePage({
   return (
     <main className="min-h-screen w-full flex flex-col">
       {/* ================= HERO ================= */}
-      <section
+      {/*<section
         className="relative min-h-[90vh] pt-20 flex items-center justify-center text-center text-white"
         style={{
           backgroundImage: `url(${
@@ -122,7 +160,27 @@ export default function HomePage({
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
-      >
+      >*/}
+	  
+	  <section className="relative min-h-[90vh] pt-20 flex items-center justify-center text-center text-white overflow-hidden">
+		  {mode === "sales" ? (
+			<video
+			  autoPlay
+			  muted
+			  loop
+			  playsInline
+			  className="absolute inset-0 w-full h-full object-cover"
+			>
+			  <source src="/videos/landing_page_clip.mp4" type="video/mp4" />
+			</video>
+		  ) : (
+			<div
+			  className="absolute inset-0 bg-cover bg-center"
+			  style={{
+				backgroundImage: `url(${(customer as CustomerConfig).heroImage})`,
+			  }}
+			/>
+		  )}
         <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" />
 
         <motion.div
@@ -134,34 +192,34 @@ export default function HomePage({
           {landing && (
 <>
   {/* OVERLAY WRAPPER (important for readability) */}
-  <div className="relative w-full flex justify-center px-6">
+<div className="relative z-10 max-w-5xl px-6 text-center">
+  <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-white min-h-[180px]">
+    
+    <span>
+      {typedHeader1}
+    </span>
 
-    {/* Glass / dark overlay */}
-    <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] rounded-3xl" />
+    {" "}
 
-    {/* CONTENT */}
-    <div className="relative z-10 max-w-4xl text-center py-16 px-6">
+    <span className="bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent">
+      {typedHeader2}
+    </span>
 
-      {/* HEADLINE */}
-      <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-white">
-        {landing.header1}{" "}
-        <span className="bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent">
-          {landing.header2}
-        </span>
-      </h1>
+    <span className="animate-pulse text-white">|</span>
+  </h1>
+</div>
 
-      {/* SUBHEADER 1 
-      <p className="mt-6 text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed">
-        {landing.subheader1}
-      </p>*/}
+<div className="mt-6 max-w-3xl mx-auto text-center">
+  <p className="text-lg md:text-xl text-gray-100 leading-relaxed min-h-[32px]">
+    {typedSubheader1}
+    <span className="animate-pulse">|</span>
+  </p>
 
-      {/* SUBHEADER 2 
-      <p className="mt-3 text-base md:text-lg text-indigo-300 font-semibold">
-        {landing.subheader2}
-      </p>*/}
+  <p className="mt-3 text-base md:text-lg text-indigo-200 font-semibold min-h-[28px]">
+    {typedSubheader2}
+  </p>
+</div>
 
-    </div>
-  </div>
 </>
           )}
 
@@ -190,36 +248,47 @@ export default function HomePage({
 <div className="flex flex-col items-center gap-5">
 
   {/* PRIMARY CTA */}
-  <button
-    onClick={() => router.push("/setup")}
-    className="group flex items-center gap-2 rounded-2xl bg-indigo-600 text-white px-10 py-4 font-semibold shadow-md hover:bg-indigo-700 hover:shadow-lg transition-all"
-  >
-    Create your booking site
-    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-  </button>
+<button
+  onClick={() => router.push("/setup")}
+  className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 px-10 py-4 font-semibold text-white shadow-[0_10px_40px_rgba(99,102,241,0.45)] transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_15px_50px_rgba(99,102,241,0.6)]"
+>
+  {/* Glow effect */}
+  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 bg-white/10" />
+
+  {/* Shine animation */}
+  <div className="absolute -left-20 top-0 h-full w-16 rotate-12 bg-white/20 blur-xl transition-all duration-700 group-hover:left-[120%]" />
+
+  {/* Content */}
+  <div className="relative flex items-center gap-3">
+    <span className="text-lg">
+      Create Yours Now
+    </span>
+
+    <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+  </div>
+</button>
 
   {/* SECONDARY CTA */}
-  <button
+  {/*<button
     onClick={() => router.push("/instagram_setup")}
     className="flex items-center gap-2 rounded-2xl bg-white text-gray-900 px-10 py-4 font-semibold border shadow-sm hover:bg-gray-50 hover:shadow-md transition-all"
   >
     <Instagram className="w-5 h-5 text-pink-500" />
     Create your Instagram bio link
-  </button>
+  </button>*/}
   
     {/* FREE TOOL CTA */}
-  <button
+  {/*<button
     onClick={() => router.push("/availability")}
     className="flex items-center gap-2 rounded-2xl bg-indigo-50 text-indigo-700 px-10 py-4 font-semibold border border-indigo-200 shadow-sm hover:bg-indigo-100 hover:shadow-md transition-all"
   >
     <ArrowRight className="w-5 h-5" />
     Create availability page
 
-    {/* FREE badge */}
     <span className="ml-2 text-xs bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-2 py-0.5 rounded-full">
       FREE
     </span>
-  </button>
+  </button>*/}
 
 </div>
 )}
