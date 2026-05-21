@@ -9,6 +9,9 @@ import { useRouter } from "next/navigation";
 
 import { ArrowRight, Instagram } from "lucide-react";
 
+import { FaInstagram, FaTiktok, FaLinkedin } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+
 export default function HomePage({
   activeCustomer,
 }: {
@@ -366,6 +369,73 @@ export default function HomePage({
       </div>
     </section>
   )}
+  
+  
+  {/* SOCIAL LINKS */}
+{mode === "client" &&
+  (
+    (customer as CustomerConfig).socialLinks?.instagram ||
+    (customer as CustomerConfig).socialLinks?.tiktok ||
+    (customer as CustomerConfig).socialLinks?.x ||
+    (customer as CustomerConfig).socialLinks?.linkedin
+  ) && (
+    <div className="mt-8 pt-6 border-t">
+      <h3 className="font-semibold text-gray-900 mb-4 text-center">
+        Follow us
+      </h3>
+
+      <div className="flex flex-wrap gap-3 justify-center">
+        {(customer as CustomerConfig).socialLinks?.instagram && (
+          <a
+            href={(customer as CustomerConfig).socialLinks?.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl bg-pink-50 text-pink-600 px-4 py-2 font-medium hover:bg-pink-100 transition"
+          >
+            <FaInstagram className="text-xl" />
+            Instagram
+          </a>
+        )}
+
+        {(customer as CustomerConfig).socialLinks?.tiktok && (
+          <a
+            href={(customer as CustomerConfig).socialLinks?.tiktok}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl bg-gray-100 text-black px-4 py-2 font-medium hover:bg-gray-200 transition"
+          >
+            <FaTiktok className="text-xl" />
+            TikTok
+          </a>
+        )}
+
+        {(customer as CustomerConfig).socialLinks?.x && (
+          <a
+            href={(customer as CustomerConfig).socialLinks?.x}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl bg-black text-white px-4 py-2 font-medium hover:bg-gray-900 transition"
+          >
+            <FaXTwitter className="text-xl" />
+            X
+          </a>
+        )}
+
+        {(customer as CustomerConfig).socialLinks?.linkedin && (
+          <a
+            href={(customer as CustomerConfig).socialLinks?.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-50 text-blue-700 px-4 py-2 font-medium hover:bg-blue-100 transition"
+          >
+            <FaLinkedin className="text-xl" />
+            LinkedIn
+          </a>
+        )}
+      </div>
+    </div>
+)}
+  
       {/* ================= SALES ONLY ================= */}
       {mode === "sales" && (
         <>

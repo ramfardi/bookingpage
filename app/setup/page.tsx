@@ -154,6 +154,13 @@ const [contact, setContact] = useState({
   phone: "",
 });
 
+const [socialLinks, setSocialLinks] = useState({
+  instagram: "",
+  tiktok: "",
+  x: "",
+  linkedin: "",
+});
+
 /* ---------------- CONTENT ---------------- */
 
 	const [useDefaultHero, setUseDefaultHero] = useState(true);
@@ -253,6 +260,7 @@ const [booking, setBooking] = useState<{
 		schedule,
 		testimonials,
 		contact,
+		socialLinks,
 	  
 	    isPaid: true,
   paidAt: new Date().toISOString(),
@@ -1056,6 +1064,65 @@ onClick={() => {
         setContact({
           ...contact,
           phone: e.target.value,
+        })
+      }
+    />
+  </section>
+)}
+
+{/* SOCIAL LINKS */}
+{step === "booking" && (
+  <section className="space-y-6 border-t pt-8">
+    <h2 className="text-xl font-semibold">Social media links</h2>
+
+    <p className="text-sm text-gray-500">
+      Optional. Add your social media links so visitors can follow or contact you.
+    </p>
+
+    <input
+      className="w-full border p-3 rounded-md"
+      placeholder="Instagram URL"
+      value={socialLinks.instagram}
+      onChange={(e) =>
+        setSocialLinks({
+          ...socialLinks,
+          instagram: e.target.value,
+        })
+      }
+    />
+
+    <input
+      className="w-full border p-3 rounded-md"
+      placeholder="TikTok URL"
+      value={socialLinks.tiktok}
+      onChange={(e) =>
+        setSocialLinks({
+          ...socialLinks,
+          tiktok: e.target.value,
+        })
+      }
+    />
+
+    <input
+      className="w-full border p-3 rounded-md"
+      placeholder="X / Twitter URL"
+      value={socialLinks.x}
+      onChange={(e) =>
+        setSocialLinks({
+          ...socialLinks,
+          x: e.target.value,
+        })
+      }
+    />
+
+    <input
+      className="w-full border p-3 rounded-md"
+      placeholder="LinkedIn URL"
+      value={socialLinks.linkedin}
+      onChange={(e) =>
+        setSocialLinks({
+          ...socialLinks,
+          linkedin: e.target.value,
         })
       }
     />

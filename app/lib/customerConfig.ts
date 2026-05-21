@@ -102,6 +102,13 @@ contact?: {
   phone?: string;
 };
 
+socialLinks?: {
+  instagram?: string;
+  tiktok?: string;
+  x?: string;
+  linkedin?: string;
+};
+
 	about: {
 	  title: string;
 	  description: string;

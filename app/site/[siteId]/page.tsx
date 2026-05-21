@@ -749,6 +749,46 @@ async function saveChanges() {
   </div>
 </section>
 
+{/* Social Links */}
+<section className="mb-8">
+  <h3 className="font-medium mb-3">Social media links</h3>
+
+  <p className="text-sm text-gray-500 mb-4">
+    Optional. These links will appear below your contact information.
+  </p>
+
+  {[
+    ["instagram", "Instagram URL"],
+    ["tiktok", "TikTok URL"],
+    ["x", "X / Twitter URL"],
+    ["linkedin", "LinkedIn URL"],
+  ].map(([key, label]) => (
+    <div key={key} className="mb-4">
+      <label className="block text-sm text-gray-600 mb-1">
+        {label}
+      </label>
+
+      <input
+        className="w-full border rounded-md p-2"
+        placeholder={label}
+        value={
+          customer.socialLinks?.[
+            key as keyof NonNullable<CustomerConfig["socialLinks"]>
+          ] || ""
+        }
+        onChange={(e) =>
+          setCustomer({
+            ...customer,
+            socialLinks: {
+              ...(customer.socialLinks || {}),
+              [key]: e.target.value,
+            },
+          })
+        }
+      />
+    </div>
+  ))}
+</section>
 
 {/* Schedule */}
 <section className="mb-8">
