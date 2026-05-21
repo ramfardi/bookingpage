@@ -238,21 +238,29 @@ export default function PricingPage() {
               <tr>
                 <th className="p-4">Service</th>
                 <th className="p-4 w-32">Price</th>
-                <th className="p-4">Includes</th>
+                {pricing.rows.some((row) => row.includes?.trim()) && (
+  <th className="p-4">Includes</th>
+)}
               </tr>
             </thead>
 
-            <tbody>
-              {pricing.rows.map((row) => (
-                <tr key={row.id} className="border-t">
-                  <td className="p-4 font-medium">{row.name}</td>
-                  <td className="p-4 whitespace-nowrap">{row.price}</td>
-                  <td className="p-4 text-gray-600">
-                    {row.includes || "—"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+			<tbody>
+			  {pricing.rows.map((row) => (
+				<tr key={row.id} className="border-t">
+				  <td className="p-4 font-medium">{row.name}</td>
+
+				  <td className="p-4 whitespace-nowrap">
+					{row.price}
+				  </td>
+
+				  {pricing.rows.some((r) => r.includes?.trim()) && (
+					<td className="p-4 text-gray-600">
+					  {row.includes?.trim() || ""}
+					</td>
+				  )}
+				</tr>
+			  ))}
+			</tbody>
           </table>
         </div>
       </div>
