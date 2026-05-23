@@ -534,7 +534,48 @@ return (
 <section className="w-full bg-gradient-to-b from-white to-indigo-50 py-32 overflow-hidden">
   <div className="mx-auto max-w-7xl px-6 space-y-32">
 
-    {/* FEATURE 1 */}
+
+    {/* booking */}
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7 }}
+      className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+    >
+
+      {/* TEXT FIRST */}
+      <div className="order-2 lg:order-1">
+        <p className="text-indigo-600 font-semibold uppercase tracking-[0.25em] mb-6">
+          EASY BOOKING
+        </p>
+
+        <blockquote className="text-4xl md:text-5xl leading-tight font-light italic text-gray-900">
+          “Let customers book with you and choose your services.”
+        </blockquote>
+
+        <p className="mt-8 text-lg text-gray-600 leading-relaxed max-w-xl">
+          Your clients can select the service and time and book via email,
+          you can confirm or modify the booking. Alternatively, you can use other booking systems like Fresha or Vagaro. 
+        </p>
+      </div>
+
+      {/* IMAGE */}
+      <div className="relative order-1 lg:order-2">
+        <div className="absolute inset-0 bg-purple-200 blur-3xl opacity-30 rounded-full"></div>
+
+        <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
+          <img
+            src="/images/book.png"
+            alt="Quote generator feature"
+            className="w-full object-cover"
+          />
+        </div>
+      </div>
+    </motion.div>
+
+
+    {/* schedule */}
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -574,7 +615,7 @@ return (
     </motion.div>
 
 
-    {/* FEATURE 2 */}
+    {/* Pricing */}
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -585,6 +626,59 @@ return (
 
       {/* TEXT FIRST */}
       <div className="order-2 lg:order-1">
+        <p className="text-indigo-600 font-semibold uppercase tracking-[0.25em] mb-6">
+          CLEAR PRICING
+        </p>
+
+        <blockquote className="text-4xl md:text-5xl leading-tight font-light italic text-gray-900">
+          “Share your pricing with the custmers, update it anytime”
+        </blockquote>
+
+        <p className="mt-8 text-lg text-gray-600 leading-relaxed max-w-xl">
+          Add services from an extensive list based on your service catagory or add yours, share your pricing with the clients and adjust it anytime.
+        </p>
+      </div>
+
+      {/* IMAGE */}
+      <div className="relative order-1 lg:order-2">
+        <div className="absolute inset-0 bg-purple-200 blur-3xl opacity-30 rounded-full"></div>
+
+        <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
+          <img
+            src="/images/price.png"
+            alt="Quote generator feature"
+            className="w-full object-cover"
+          />
+        </div>
+      </div>
+    </motion.div>
+
+
+
+    {/* Testimonial */}
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7 }}
+      className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+    >
+
+      {/* LEFT IMAGE */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-indigo-200 blur-3xl opacity-30 rounded-full"></div>
+
+        <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
+          <img
+            src="/images/testi.png"
+            alt="Availability feature"
+            className="w-full object-cover"
+          />
+        </div>
+      </div>
+
+      {/* RIGHT TEXT */}
+      <div>
         <p className="text-indigo-600 font-semibold uppercase tracking-[0.25em] mb-6">
           INSTANT TRUST
         </p>
@@ -599,20 +693,8 @@ return (
           or any other review link that you have.
         </p>
       </div>
-
-      {/* IMAGE */}
-      <div className="relative order-1 lg:order-2">
-        <div className="absolute inset-0 bg-purple-200 blur-3xl opacity-30 rounded-full"></div>
-
-        <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
-          <img
-            src="/images/testi.png"
-            alt="Quote generator feature"
-            className="w-full object-cover"
-          />
-        </div>
-      </div>
     </motion.div>
+
 
   </div>
 </section>
