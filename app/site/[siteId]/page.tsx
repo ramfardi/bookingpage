@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import HomePage from "@/components/HomePage";
 import type { CustomerConfig, ScheduleDay } from "@/app/lib/customerConfig";
-import { supabase } from "@/app/lib/supabase";
+import { supabaseBrowser } from "@/app/lib/supabase-browser";
 import imageCompression from "browser-image-compression";
 
 export default function SitePage({
@@ -98,7 +98,7 @@ export default function SitePage({
 
     const fileName = `${crypto.randomUUID()}.${ext}`;
 
-    const { error } = await supabase.storage
+    const { error } = await supabaseBrowser.storage
       .from("gallery")
       .upload(fileName, compressed);
 
@@ -108,7 +108,7 @@ export default function SitePage({
       return;
     }
 
-    const { data } = supabase.storage
+    const { data } = supabaseBrowser.storage
       .from("gallery")
       .getPublicUrl(fileName);
 

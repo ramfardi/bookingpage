@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { templates } from "@/app/templates";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 import imageCompression from "browser-image-compression";
-
+import { supabaseBrowser } from "@/app/lib/supabase-browser";
 const scheduleDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 function buildTimeSlots(startHour: string, endHour: string) {
@@ -241,7 +241,7 @@ async function uploadGalleryImage(file: File) {
 
     const fileName = `${crypto.randomUUID()}.${ext}`;
 
-    const { error } = await supabase.storage
+    const { error } = await supabaseBrowser.storage
       .from("gallery")
       .upload(fileName, compressed);
 
@@ -251,7 +251,7 @@ async function uploadGalleryImage(file: File) {
       return;
     }
 
-    const { data } = supabase.storage
+    const { data } = supabaseBrowser.storage
       .from("gallery")
       .getPublicUrl(fileName);
 
