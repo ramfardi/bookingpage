@@ -146,7 +146,37 @@ useEffect(() => {
 	router.push("/booking");
   }
 
-  return (
+return (
+  <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "SimpleBookMe",
+          applicationCategory: "BusinessApplication",
+          operatingSystem: "Web",
+          description:
+            "Booking website builder for cleaners, salons, home services, and independent businesses.",
+          url: "https://simplebookme.com",
+          image: "https://simplebookme.com/images/og-home.jpg",
+
+          offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "CAD",
+          },
+
+          creator: {
+            "@type": "Organization",
+            name: "SimpleBookMe",
+            url: "https://simplebookme.com",
+          },
+        }),
+      }}
+    />
+
     <main className="min-h-screen w-full flex flex-col">
       {/* ================= HERO ================= */}
       {/*<section
@@ -651,5 +681,6 @@ useEffect(() => {
         </>
       )}
     </main>
-  );
+  </>
+);
 }

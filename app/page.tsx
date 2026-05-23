@@ -8,9 +8,11 @@ import { getSiteCleaningQuote } from "./lib/getSiteCleaningQuote";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "SimpleBookMe | Create a Booking Website in Minutes",
-  description:
-    "SimpleBookMe helps service businesses create a professional booking website with online appointments and instant confirmations.",
+metadataBase: new URL("https://simplebookme.com"),
+  title:
+  "Booking Website Builder for Cleaners, Salons & Service Businesses | SimpleBookMe",
+description:
+  "Create a professional booking website for your cleaning business, salon, handyman service, or freelance business. Accept online bookings, share your availability, and get customers fast.",
   alternates: {
     canonical: "https://simplebookme.com/",
   },
@@ -18,6 +20,30 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+    openGraph: {
+    title:
+      "Booking Website Builder for Service Businesses | SimpleBookMe",
+
+    description:
+      "Create a professional booking website with scheduling, quote tools, and availability pages.",
+
+    url: "https://simplebookme.com",
+
+    siteName: "SimpleBookMe",
+
+    images: [
+      {
+        url: "https://simplebookme.com/images/og-home.jpg",
+        width: 1200,
+        height: 630,
+        alt: "SimpleBookMe Homepage",
+      },
+    ],
+
+    locale: "en_US",
+    type: "website",
+  },
+  
 };
 
 export default async function Page() {
