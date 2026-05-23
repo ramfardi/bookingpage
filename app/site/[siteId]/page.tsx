@@ -479,7 +479,7 @@ async function saveChanges() {
     + Add bullet point
   </button>
 </div>
-			
+</section>			
 			
 {/* -------- GALLERY -------- */}
 <section className="mb-8">
