@@ -117,12 +117,48 @@ const isSubdomain =
             `,
           }}
         />
+		
+		<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+
+      name: "SimpleBookMe",
+
+      applicationCategory: "BusinessApplication",
+
+      operatingSystem: "Web",
+
+      description:
+        "Booking website builder for cleaners, salons, and service businesses.",
+
+      url: "https://simplebookme.com",
+
+      image: "https://simplebookme.com/images/og-home.jpg",
+
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "CAD",
+      },
+
+      creator: {
+        "@type": "Organization",
+        name: "SimpleBookMe",
+        url: "https://simplebookme.com",
+      },
+    }),
+  }}
+/>
+		
       </head>
 
       <body className="bg-gradient-to-br from-indigo-50 via-white to-purple-50">
         <Providers>
           {/* Navbar is client-side and resolves mode async */}
-          //{!isSubdomain && <Navbar />}
+
 		  <Navbar />
 
           {/* Offset for fixed navbar height */}
