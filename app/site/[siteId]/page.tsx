@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import HomePage from "@/components/HomePage";
 import type { CustomerConfig, ScheduleDay } from "@/app/lib/customerConfig";
+import { supabase } from "@/app/lib/supabase";
+import imageCompression from "browser-image-compression";
 
 export default function SitePage({
   params,
@@ -16,6 +18,7 @@ export default function SitePage({
   const [siteId, setSiteId] = useState<string | null>(null);
   const [customer, setCustomer] = useState<CustomerConfig | null>(null);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   /* ---------------- RESOLVE PARAMS ---------------- */
   useEffect(() => {
@@ -81,6 +84,49 @@ export default function SitePage({
   }
 
   /* ---------------- SAVE ---------------- */
+  
+  async function uploadGalleryImage(file: File) {
+  try {
+    setUploading(true);
+
+    const compressed = await imageCompression(file, {
+      maxSizeMB: 0.8,
+      maxWidthOrHeight: 1600,
+    });
+
+    const ext = file.name.split(".").pop();
+
+    const fileName = `${crypto.randomUUID()}.${ext}`;
+
+    const { error } = await supabase.storage
+      .from("gallery")
+      .upload(fileName, compressed);
+
+    if (error) {
+      console.error(error);
+      alert("Upload failed");
+      return;
+    }
+
+    const { data } = supabase.storage
+      .from("gallery")
+      .getPublicUrl(fileName);
+
+    setCustomer((prev) => ({
+      ...prev!,
+      about: {
+        ...prev!.about,
+        gallery: [
+          ...(prev!.about.gallery || []),
+          data.publicUrl,
+        ],
+      },
+    }));
+  } finally {
+    setUploading(false);
+  }
+}
+  
 async function saveChanges() {
   if (!siteId || !customer) return;
 
@@ -435,70 +481,146 @@ async function saveChanges() {
 </div>
 			
 			
-          </section>
-		  
-		  
-		  <section className="mb-8">
+{/* -------- GALLERY -------- */}
+<section className="mb-8">
   <h3 className="font-medium mb-3">Gallery</h3>
 
-  {(customer.about.gallery || []).map((url, index) => (
-    <div key={index} className="flex gap-2 mb-2">
-      <input
-        className="flex-1 border rounded-md p-2"
-        placeholder="Google Drive image link"
-        value={url}
-        onChange={(e) => {
-          const updated = [...(customer.about.gallery || [])];
-          updated[index] = e.target.value;
+  <p className="text-sm text-gray-500 mb-4 leading-relaxed">
+    Upload photos directly or paste image links manually.
+    Existing Google Drive image links still work exactly the same.
+  </p>
 
-          setCustomer({
-            ...customer,
-            about: {
-              ...customer.about,
-              gallery: updated,
-            },
-          });
-        }}
-      />
+  {/* ---------------- DIRECT UPLOAD ---------------- */}
+  <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 p-5 text-center mb-5">
+    <input
+      type="file"
+      accept="image/*"
+      multiple
+      onChange={async (e) => {
+        const files = Array.from(e.target.files || []);
 
-      <button
-        type="button"
-        className="text-red-600 px-2"
-        onClick={() => {
-          setCustomer({
-            ...customer,
-            about: {
-              ...customer.about,
-              gallery: (customer.about.gallery || []).filter(
-                (_, i) => i !== index
-              ),
-            },
-          });
-        }}
-      >
-        ✕
-      </button>
+        for (const file of files) {
+          await uploadGalleryImage(file);
+        }
+      }}
+      className="block w-full text-sm text-gray-600
+      file:mr-4 file:rounded-xl file:border-0
+      file:bg-indigo-600 file:px-4 file:py-2
+      file:text-white hover:file:bg-indigo-700"
+    />
+
+    <p className="mt-3 text-xs text-gray-500">
+      Upload JPG, PNG, or WEBP images
+    </p>
+
+    {uploading && (
+      <p className="mt-3 text-sm text-indigo-600">
+        Uploading images...
+      </p>
+    )}
+  </div>
+
+  {/* ---------------- IMAGE PREVIEW GRID ---------------- */}
+  {(customer.about.gallery || []).length > 0 && (
+    <div className="grid grid-cols-2 gap-3 mb-5">
+      {(customer.about.gallery || []).map((url, index) => (
+        <div
+          key={index}
+          className="relative rounded-xl overflow-hidden border bg-white"
+        >
+          <img
+            src={url}
+            alt={`Gallery ${index}`}
+            className="h-28 w-full object-cover"
+          />
+
+          <button
+            type="button"
+            className="absolute top-2 right-2 bg-white/90 text-red-500 rounded-lg px-2 py-1 text-xs shadow"
+            onClick={() => {
+              setCustomer({
+                ...customer,
+                about: {
+                  ...customer.about,
+                  gallery: (customer.about.gallery || []).filter(
+                    (_, i) => i !== index
+                  ),
+                },
+              });
+            }}
+          >
+            Remove
+          </button>
+        </div>
+      ))}
     </div>
-  ))}
+  )}
 
-  <button
-    type="button"
-    className="text-indigo-600 text-sm font-medium"
-    onClick={() => {
-      setCustomer({
-        ...customer,
-        about: {
-          ...customer.about,
-          gallery: [
-            ...(customer.about.gallery || []),
-            "",
-          ],
-        },
-      });
-    }}
-  >
-    + Add image
-  </button>
+  {/* ---------------- MANUAL URL INPUTS ---------------- */}
+  <div className="space-y-3">
+    <h4 className="text-sm font-medium text-gray-700">
+      Add image links manually
+    </h4>
+
+    {(customer.about.gallery || []).map((url, index) => (
+      <div key={index} className="flex gap-2 mb-2">
+        <input
+          className="flex-1 border rounded-md p-2"
+          placeholder="Google Drive image link"
+          value={url}
+          onChange={(e) => {
+            const updated = [...(customer.about.gallery || [])];
+            updated[index] = e.target.value;
+
+            setCustomer({
+              ...customer,
+              about: {
+                ...customer.about,
+                gallery: updated,
+              },
+            });
+          }}
+        />
+
+        <button
+          type="button"
+          className="text-red-600 px-2"
+          onClick={() => {
+            setCustomer({
+              ...customer,
+              about: {
+                ...customer.about,
+                gallery: (customer.about.gallery || []).filter(
+                  (_, i) => i !== index
+                ),
+              },
+            });
+          }}
+        >
+          ✕
+        </button>
+      </div>
+    ))}
+
+    <button
+      type="button"
+      className="text-indigo-600 text-sm font-medium"
+      onClick={() => {
+        setCustomer({
+          ...customer,
+          about: {
+            ...customer.about,
+            gallery: [
+              ...(customer.about.gallery || []),
+              "",
+            ],
+          },
+        });
+      }}
+    >
+      + Add image link
+    </button>
+  </div>
 </section>
 
 

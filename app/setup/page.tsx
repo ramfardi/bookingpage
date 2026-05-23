@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { templates } from "@/app/templates";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
-
+import imageCompression from "browser-image-compression";
 
 const scheduleDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -161,6 +161,8 @@ const [socialLinks, setSocialLinks] = useState({
   linkedin: "",
 });
 
+const [uploading, setUploading] = useState(false);
+
 /* ---------------- CONTENT ---------------- */
 
 	const [useDefaultHero, setUseDefaultHero] = useState(true);
@@ -224,6 +226,43 @@ const [booking, setBooking] = useState<{
   }, [templateId]);
 
   /* ---------------- SUBMIT ---------------- */
+
+async function uploadGalleryImage(file: File) {
+  try {
+    setUploading(true);
+
+    const ext = file.name.split(".").pop();
+
+    // COMPRESS IMAGE
+    const compressed = await imageCompression(file, {
+      maxSizeMB: 0.8,
+      maxWidthOrHeight: 1600,
+    });
+
+    const fileName = `${crypto.randomUUID()}.${ext}`;
+
+    const { error } = await supabase.storage
+      .from("gallery")
+      .upload(fileName, compressed);
+
+    if (error) {
+      console.error(error);
+      alert("Upload failed");
+      return;
+    }
+
+    const { data } = supabase.storage
+      .from("gallery")
+      .getPublicUrl(fileName);
+
+    setAbout((prev) => ({
+      ...prev,
+      gallery: [...prev.gallery, data.publicUrl],
+    }));
+  } finally {
+    setUploading(false);
+  }
+}
 
   async function handleCreate() {
     const siteConfig: CustomerConfig = {
@@ -603,79 +642,166 @@ onClick={() => {
 </div>
   </div>
 
-  {/* ---------------- GALLERY ---------------- */}
-	  <div className="space-y-4 pt-6 border-t">
-		<h3 className="text-lg font-semibold">Sample work gallery</h3>
-		<p className="text-sm text-gray-500">
-		  Add image links showing your work, completed projects, or portfolio.
-		  Upload your photos to Google Drive, then paste the share links here.
+{/* ---------------- GALLERY ---------------- */}
+<div className="space-y-4 pt-6 border-t">
+  <h3 className="text-lg font-semibold">
+    Sample work gallery
+  </h3>
 
-		  <br />
-		  <br />
+  <p className="text-sm text-gray-500 leading-relaxed">
+    Add photos showing your work, portfolio, completed projects,
+    business space, or services.
 
-		  To get a working image link:
-		  <br />
-		  1. Upload your photos to Google Drive
-		  <br />
-		  2. Right-click the image → Share
-		  <br />
-		  3. Change access to <strong>Anyone with the link</strong>
-		  <br />
-		  4. Copy the share link and paste it here
+    <br />
+    <br />
 
-		  <br />
-		  <br />
+    You can either:
+    <br />
+    • Upload images directly using the uploader below
+    <br />
+    • OR paste image links manually (Google Drive still works)
 
-		  Your images will appear in a beautiful gallery on your website.
-		  Direct uploads will be supported later.
-		</p>
+    <br />
+    <br />
 
-		{about.gallery.map((url, index) => (
-		  <div key={index} className="flex gap-3">
-			<input
-			  className="flex-1 border p-3 rounded-md"
-			  placeholder="https://image-url.jpg"
-			  value={url}
-			  onChange={(e) => {
-				const updated = [...about.gallery];
-				updated[index] = e.target.value;
-				setAbout({ ...about, gallery: updated });
-			  }}
-			/>
+    <strong>For Google Drive links:</strong>
+    <br />
+    1. Upload your image to Google Drive
+    <br />
+    2. Right-click the image → Share
+    <br />
+    3. Change access to <strong>Anyone with the link</strong>
+    <br />
+    4. Copy the share link and paste it below
 
-			<button
-			  type="button"
-			  className="text-red-500"
-			  onClick={(e) => {
-				e.preventDefault();
-				e.stopPropagation(); // 🔑 CRITICAL FOR MOBILE
-				setAbout({
-				  ...about,
-				  gallery: about.gallery.filter((_, i) => i !== index),
-				});
-			  }}
-			>
-			  Remove
-			</button>
+    <br />
+    <br />
 
-		  </div>
-		))}
+    Your images will appear in a beautiful gallery on your website.
+  </p>
 
-		<button
-		  type="button"
-		  className="text-indigo-600 font-medium"
-		  onClick={() =>
-			setAbout({
-			  ...about,
-			  gallery: [...about.gallery, ""],
-			})
-		  }
-		>
-		  + Add image
-		</button>
-	  </div>
+  {/* ---------------- DIRECT UPLOAD ---------------- */}
+  <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 p-8 text-center">
+    <input
+      type="file"
+      accept="image/*"
+      multiple
+      onChange={async (e) => {
+        const files = Array.from(e.target.files || []);
+
+        for (const file of files) {
+          await uploadGalleryImage(file);
+        }
+      }}
+      className="block w-full text-sm text-gray-600
+      file:mr-4 file:rounded-xl file:border-0
+      file:bg-indigo-600 file:px-4 file:py-2
+      file:text-white hover:file:bg-indigo-700"
+    />
+
+    <p className="mt-3 text-sm text-gray-500">
+      Upload JPG, PNG, or WEBP images
+    </p>
+
+    {uploading && (
+      <p className="mt-3 text-sm text-indigo-600">
+        Uploading images...
+      </p>
+    )}
+  </div>
+
+  {/* ---------------- PREVIEW GRID ---------------- */}
+  {about.gallery.length > 0 && (
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      {about.gallery.map((url, index) => (
+        <div
+          key={index}
+          className="relative rounded-xl overflow-hidden border bg-white"
+        >
+          <img
+            src={url}
+            alt={`Gallery ${index}`}
+            className="h-32 w-full object-cover"
+          />
+
+          <button
+            type="button"
+            className="absolute top-2 right-2 bg-white/90 text-red-500 rounded-lg px-2 py-1 text-xs shadow"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              setAbout({
+                ...about,
+                gallery: about.gallery.filter((_, i) => i !== index),
+              });
+            }}
+          >
+            Remove
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+
+  {/* ---------------- MANUAL URL INPUTS ---------------- */}
+  <div className="space-y-3">
+    <p className="text-sm font-medium text-gray-700">
+      Add image links manually
+    </p>
+
+    {about.gallery.map((url, index) => (
+      <div key={index} className="flex gap-3">
+        <input
+          className="flex-1 border p-3 rounded-md"
+          placeholder="https://image-url.jpg"
+          value={url}
+          onChange={(e) => {
+            const updated = [...about.gallery];
+            updated[index] = e.target.value;
+
+            setAbout({
+              ...about,
+              gallery: updated,
+            });
+          }}
+        />
+
+        <button
+          type="button"
+          className="text-red-500"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            setAbout({
+              ...about,
+              gallery: about.gallery.filter((_, i) => i !== index),
+            });
+          }}
+        >
+          Remove
+        </button>
+      </div>
+    ))}
+
+    <button
+      type="button"
+      className="text-indigo-600 font-medium"
+      onClick={() =>
+        setAbout({
+          ...about,
+          gallery: [...about.gallery, ""],
+        })
+      }
+    >
+      + Add image link
+    </button>
+  </div>
+</div>
+	  
+	  
 	</section>
-
       )}
 
       {/* SERVICES */}
