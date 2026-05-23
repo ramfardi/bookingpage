@@ -527,7 +527,97 @@ return (
       {/* ================= SALES ONLY ================= */}
       {mode === "sales" && (
         <>
-          {/* -------- FEATURES -------- */}
+
+		  
+		  
+		  {/* -------- FEATURE SHOWCASE -------- */}
+<section className="w-full bg-gradient-to-b from-white to-indigo-50 py-32 overflow-hidden">
+  <div className="mx-auto max-w-7xl px-6 space-y-32">
+
+    {/* FEATURE 1 */}
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7 }}
+      className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+    >
+
+      {/* LEFT IMAGE */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-indigo-200 blur-3xl opacity-30 rounded-full"></div>
+
+        <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
+          <img
+            src="/images/schedule.png"
+            alt="Availability feature"
+            className="w-full object-cover"
+          />
+        </div>
+      </div>
+
+      {/* RIGHT TEXT */}
+      <div>
+        <p className="text-indigo-600 font-semibold uppercase tracking-[0.25em] mb-6">
+          LIVE AVAILABILITY
+        </p>
+
+        <blockquote className="text-4xl md:text-5xl leading-tight font-light italic text-gray-900">
+          “Share your weekly schedule with customers instantly.”
+        </blockquote>
+
+        <p className="mt-8 text-lg text-gray-600 leading-relaxed max-w-xl">
+          Create a beautiful public availability page that updates in real time (update it anytime).
+          Perfect for cleaners, stylists, handymen, and independent service businesses.
+        </p>
+      </div>
+    </motion.div>
+
+
+    {/* FEATURE 2 */}
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7 }}
+      className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+    >
+
+      {/* TEXT FIRST */}
+      <div className="order-2 lg:order-1">
+        <p className="text-indigo-600 font-semibold uppercase tracking-[0.25em] mb-6">
+          INSTANT TRUST
+        </p>
+
+        <blockquote className="text-4xl md:text-5xl leading-tight font-light italic text-gray-900">
+          “Let customers see your testimonials —
+          build trust instantly.”
+        </blockquote>
+
+        <p className="mt-8 text-lg text-gray-600 leading-relaxed max-w-xl">
+          Your clients can see the link and QR code for your Google Review,
+          or any other review link that you have.
+        </p>
+      </div>
+
+      {/* IMAGE */}
+      <div className="relative order-1 lg:order-2">
+        <div className="absolute inset-0 bg-purple-200 blur-3xl opacity-30 rounded-full"></div>
+
+        <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
+          <img
+            src="/images/testi.png"
+            alt="Quote generator feature"
+            className="w-full object-cover"
+          />
+        </div>
+      </div>
+    </motion.div>
+
+  </div>
+</section>
+		  
+	          {/* -------- FEATURES -------- */}
           <section className="w-full bg-gradient-to-b from-white to-indigo-50 py-32">
             <div className="mx-auto max-w-6xl px-8">
               <div className="text-center mb-16">
@@ -570,7 +660,8 @@ return (
                 ))}
               </div>
             </div>
-          </section>
+          </section>	  
+		  
 
 			{/*
 			<section className="bg-white py-28">
@@ -609,13 +700,9 @@ return (
               <div className="space-y-4">
                 {[
                   {
-                    q: "Do I need to pay monthly?",
-                    a: "No. SimpleBookMe does not charge any recurring monthly fees.",
+                    q: "What is the cost?",
+                    a: "SimpleBookMe is currently free.",
                   },
-				  {
-					  q: "Can I preview and test my website before purchasing?",
-					  a: "Yes. You can preview your custom website, test the booking flow, and make changes before completing your purchase.",
-					},
                   {
                     q: "Can I use my existing booking system?",
                     a: "Yes. You can link any external booking system or use the built-in email booking.",
