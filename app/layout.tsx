@@ -36,14 +36,28 @@ export const metadata: Metadata = {
     canonical: "https://simplebookme.com",
   },
 
-  openGraph: {
-    title: "Create a Booking Website & Instagram Bio Link | SimpleBookMe",
-    description:
-      "Build a booking website for your service business and turn your Instagram bio into a booking page. Accept appointments, show services, and get a professional website with no monthly fee.",
-    url: "https://simplebookme.com",
-    siteName: "SimpleBookMe",
-    type: "website",
-  },
+	openGraph: {
+	  title:
+		"Create a Booking Website & Instagram Bio Link | SimpleBookMe",
+
+	  description:
+		"Build a booking website for your service business and turn your Instagram bio into a booking page.",
+
+	  url: "/",
+
+	  siteName: "SimpleBookMe",
+
+	  type: "website",
+
+	  images: [
+		{
+		  url: "/images/og-home.jpg",
+		  width: 1200,
+		  height: 630,
+		  alt: "SimpleBookMe Booking Website Builder",
+		},
+	  ],
+	},
   
     icons: {
     icon: [
