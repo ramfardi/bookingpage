@@ -52,15 +52,25 @@ export default function GalleryPage() {
 return (
   <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 px-6 py-24">
     <div className="max-w-6xl mx-auto">
-      <div className="text-center mb-14">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-          Portfolio
-        </h1>
+		<div className="text-center mb-16">
+		  <div className="inline-block mb-4">
+			<span className="rounded-full bg-white/80 px-5 py-2 text-xs tracking-[0.35em] uppercase text-gray-500 shadow-sm border border-gray-100 italic">
+			  Featured Work
+			</span>
+		  </div>
 
-        <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
-          Explore examples of our recent work and projects.
-        </p>
-      </div>
+		  <h1 className="text-5xl md:text-7xl font-black italic tracking-tight text-gray-900 leading-[0.95]">
+			Transformations
+			<span className="block text-indigo-600">
+			  & Creative Results
+			</span>
+		  </h1>
+
+		  <p className="mt-6 text-lg italic text-gray-600 max-w-3xl mx-auto leading-relaxed">
+			A curated collection of recent projects, visual transformations,
+			and standout work crafted with attention to detail.
+		  </p>
+		</div>
 
       {gallery.length === 0 && beforeAfter.length === 0 ? (
         <div className="text-center py-24">
@@ -109,13 +119,15 @@ return (
           {beforeAfter.length > 0 && (
             <section className="mt-20">
               <div className="text-center mb-10">
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-                  Before & After
-                </h2>
+				<h2 className="text-4xl md:text-5xl font-black italic tracking-tight text-gray-900">
+				  Before
+				  <span className="text-indigo-600"> / </span>
+				  After
+				</h2>
 
-                <p className="mt-3 text-gray-600">
-                  Slide to compare transformations and completed work.
-                </p>
+				<p className="mt-4 text-lg italic text-gray-600">
+				  Compare the transformation with an interactive slider experience.
+				</p>
               </div>
 
               <div className="grid gap-10">
@@ -140,7 +152,7 @@ return (
       >
         <button
           type="button"
-          className="absolute top-5 right-5 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-gray-900 shadow"
+          className="absolute top-5 right-5 rounded-full bg-white/90 px-5 py-2 text-sm font-bold italic text-gray-900 shadow-lg"
           onClick={() => setSelectedImage(null)}
         >
           Close
