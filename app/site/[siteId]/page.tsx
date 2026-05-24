@@ -294,24 +294,24 @@ async function downloadBeforeAfterImage() {
 function saveSliderToPortfolio() {
   if (!beforeImage || !afterImage) return;
 
-  setCustomer({
-    ...customer,
+  setCustomer((prev) => {
+    if (!prev) return prev;
 
-    beforeAfter: [
-      ...(customer.beforeAfter || []),
-
-      {
-        id: crypto.randomUUID(),
-        type: "slider",
-        beforeImage,
-        afterImage,
-      },
-    ],
+    return {
+      ...prev,
+      beforeAfter: [
+        ...(prev.beforeAfter || []),
+        {
+          id: crypto.randomUUID(),
+          type: "slider",
+          beforeImage,
+          afterImage,
+        },
+      ],
+    };
   });
 
-  alert(
-    "Slider added. Click Save changes to publish."
-  );
+  alert("Slider added. Click Save changes to publish.");
 }
 
 
