@@ -19,6 +19,14 @@ export default function SitePage({
   const [customer, setCustomer] = useState<CustomerConfig | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  
+  const [beforeImage, setBeforeImage] = useState<string | null>(null);
+
+	const [afterImage, setAfterImage] = useState<string | null>(null);
+
+	const [beforeAfterMode, setBeforeAfterMode] = useState<
+	  "story" | "square" | "slider"
+	>("story");
 
   /* ---------------- RESOLVE PARAMS ---------------- */
   useEffect(() => {
@@ -180,6 +188,133 @@ async function saveChanges() {
   setCustomer(updatedCustomer);
   alert("Changes saved");
 }
+
+
+
+function handleImageDragStart(
+  e: React.DragEvent,
+  imageUrl: string
+) {
+  e.dataTransfer.setData("imageUrl", imageUrl);
+}
+
+function handleBeforeAfterDrop(
+  e: React.DragEvent,
+  type: "before" | "after"
+) {
+  e.preventDefault();
+
+  const imageUrl = e.dataTransfer.getData("imageUrl");
+
+  if (!imageUrl) return;
+
+  if (type === "before") setBeforeImage(imageUrl);
+
+  if (type === "after") setAfterImage(imageUrl);
+}
+
+async function downloadBeforeAfterImage() {
+  if (!beforeImage || !afterImage) return;
+
+  const canvas = document.createElement("canvas");
+
+  if (beforeAfterMode === "story") {
+    canvas.width = 1080;
+    canvas.height = 1920;
+  } else {
+    canvas.width = 1080;
+    canvas.height = 1080;
+  }
+
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) return;
+
+  const before = new Image();
+  const after = new Image();
+
+  before.crossOrigin = "anonymous";
+  after.crossOrigin = "anonymous";
+
+  before.onload = () => {
+    after.onload = () => {
+      const halfWidth = canvas.width / 2;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.drawImage(
+        before,
+        0,
+        0,
+        halfWidth,
+        canvas.height
+      );
+
+      ctx.drawImage(
+        after,
+        halfWidth,
+        0,
+        halfWidth,
+        canvas.height
+      );
+
+      ctx.fillStyle = "rgba(0,0,0,0.6)";
+      ctx.fillRect(0, 0, canvas.width, 90);
+
+      ctx.fillStyle = "white";
+      ctx.font = "bold 42px Arial";
+
+      ctx.fillText("BEFORE", 130, 60);
+
+      ctx.fillText(
+        "AFTER",
+        halfWidth + 160,
+        60
+      );
+
+      const link = document.createElement("a");
+
+      link.href = canvas.toDataURL("image/png");
+
+      link.download =
+        beforeAfterMode === "story"
+          ? "before-after-story.png"
+          : "before-after-square.png";
+
+      link.click();
+    };
+
+    after.src = afterImage;
+  };
+
+  before.src = beforeImage;
+}
+
+function saveSliderToPortfolio() {
+  if (!beforeImage || !afterImage) return;
+
+  setCustomer({
+    ...customer,
+
+    beforeAfter: [
+      ...(customer.beforeAfter || []),
+
+      {
+        id: crypto.randomUUID(),
+        type: "slider",
+        beforeImage,
+        afterImage,
+      },
+    ],
+  });
+
+  alert(
+    "Slider added. Click Save changes to publish."
+  );
+}
+
+
 
   return (
     <div className="flex h-screen">
@@ -528,11 +663,15 @@ async function saveChanges() {
           key={index}
           className="relative rounded-xl overflow-hidden border bg-white"
         >
-          <img
-            src={url}
-            alt={`Gallery ${index}`}
-            className="h-28 w-full object-cover"
-          />
+		<img
+		  src={url}
+		  alt={`Gallery ${index}`}
+		  draggable
+		  onDragStart={(e) =>
+			handleImageDragStart(e, url)
+		  }
+		  className="h-28 w-full object-cover cursor-grab"
+		/>
 
           <button
             type="button"
@@ -555,6 +694,123 @@ async function saveChanges() {
       ))}
     </div>
   )}
+  
+  {/* BEFORE / AFTER CREATOR */}
+{(customer.about.gallery || []).length >= 2 && (
+  <div className="mt-6 rounded-2xl border bg-white p-4">
+    <h4 className="font-medium text-gray-800 mb-2">
+      Before / After Creator
+    </h4>
+
+    <p className="text-xs text-gray-500 mb-4">
+      Drag two gallery photos below.
+      Create downloadable Instagram
+      images or an interactive slider.
+    </p>
+
+    <div className="grid grid-cols-2 gap-3 mb-4">
+      {/* BEFORE */}
+
+      <div
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) =>
+          handleBeforeAfterDrop(e, "before")
+        }
+        className="h-36 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center overflow-hidden"
+      >
+        {beforeImage ? (
+          <img
+            src={beforeImage}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <span className="text-xs text-gray-500">
+            Drop BEFORE photo here
+          </span>
+        )}
+      </div>
+
+      {/* AFTER */}
+
+      <div
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) =>
+          handleBeforeAfterDrop(e, "after")
+        }
+        className="h-36 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center overflow-hidden"
+      >
+        {afterImage ? (
+          <img
+            src={afterImage}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <span className="text-xs text-gray-500">
+            Drop AFTER photo here
+          </span>
+        )}
+      </div>
+    </div>
+
+    {beforeImage && afterImage && (
+      <div className="space-y-3">
+        <select
+          value={beforeAfterMode}
+          onChange={(e) =>
+            setBeforeAfterMode(
+              e.target.value as
+                | "story"
+                | "square"
+                | "slider"
+            )
+          }
+          className="w-full border rounded-md p-2 text-sm"
+        >
+          <option value="story">
+            Instagram Story Image
+          </option>
+
+          <option value="square">
+            Square Post Image
+          </option>
+
+          <option value="slider">
+            Interactive Website Slider
+          </option>
+        </select>
+
+        {beforeAfterMode !== "slider" ? (
+          <button
+            type="button"
+            onClick={downloadBeforeAfterImage}
+            className="w-full bg-indigo-600 text-white py-2 rounded-md font-medium"
+          >
+            Download Image
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={saveSliderToPortfolio}
+            className="w-full bg-emerald-600 text-white py-2 rounded-md font-medium"
+          >
+            Save Slider to Website
+          </button>
+        )}
+
+        <button
+          type="button"
+          onClick={() => {
+            setBeforeImage(null);
+            setAfterImage(null);
+          }}
+          className="w-full text-sm text-gray-500"
+        >
+          Clear Selection
+        </button>
+      </div>
+    )}
+  </div>
+)}
 
   {/* ---------------- MANUAL URL INPUTS ---------------- */}
   <div className="space-y-3">

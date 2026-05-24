@@ -276,6 +276,7 @@ async function uploadGalleryImage(file: File) {
 
       landing,
       about,
+	  beforeAfter: [],
 	  
 
       services: services

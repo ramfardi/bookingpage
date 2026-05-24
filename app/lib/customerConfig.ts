@@ -109,6 +109,13 @@ socialLinks?: {
   linkedin?: string;
 };
 
+beforeAfter?: {
+  id: string;
+  type: "slider";
+  beforeImage: string;
+  afterImage: string;
+}[];
+
 	about: {
 	  title: string;
 	  description: string;
