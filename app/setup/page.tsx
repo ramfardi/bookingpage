@@ -231,19 +231,20 @@ async function uploadGalleryImage(file: File) {
   try {
     setUploading(true);
 
+    const isVideo = file.type.startsWith("video/");
     const ext = file.name.split(".").pop();
-
-    // COMPRESS IMAGE
-    const compressed = await imageCompression(file, {
-      maxSizeMB: 0.8,
-      maxWidthOrHeight: 1600,
-    });
-
     const fileName = `${crypto.randomUUID()}.${ext}`;
+
+    const fileToUpload = isVideo
+      ? file
+      : await imageCompression(file, {
+          maxSizeMB: 0.8,
+          maxWidthOrHeight: 1600,
+        });
 
     const { error } = await supabaseBrowser.storage
       .from("gallery")
-      .upload(fileName, compressed);
+      .upload(fileName, fileToUpload);
 
     if (error) {
       console.error(error);
@@ -685,7 +686,7 @@ onClick={() => {
   <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 p-8 text-center">
     <input
       type="file"
-      accept="image/*"
+      accept="image/*,video/*"
       multiple
       onChange={async (e) => {
         const files = Array.from(e.target.files || []);

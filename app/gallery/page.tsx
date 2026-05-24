@@ -22,6 +22,10 @@ function normalizeGoogleDriveImage(url: string) {
   return url;
 }
 
+function isVideoUrl(url: string) {
+  return /\.(mp4|webm|mov|m4v)$/i.test(url.split("?")[0]);
+}
+
 export default function GalleryPage() {
   const [customer, setCustomer] = useState<
     CustomerConfig | LandingConfig | null
@@ -93,12 +97,21 @@ return (
                   >
                     <div className="relative overflow-hidden rounded-[2rem] bg-white p-2 shadow-xl ring-1 ring-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
                       <div className="overflow-hidden rounded-[1.5rem]">
-                        <img
-                          src={imageUrl}
-                          alt={`Gallery image ${index + 1}`}
-                          className="w-full object-cover transition duration-500 group-hover:scale-105"
-                          loading="lazy"
-                        />
+						{isVideoUrl(imageUrl) ? (
+						  <video
+							src={imageUrl}
+							className="w-full rounded-[1.5rem]"
+							controls
+							playsInline
+						  />
+						) : (
+						  <img
+							src={imageUrl}
+							alt={`Gallery image ${index + 1}`}
+							className="w-full object-cover transition duration-500 group-hover:scale-105"
+							loading="lazy"
+						  />
+						)}
                       </div>
 
                       <div className="pointer-events-none absolute inset-2 rounded-[1.5rem] bg-gradient-to-t from-black/25 via-transparent to-white/10 opacity-0 transition duration-300 group-hover:opacity-100" />
