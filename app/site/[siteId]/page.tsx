@@ -213,6 +213,81 @@ function handleBeforeAfterDrop(
   if (type === "after") setAfterImage(imageUrl);
 }
 
+
+function drawImageCover(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+) {
+  const imgRatio = img.width / img.height;
+  const boxRatio = width / height;
+
+  let sourceWidth = img.width;
+  let sourceHeight = img.height;
+  let sourceX = 0;
+  let sourceY = 0;
+
+  if (imgRatio > boxRatio) {
+    sourceWidth = img.height * boxRatio;
+    sourceX = (img.width - sourceWidth) / 2;
+  } else {
+    sourceHeight = img.width / boxRatio;
+    sourceY = (img.height - sourceHeight) / 2;
+  }
+
+  ctx.drawImage(
+    img,
+    sourceX,
+    sourceY,
+    sourceWidth,
+    sourceHeight,
+    x,
+    y,
+    width,
+    height
+  );
+}
+
+function drawImageCover(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+) {
+  const imgRatio = img.width / img.height;
+  const boxRatio = width / height;
+
+  let sourceWidth = img.width;
+  let sourceHeight = img.height;
+  let sourceX = 0;
+  let sourceY = 0;
+
+  if (imgRatio > boxRatio) {
+    sourceWidth = img.height * boxRatio;
+    sourceX = (img.width - sourceWidth) / 2;
+  } else {
+    sourceHeight = img.width / boxRatio;
+    sourceY = (img.height - sourceHeight) / 2;
+  }
+
+  ctx.drawImage(
+    img,
+    sourceX,
+    sourceY,
+    sourceWidth,
+    sourceHeight,
+    x,
+    y,
+    width,
+    height
+  );
+}
+
 async function downloadBeforeAfterImage() {
   if (!beforeImage || !afterImage) return;
 
@@ -227,7 +302,6 @@ async function downloadBeforeAfterImage() {
   }
 
   const ctx = canvas.getContext("2d");
-
   if (!ctx) return;
 
   const before = new Image();
@@ -243,21 +317,9 @@ async function downloadBeforeAfterImage() {
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.drawImage(
-        before,
-        0,
-        0,
-        halfWidth,
-        canvas.height
-      );
+      drawImageCover(ctx, before, 0, 0, halfWidth, canvas.height);
 
-      ctx.drawImage(
-        after,
-        halfWidth,
-        0,
-        halfWidth,
-        canvas.height
-      );
+      drawImageCover(ctx, after, halfWidth, 0, halfWidth, canvas.height);
 
       ctx.fillStyle = "rgba(0,0,0,0.6)";
       ctx.fillRect(0, 0, canvas.width, 90);
@@ -266,15 +328,9 @@ async function downloadBeforeAfterImage() {
       ctx.font = "bold 42px Arial";
 
       ctx.fillText("BEFORE", 130, 60);
-
-      ctx.fillText(
-        "AFTER",
-        halfWidth + 160,
-        60
-      );
+      ctx.fillText("AFTER", halfWidth + 160, 60);
 
       const link = document.createElement("a");
-
       link.href = canvas.toDataURL("image/png");
 
       link.download =
@@ -655,47 +711,73 @@ function saveSliderToPortfolio() {
     )}
   </div>
 
-  {/* ---------------- IMAGE PREVIEW GRID ---------------- */}
-  {(customer.about.gallery || []).length > 0 && (
-    <div className="grid grid-cols-2 gap-3 mb-5">
-      {(customer.about.gallery || []).map((url, index) => (
-        <div
-          key={index}
-          className="relative rounded-xl overflow-hidden border bg-white"
-        >
-		<img
-		  src={url}
-		  alt={`Gallery ${index}`}
-		  draggable
-		  onDragStart={(e) =>
-			handleImageDragStart(e, url)
-		  }
-		  className="h-28 w-full object-cover cursor-grab"
-		/>
+{/* ---------------- IMAGE PREVIEW GRID ---------------- */}
+{(customer.about.gallery || []).length > 0 && (
+  <div className="grid grid-cols-2 gap-3 mb-5">
+    {(customer.about.gallery || []).map((url, index) => (
+      <div
+        key={index}
+        className="relative rounded-xl overflow-hidden border bg-white"
+      >
+        <img
+          src={url}
+          alt={`Gallery ${index}`}
+          draggable
+          onDragStart={(e) =>
+            handleImageDragStart(e, url)
+          }
+          className="h-28 w-full object-cover cursor-grab"
+        />
+
+        <div className="flex gap-2 p-2">
+          <button
+            type="button"
+            onClick={() => setBeforeImage(url)}
+            className={`flex-1 rounded-lg px-2 py-1 text-xs font-medium transition ${
+              beforeImage === url
+                ? "bg-black text-white"
+                : "bg-gray-100 text-gray-700"
+            }`}
+          >
+            Set Before
+          </button>
 
           <button
             type="button"
-            className="absolute top-2 right-2 bg-white/90 text-red-500 rounded-lg px-2 py-1 text-xs shadow"
-            onClick={() => {
-              setCustomer({
-                ...customer,
-                about: {
-                  ...customer.about,
-                  gallery: (customer.about.gallery || []).filter(
-                    (_, i) => i !== index
-                  ),
-                },
-              });
-            }}
+            onClick={() => setAfterImage(url)}
+            className={`flex-1 rounded-lg px-2 py-1 text-xs font-medium transition ${
+              afterImage === url
+                ? "bg-indigo-600 text-white"
+                : "bg-indigo-100 text-indigo-700"
+            }`}
           >
-            Remove
+            Set After
           </button>
         </div>
-      ))}
-    </div>
-  )}
-  
-  {/* BEFORE / AFTER CREATOR */}
+
+        <button
+          type="button"
+          className="absolute top-2 right-2 bg-white/90 text-red-500 rounded-lg px-2 py-1 text-xs shadow"
+          onClick={() => {
+            setCustomer({
+              ...customer,
+              about: {
+                ...customer.about,
+                gallery: (customer.about.gallery || []).filter(
+                  (_, i) => i !== index
+                ),
+              },
+            });
+          }}
+        >
+          Remove
+        </button>
+      </div>
+    ))}
+  </div>
+)}
+
+{/* BEFORE / AFTER CREATOR */}
 {(customer.about.gallery || []).length >= 2 && (
   <div className="mt-6 rounded-2xl border bg-white p-4">
     <h4 className="font-medium text-gray-800 mb-2">
@@ -703,14 +785,11 @@ function saveSliderToPortfolio() {
     </h4>
 
     <p className="text-xs text-gray-500 mb-4">
-      Drag two gallery photos below.
-      Create downloadable Instagram
-      images or an interactive slider.
+      Drag two gallery photos into the boxes, or tap Set Before and Set After
+      above on mobile/tablet.
     </p>
 
     <div className="grid grid-cols-2 gap-3 mb-4">
-      {/* BEFORE */}
-
       <div
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) =>
@@ -721,16 +800,15 @@ function saveSliderToPortfolio() {
         {beforeImage ? (
           <img
             src={beforeImage}
+            alt="Before selected"
             className="h-full w-full object-cover"
           />
         ) : (
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-gray-500 text-center px-2">
             Drop BEFORE photo here
           </span>
         )}
       </div>
-
-      {/* AFTER */}
 
       <div
         onDragOver={(e) => e.preventDefault()}
@@ -742,10 +820,11 @@ function saveSliderToPortfolio() {
         {afterImage ? (
           <img
             src={afterImage}
+            alt="After selected"
             className="h-full w-full object-cover"
           />
         ) : (
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-gray-500 text-center px-2">
             Drop AFTER photo here
           </span>
         )}
@@ -811,7 +890,6 @@ function saveSliderToPortfolio() {
     )}
   </div>
 )}
-
   {/* ---------------- MANUAL URL INPUTS ---------------- */}
   <div className="space-y-3">
     <h4 className="text-sm font-medium text-gray-700">
