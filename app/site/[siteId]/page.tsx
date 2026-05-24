@@ -340,7 +340,7 @@ function saveSliderToPortfolio() {
     <div className="flex h-screen">
       {/* ================= LEFT: EDITOR ================= */}
       {isEditor && (
-        <aside className="w-80 border-r bg-gray-50 p-4 overflow-y-auto">
+        <aside className="w-[42rem] border-r bg-gray-50 p-6 overflow-y-auto shrink-0">
           <h2 className="text-lg font-semibold mb-6">
             Edit your website
           </h2>
@@ -854,6 +854,61 @@ function saveSliderToPortfolio() {
     )}
   </div>
 )}
+
+{/* SAVED BEFORE / AFTER SLIDERS */}
+{(customer.beforeAfter || []).length > 0 && (
+  <div className="mt-6 rounded-2xl border bg-white p-4">
+    <h4 className="font-medium text-gray-800 mb-3">
+      Saved Before / After Sliders
+    </h4>
+
+    <div className="space-y-3">
+      {(customer.beforeAfter || []).map((item) => (
+        <div
+          key={item.id}
+          className="rounded-xl border bg-gray-50 p-3"
+        >
+          <div className="grid grid-cols-2 gap-2 mb-3">
+            <img
+              src={item.beforeImage}
+              alt="Before"
+              className="h-24 w-full object-cover rounded-lg"
+            />
+
+            <img
+              src={item.afterImage}
+              alt="After"
+              className="h-24 w-full object-cover rounded-lg"
+            />
+          </div>
+
+          <button
+            type="button"
+            className="w-full rounded-md bg-red-50 text-red-600 py-2 text-sm font-medium hover:bg-red-100"
+            onClick={() => {
+              if (!confirm("Remove this before/after slider?")) return;
+
+              setCustomer({
+                ...customer,
+                beforeAfter: (customer.beforeAfter || []).filter(
+                  (slider) => slider.id !== item.id
+                ),
+              });
+            }}
+          >
+            Remove Slider
+          </button>
+        </div>
+      ))}
+    </div>
+
+    <p className="mt-3 text-xs text-gray-500">
+      Click “Save changes” after removing a slider.
+    </p>
+  </div>
+)}
+
+
   {/* ---------------- MANUAL URL INPUTS ---------------- */}
   <div className="space-y-3">
     <h4 className="text-sm font-medium text-gray-700">
