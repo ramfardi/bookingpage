@@ -214,42 +214,6 @@ function handleBeforeAfterDrop(
 }
 
 
-function drawImageCover(
-  ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement,
-  x: number,
-  y: number,
-  width: number,
-  height: number
-) {
-  const imgRatio = img.width / img.height;
-  const boxRatio = width / height;
-
-  let sourceWidth = img.width;
-  let sourceHeight = img.height;
-  let sourceX = 0;
-  let sourceY = 0;
-
-  if (imgRatio > boxRatio) {
-    sourceWidth = img.height * boxRatio;
-    sourceX = (img.width - sourceWidth) / 2;
-  } else {
-    sourceHeight = img.width / boxRatio;
-    sourceY = (img.height - sourceHeight) / 2;
-  }
-
-  ctx.drawImage(
-    img,
-    sourceX,
-    sourceY,
-    sourceWidth,
-    sourceHeight,
-    x,
-    y,
-    width,
-    height
-  );
-}
 
 function drawImageCover(
   ctx: CanvasRenderingContext2D,
