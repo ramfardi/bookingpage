@@ -55,20 +55,19 @@ return (
 		<div className="text-center mb-16">
 		  <div className="inline-block mb-4">
 			<span className="rounded-full bg-white/80 px-5 py-2 text-xs tracking-[0.35em] uppercase text-gray-500 shadow-sm border border-gray-100 italic">
-			  Featured Work
+			  Portfolio
 			</span>
 		  </div>
 
 		  <h1 className="text-5xl md:text-7xl font-black italic tracking-tight text-gray-900 leading-[0.95]">
-			Transformations
+			Featured
 			<span className="block text-indigo-600">
-			  & Creative Results
+			  Projects
 			</span>
 		  </h1>
 
 		  <p className="mt-6 text-lg italic text-gray-600 max-w-3xl mx-auto leading-relaxed">
-			A curated collection of recent projects, visual transformations,
-			and standout work crafted with attention to detail.
+			A collection of recent works.
 		  </p>
 		</div>
 
@@ -120,9 +119,9 @@ return (
             <section className="mt-20">
               <div className="text-center mb-10">
 				<h2 className="text-4xl md:text-5xl font-black italic tracking-tight text-gray-900">
-				  Before
-				  <span className="text-indigo-600"> / </span>
-				  After
+				  Compare before
+				  <span className="text-indigo-600"> & </span>
+				  after
 				</h2>
 
 				<p className="mt-4 text-lg italic text-gray-600">
