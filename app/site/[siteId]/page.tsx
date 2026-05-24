@@ -124,9 +124,15 @@ async function uploadGalleryImage(file: File) {
       .from("gallery")
       .getPublicUrl(fileName);
 
-    setAbout((prev) => ({
-      ...prev,
-      gallery: [...prev.gallery, data.publicUrl],
+    setCustomer((prev) => ({
+      ...prev!,
+      about: {
+        ...prev!.about,
+        gallery: [
+          ...(prev!.about.gallery || []),
+          data.publicUrl,
+        ],
+      },
     }));
   } finally {
     setUploading(false);
