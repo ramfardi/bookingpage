@@ -64,9 +64,9 @@ return (
 		  </div>
 
 		  <h1 className="text-5xl md:text-7xl font-black italic tracking-tight text-gray-900 leading-[0.95]">
-			Featured
+			
 			<span className="block text-indigo-600">
-			  Projects
+			  
 			</span>
 		  </h1>
 
