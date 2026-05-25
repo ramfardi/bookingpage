@@ -181,9 +181,8 @@ return (
             <section className="mt-20">
               <div className="text-center mb-10">
 				<h2 className="text-4xl md:text-5xl font-black italic tracking-tight text-gray-900">
-				  Compare before
-				  <span className="text-indigo-600"> & </span>
-				  after
+				  before
+				  <span className="text-indigo-600"> & after </span>
 				</h2>
 
 				<p className="mt-4 text-lg italic text-gray-600">
