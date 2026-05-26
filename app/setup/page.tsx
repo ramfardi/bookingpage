@@ -475,22 +475,36 @@ onClick={() => {
 			<option value="photo">Photography Services</option>
           </select>
 
-          <input
-            className="w-full border p-3 rounded-md"
-            placeholder="Business name"
-            value={form.businessName}
-            onChange={(e) =>
-              setForm({ ...form, businessName: e.target.value })
-            }
-          />
+		<div>
+		  <input
+			className="w-full border p-3 rounded-md"
+			placeholder="Business name"
+			value={form.businessName}
+			onChange={(e) =>
+			  setForm({ ...form, businessName: e.target.value })
+			}
+		  />
 
-          <input
-            className="w-full border p-3 rounded-md"
-            placeholder="Booking email"
-            type="email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-          />
+		  <p className="text-xs text-gray-500 mt-1">
+			this name will appear on your website and booking pages
+		  </p>
+		</div>
+
+		<div>
+		  <input
+			className="w-full border p-3 rounded-md"
+			placeholder="Booking email"
+			type="email"
+			value={form.email}
+			onChange={(e) =>
+			  setForm({ ...form, email: e.target.value })
+			}
+		  />
+
+		  <p className="text-xs text-gray-500 mt-1">
+			customers booking requests will be sent to this email
+		  </p>
+		</div>
 
           <div>
             <input
@@ -502,7 +516,7 @@ onClick={() => {
               }
             />
             <p className="text-xs text-gray-500 mt-1">
-              Live at: {form.subdomain || "yourbusiness"}.simplebookme.com
+              will be live at: {form.subdomain || "yourbusiness"}.simplebookme.com
             </p>
           </div>
         </section>
@@ -651,7 +665,7 @@ onClick={() => {
   </h3>
 
   <p className="text-sm text-gray-500 leading-relaxed">
-    Add photos showing your work, portfolio, completed projects,
+    Add photos/clips showing your work, portfolio, completed projects,
     business space, or services.
 
     <br />
@@ -702,12 +716,12 @@ onClick={() => {
     />
 
     <p className="mt-3 text-sm text-gray-500">
-      Upload JPG, PNG, or WEBP images
+      Upload Clips/images
     </p>
 
     {uploading && (
       <p className="mt-3 text-sm text-indigo-600">
-        Uploading images...
+        Uploading files...
       </p>
     )}
   </div>
