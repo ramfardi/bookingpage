@@ -3,7 +3,7 @@ import Navbar from "@/components/navbar/Navbar";
 import { Providers } from "./providers";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-
+import { Analytics } from "@vercel/analytics/react";
 
 
 export const metadata: Metadata = {
@@ -166,6 +166,8 @@ const isSubdomain =
             {children}
           </main>
         </Providers>
+		<Analytics />
+		
       </body>
     </html>
   );
