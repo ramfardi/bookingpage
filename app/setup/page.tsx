@@ -224,6 +224,26 @@ const [booking, setBooking] = useState<{
     setBooking(template.defaultData.booking);
     setDeposit(template.defaultData.deposit);
   }, [templateId]);
+  
+  useEffect(() => {
+  const sessionId =
+    localStorage.getItem("setup_session") ||
+    crypto.randomUUID();
+
+  localStorage.setItem("setup_session", sessionId);
+
+  fetch("/api/setup-track", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      sessionId,
+      step,
+      templateId,
+    }),
+  });
+}, [step, templateId]);
 
   /* ---------------- SUBMIT ---------------- */
 
