@@ -12,6 +12,8 @@ import { ArrowRight, Instagram } from "lucide-react";
 import { FaInstagram, FaTiktok, FaLinkedin } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
+import LandingBeforeAfter from "@/components/LandingBeforeAfter";
+
 export default function HomePage({
   activeCustomer,
 }: {
@@ -694,6 +696,52 @@ return (
         </p>
       </div>
     </motion.div>
+	
+{/* BEFORE & AFTER PORTFOLIO */}
+<motion.div
+  initial={{ opacity: 0, y: 40 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.7 }}
+  className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+>
+  {/* TEXT */}
+  <div className="order-2 lg:order-1">
+    <p className="text-indigo-600 font-semibold uppercase tracking-[0.25em] mb-6">
+      BEFORE & AFTER PORTFOLIO
+    </p>
+
+    <blockquote className="text-4xl md:text-5xl leading-tight font-light italic text-gray-900">
+      “Show your best work with an interactive slider.”
+    </blockquote>
+
+    <p className="mt-8 text-lg text-gray-600 leading-relaxed max-w-xl">
+      Perfect for cleaners, hair stylists, nail artists,
+      painters, landscapers, detailers and home service
+      professionals. Let visitors compare before and after
+      results by dragging the slider.
+    </p>
+
+    <div className="mt-8 space-y-3 text-gray-700">
+      <div>✓ Unlimited portfolio projects</div>
+      <div>✓ Interactive before & after comparison</div>
+      <div>✓ Mobile friendly experience</div>
+      <div>✓ Builds trust and increases bookings</div>
+    </div>
+  </div>
+
+  {/* SLIDER DEMO */}
+  <div className="relative order-1 lg:order-2">
+    <div className="absolute inset-0 bg-indigo-200 blur-3xl opacity-30 rounded-full"></div>
+
+    <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white p-4">
+      <LandingBeforeAfter
+        beforeImage="/images/before.png"
+        afterImage="/images/after.png"
+      />
+    </div>
+  </div>
+</motion.div>
 
 
   </div>

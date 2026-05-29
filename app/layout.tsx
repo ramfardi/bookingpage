@@ -8,29 +8,38 @@ import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: "Create a Booking Website & Instagram Bio Link | No Monthly Fee | SimpleBookMe",
-  description:
-    "Create a professional booking website for your small business in minutes. Generate an Instagram bio link, accept bookings online, display services and pricing, and get your own website without monthly fees.",
+description:
+  "Create a professional booking website for cleaners, hair salons, beauty businesses, handymen and service professionals. Accept bookings online, display pricing, showcase before & after portfolios, availability calendars, testimonials, Google reviews, contact information and social media links. No monthly fees.",
 
-  keywords: [
-    "booking website builder",
-    "create booking website",
-    "online booking system",
-    "scheduling website",
-    "appointment booking website",
-    "Instagram bio link for business",
-    "create instagram bio link",
-    "instagram booking link",
-    "small business website",
-    "website for service business",
-    "booking website for hair salon",
-    "booking website for cleaning business",
-    "appointment scheduling website",
-    "no monthly fee website builder",
-    "one time payment website",
-    "booking page for instagram",
-    "simple booking website",
-    "service business website",
-  ],
+keywords: [
+  "booking website builder",
+  "appointment booking website",
+  "online booking system",
+  "service business website",
+
+  "cleaning business website",
+  "hair salon website",
+  "beauty salon website",
+  "handyman website",
+  "landscaping website",
+
+  "availability calendar",
+  "booking calendar",
+  "online appointment scheduling",
+
+  "before and after gallery",
+  "portfolio website for service business",
+  "customer testimonial website",
+  "google review showcase",
+
+  "instagram booking page",
+  "instagram bio link",
+  "tiktok booking page",
+
+  "small business website",
+  "website builder for service business",
+  "no monthly fee website builder",
+],
 
   alternates: {
     canonical: "https://simplebookme.com",
@@ -122,34 +131,49 @@ const isSubdomain =
   type="application/ld+json"
   dangerouslySetInnerHTML={{
     __html: JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
 
-      name: "SimpleBookMe",
+  name: "SimpleBookMe",
 
-      applicationCategory: "BusinessApplication",
+  applicationCategory: "BusinessApplication",
 
-      operatingSystem: "Web",
+  operatingSystem: "Web",
 
-      description:
-        "Booking website builder for cleaners, salons, and service businesses.",
+  url: "https://simplebookme.com",
 
-      url: "https://simplebookme.com",
+  image: "https://simplebookme.com/images/og-home.jpg",
 
-      image: "https://simplebookme.com/images/og-home.jpg",
+  description:
+    "Booking website builder for cleaners, hair salons, beauty businesses, handymen and service professionals.",
 
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "CAD",
-      },
+  featureList: [
+    "Online booking",
+    "Availability calendar",
+    "Instagram bio link",
+    "Portfolio gallery",
+    "Before and after slider",
+    "Video portfolio",
+    "Google Maps location",
+    "Testimonials",
+    "Google review links",
+    "Social media links",
+    "Pricing display",
+    "Contact section",
+  ],
 
-      creator: {
-        "@type": "Organization",
-        name: "SimpleBookMe",
-        url: "https://simplebookme.com",
-      },
-    }),
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "CAD",
+  },
+
+  creator: {
+    "@type": "Organization",
+    name: "SimpleBookMe",
+    url: "https://simplebookme.com",
+  },
+}),
   }}
 />
 		
