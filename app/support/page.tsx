@@ -121,7 +121,6 @@ export default function SupportPage() {
 
         <div className="mt-10 border-t pt-6 text-center">
           <p className="font-medium">SimpleBookMe Support</p>
-          <p className="text-gray-500">support@simplebookme.com</p>
           <p className="text-sm text-gray-400 mt-2">
             Typical response time: within 24 hours
           </p>
