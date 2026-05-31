@@ -5,6 +5,7 @@ import { templates } from "@/app/templates";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 import imageCompression from "browser-image-compression";
 import { supabaseBrowser } from "@/app/lib/supabase-browser";
+import { generateSeo } from "@/app/lib/generateSeo";
 const scheduleDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 function buildTimeSlots(startHour: string, endHour: string) {
@@ -150,6 +151,11 @@ const [testimonials, setTestimonials] = useState({
 
 const [contact, setContact] = useState({
   address: "",
+
+  city: "",
+  province: "",
+  country: "",
+
   email: "",
   phone: "",
 });
@@ -286,6 +292,8 @@ async function uploadGalleryImage(file: File) {
 }
 
   async function handleCreate() {
+  
+  
     const siteConfig: CustomerConfig = {
       siteId: crypto.randomUUID(),
       templateId,
@@ -322,6 +330,7 @@ async function uploadGalleryImage(file: File) {
 		testimonials,
 		contact,
 		socialLinks,
+		seo,
 	  
 	    isPaid: true,
   paidAt: new Date().toISOString(),
@@ -332,6 +341,8 @@ async function uploadGalleryImage(file: File) {
       },
 
     };
+	
+	siteConfig.seo = generateSeo(siteConfig);
 
     const res = await fetch("/api/create-site", {
       method: "POST",
@@ -1189,9 +1200,9 @@ onClick={() => {
   <section className="space-y-6 border-t pt-8">
     <h2 className="text-xl font-semibold">Contact information</h2>
 
-    <p className="text-sm text-gray-500">
-      Optional. If provided, this will appear on your homepage below testimonials.
-    </p>
+<p className="text-sm text-gray-500">
+  Optional. City and Province help customers find your website on Google and improve local SEO.
+</p>
 
     <input
       className="w-full border p-3 rounded-md"
@@ -1204,6 +1215,42 @@ onClick={() => {
         })
       }
     />
+	
+	<input
+  className="w-full border p-3 rounded-md"
+  placeholder="City"
+  value={contact.city}
+  onChange={(e) =>
+    setContact({
+      ...contact,
+      city: e.target.value,
+    })
+  }
+/>
+
+<input
+  className="w-full border p-3 rounded-md"
+  placeholder="Province / State"
+  value={contact.province}
+  onChange={(e) =>
+    setContact({
+      ...contact,
+      province: e.target.value,
+    })
+  }
+/>
+
+<input
+  className="w-full border p-3 rounded-md"
+  placeholder="Country"
+  value={contact.country}
+  onChange={(e) =>
+    setContact({
+      ...contact,
+      country: e.target.value,
+    })
+  }
+/>
 
     <input
       className="w-full border p-3 rounded-md"

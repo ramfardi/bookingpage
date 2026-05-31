@@ -98,6 +98,10 @@ export type CustomerConfig = {
 
 contact?: {
   address?: string;
+  city?: string;
+  province?: string;
+  country?: string;
+
   email?: string;
   phone?: string;
 };
@@ -122,6 +126,12 @@ beforeAfter?: {
 	  highlights: string[];
 	  gallery?: string[];
 	};
+	
+	seo?: {
+  title?: string;
+  description?: string;
+  keywords?: string[];
+};
 	
 
 };

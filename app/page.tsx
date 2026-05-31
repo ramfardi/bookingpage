@@ -5,6 +5,9 @@ import { headers } from "next/headers";
 import { getSiteFromHost } from "./lib/getSiteFromHost";
 import { getSiteCleaningQuote } from "./lib/getSiteCleaningQuote";
 
+import { getCustomerServer } from "./lib/getCustomerServer";
+import { generateSeo } from "./lib/generateSeo";
+
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -46,6 +49,45 @@ description:
   
 };
 
+export async function generateMetadata() {
+  const host =
+    (await headers()).get("host") || "";
+
+  const customer =
+    await getCustomerServer(host);
+
+  if (!customer) {
+    return metadata;
+  }
+
+  const seo =
+    customer.seo ||
+    generateSeo(customer);
+
+  return {
+    title: seo.title,
+
+    description:
+      seo.description,
+
+    keywords:
+      seo.keywords?.join(", "),
+
+    openGraph: {
+      title: seo.title,
+
+      description:
+        seo.description,
+
+      url:
+        `https://${customer.subdomain}.simplebookme.com`,
+
+      siteName:
+        customer.businessName,
+    },
+  };
+}
+
 export default async function Page() {
   const host = (await headers()).get("host") || "";
 
@@ -65,5 +107,16 @@ export default async function Page() {
   }
 
   // 🔥 fallback: homepage
-  return <HomePage />;
+  const customer =
+  await getCustomerServer(host);
+
+if (customer) {
+  return (
+    <HomePage
+      activeCustomer={customer}
+    />
+  );
+}
+
+return <HomePage />;
 }

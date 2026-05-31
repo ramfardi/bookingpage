@@ -6,7 +6,7 @@ import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 import type { LandingConfig } from "@/app/lib/landingConfig";
 import { useRouter } from "next/navigation";
-
+import SeoSchema from "@/components/SeoSchema";
 import { ArrowRight, Instagram } from "lucide-react";
 
 import { FaInstagram, FaTiktok, FaLinkedin } from "react-icons/fa";
@@ -150,34 +150,33 @@ useEffect(() => {
 
 return (
   <>
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          name: "SimpleBookMe",
-          applicationCategory: "BusinessApplication",
-          operatingSystem: "Web",
-          description:
-            "Booking website builder for cleaners, salons, home services, and independent businesses.",
-          url: "https://simplebookme.com",
-          image: "https://simplebookme.com/images/og-home.jpg",
+{mode === "sales" ? (
+  <script
+    type="application/ld+json"
+    dangerouslySetInnerHTML={{
+      __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
 
-          offers: {
-            "@type": "Offer",
-            price: "0",
-            priceCurrency: "CAD",
-          },
+        name: "SimpleBookMe",
 
-          creator: {
-            "@type": "Organization",
-            name: "SimpleBookMe",
-            url: "https://simplebookme.com",
-          },
-        }),
-      }}
-    />
+        applicationCategory:
+          "BusinessApplication",
+
+        operatingSystem: "Web",
+
+        description:
+          "Booking website builder for service businesses.",
+
+        url: "https://simplebookme.com",
+      }),
+    }}
+  />
+) : (
+  <SeoSchema
+    customer={customer as CustomerConfig}
+  />
+)}
 
     <main className="min-h-screen w-full flex flex-col">
       {/* ================= HERO ================= */}

@@ -6,6 +6,8 @@ import HomePage from "@/components/HomePage";
 import type { CustomerConfig, ScheduleDay } from "@/app/lib/customerConfig";
 import { supabaseBrowser } from "@/app/lib/supabase-browser";
 import imageCompression from "browser-image-compression";
+import { generateSeo } from "@/app/lib/generateSeo";
+
 
 export default function SitePage({
   params,
@@ -171,6 +173,8 @@ async function saveChanges() {
       })),
     },
   };
+  
+  updatedCustomer.seo = generateSeo(updatedCustomer);
 
   const res = await fetch(`/api/site/${siteId}`, {
     method: "PUT",
@@ -1181,6 +1185,69 @@ function saveSliderToPortfolio() {
       }
     />
   </div>
+  
+  <div className="mb-4">
+  <label className="block text-sm text-gray-600 mb-1">
+    City
+  </label>
+
+  <input
+    className="w-full border rounded-md p-2"
+    placeholder="City"
+    value={customer.contact?.city || ""}
+    onChange={(e) =>
+      setCustomer({
+        ...customer,
+        contact: {
+          ...(customer.contact || {}),
+          city: e.target.value,
+        },
+      })
+    }
+  />
+</div>
+
+<div className="mb-4">
+  <label className="block text-sm text-gray-600 mb-1">
+    Province / State
+  </label>
+
+  <input
+    className="w-full border rounded-md p-2"
+    placeholder="Province / State"
+    value={customer.contact?.province || ""}
+    onChange={(e) =>
+      setCustomer({
+        ...customer,
+        contact: {
+          ...(customer.contact || {}),
+          province: e.target.value,
+        },
+      })
+    }
+  />
+</div>
+
+<div className="mb-4">
+  <label className="block text-sm text-gray-600 mb-1">
+    Country
+  </label>
+
+  <input
+    className="w-full border rounded-md p-2"
+    placeholder="Country"
+    value={customer.contact?.country || ""}
+    onChange={(e) =>
+      setCustomer({
+        ...customer,
+        contact: {
+          ...(customer.contact || {}),
+          country: e.target.value,
+        },
+      })
+    }
+  />
+</div>
 
   {/* EMAIL */}
   <div className="mb-4">
