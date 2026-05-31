@@ -10,45 +10,6 @@ import { generateSeo } from "./lib/generateSeo";
 
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-metadataBase: new URL("https://simplebookme.com"),
-  title:
-  "Booking Website Builder for Cleaners, Salons & Service Businesses | SimpleBookMe",
-description:
-  "Create a professional booking website for your cleaning business, salon, handyman service, or freelance business. Accept online bookings, share your availability, and get customers fast.",
-  alternates: {
-    canonical: "https://simplebookme.com/",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-    openGraph: {
-    title:
-      "Booking Website Builder for Service Businesses | SimpleBookMe",
-
-    description:
-      "Create a professional booking website with scheduling, quote tools, and availability pages.",
-
-    url: "https://simplebookme.com",
-
-    siteName: "SimpleBookMe",
-
-    images: [
-      {
-        url: "https://simplebookme.com/images/og-home.jpg",
-        width: 1200,
-        height: 630,
-        alt: "SimpleBookMe Homepage",
-      },
-    ],
-
-    locale: "en_US",
-    type: "website",
-  },
-  
-};
-
 export async function generateMetadata() {
   const host =
     (await headers()).get("host") || "";
@@ -56,10 +17,53 @@ export async function generateMetadata() {
   const customer =
     await getCustomerServer(host);
 
+  // MAIN SIMPLEBOOKME SITE
   if (!customer) {
-    return metadata;
+    return {
+      metadataBase: new URL("https://simplebookme.com"),
+
+      title:
+        "Booking Website Builder for Cleaners, Salons & Service Businesses | SimpleBookMe",
+
+      description:
+        "Create a professional booking website for your cleaning business, salon, handyman service, or freelance business. Accept online bookings, share your availability, and get customers fast.",
+
+      alternates: {
+        canonical: "https://simplebookme.com/",
+      },
+
+      robots: {
+        index: true,
+        follow: true,
+      },
+
+      openGraph: {
+        title:
+          "Booking Website Builder for Service Businesses | SimpleBookMe",
+
+        description:
+          "Create a professional booking website with scheduling, quote tools, and availability pages.",
+
+        url: "https://simplebookme.com",
+
+        siteName: "SimpleBookMe",
+
+        images: [
+          {
+            url: "https://simplebookme.com/images/og-home.jpg",
+            width: 1200,
+            height: 630,
+            alt: "SimpleBookMe Homepage",
+          },
+        ],
+
+        locale: "en_US",
+        type: "website",
+      },
+    };
   }
 
+  // CUSTOMER SUBDOMAIN
   const seo =
     customer.seo ||
     generateSeo(customer);
@@ -67,23 +71,27 @@ export async function generateMetadata() {
   return {
     title: seo.title,
 
-    description:
-      seo.description,
+    description: seo.description,
 
-    keywords:
-      seo.keywords?.join(", "),
+    keywords: seo.keywords,
+
+    robots: {
+      index: true,
+      follow: true,
+    },
 
     openGraph: {
       title: seo.title,
 
-      description:
-        seo.description,
+      description: seo.description,
 
-      url:
-        `https://${customer.subdomain}.simplebookme.com`,
+      url: `https://${customer.subdomain}.simplebookme.com`,
 
-      siteName:
-        customer.businessName,
+      siteName: customer.businessName,
+    },
+
+    alternates: {
+      canonical: `https://${customer.subdomain}.simplebookme.com`,
     },
   };
 }

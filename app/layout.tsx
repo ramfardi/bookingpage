@@ -7,6 +7,8 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
+
+metadataBase: new URL("https://simplebookme.com"),
   title: "Create a Booking Website & Instagram Bio Link | No Monthly Fee | SimpleBookMe",
 description:
   "Create a professional booking website for cleaners, hair salons, beauty businesses, handymen and service professionals. Accept bookings online, display pricing, showcase before & after portfolios, availability calendars, testimonials, Google reviews, contact information and social media links. No monthly fees.",
@@ -104,9 +106,12 @@ export default async function RootLayout({
 const host = (await headers()).get("host") || "";
 
 // adjust this if needed
+const cleanHost = host.split(":")[0];
+
 const isSubdomain =
-  host !== "simplebookme.com" &&
-  !host.startsWith("www.");
+  cleanHost.endsWith("simplebookme.com") &&
+  cleanHost !== "simplebookme.com" &&
+  cleanHost !== "www.simplebookme.com";
 
   return (
     <html lang="en">
@@ -127,55 +132,59 @@ const isSubdomain =
           }}
         />
 		
-		<script
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{
-    __html: JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
+{!isSubdomain && (
+  <script
+    type="application/ld+json"
+    dangerouslySetInnerHTML={{
+      __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
 
-  name: "SimpleBookMe",
+        name: "SimpleBookMe",
 
-  applicationCategory: "BusinessApplication",
+        applicationCategory:
+          "BusinessApplication",
 
-  operatingSystem: "Web",
+        operatingSystem: "Web",
 
-  url: "https://simplebookme.com",
+        url: "https://simplebookme.com",
 
-  image: "https://simplebookme.com/images/og-home.jpg",
+        image:
+          "https://simplebookme.com/images/og-home.jpg",
 
-  description:
-    "Booking website builder for cleaners, hair salons, beauty businesses, handymen and service professionals.",
+        description:
+          "Booking website builder for cleaners, hair salons, beauty businesses, handymen and service professionals.",
 
-  featureList: [
-    "Online booking",
-    "Availability calendar",
-    "Instagram bio link",
-    "Portfolio gallery",
-    "Before and after slider",
-    "Video portfolio",
-    "Google Maps location",
-    "Testimonials",
-    "Google review links",
-    "Social media links",
-    "Pricing display",
-    "Contact section",
-  ],
+        featureList: [
+          "Online booking",
+          "Availability calendar",
+          "Instagram bio link",
+          "Portfolio gallery",
+          "Before and after slider",
+          "Video portfolio",
+          "Google Maps location",
+          "Testimonials",
+          "Google review links",
+          "Social media links",
+          "Pricing display",
+          "Contact section",
+        ],
 
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "CAD",
-  },
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "CAD",
+        },
 
-  creator: {
-    "@type": "Organization",
-    name: "SimpleBookMe",
-    url: "https://simplebookme.com",
-  },
-}),
-  }}
-/>
+        creator: {
+          "@type": "Organization",
+          name: "SimpleBookMe",
+          url: "https://simplebookme.com",
+        },
+      }),
+    }}
+  />
+)}
 		
       </head>
 
