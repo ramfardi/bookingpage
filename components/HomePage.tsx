@@ -323,11 +323,13 @@ return (
       <div className="max-w-6xl mx-auto">
         <div className="h-px bg-gray-200 mb-14" />
 
-        <div className="text-center mb-10">
-		<h2 className="text-4xl font-semibold italic text-gray-900 font-serif">
-		  testimonials
-		</h2>
-        </div>
+{/*
+<div className="text-center mb-10">
+  <h2 className="text-4xl font-semibold italic text-gray-900 font-serif">
+    testimonials
+  </h2>
+</div>
+*/}
 
         <div className="flex flex-wrap justify-center gap-6">
           {(customer as CustomerConfig).testimonials?.reviews
