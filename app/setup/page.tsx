@@ -330,7 +330,6 @@ async function uploadGalleryImage(file: File) {
 		testimonials,
 		contact,
 		socialLinks,
-		seo,
 	  
 	    isPaid: true,
   paidAt: new Date().toISOString(),
