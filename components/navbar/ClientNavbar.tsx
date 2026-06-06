@@ -108,8 +108,9 @@ const [clientBusinessName, setClientBusinessName] = useState("");
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
 		{/* Logo / Brand */}
 		<div className="flex items-center min-w-0">
-		  {clientLogoUrl ? (
-			<Link href={base || "/"} className="flex items-center min-w-0">
+		{clientLogoUrl ? (
+		  <Link href={base || "/"} className="flex items-center min-w-0">
+			<div className="rounded-xl bg-white/70 p-1.5 border border-gray-200 shadow-sm">
 			  <img
 				src={clientLogoUrl}
 				alt={
@@ -117,10 +118,11 @@ const [clientBusinessName, setClientBusinessName] = useState("");
 					? `${clientBusinessName} logo`
 					: "Business logo"
 				}
-				className="h-9 sm:h-10 w-auto max-w-[150px] sm:max-w-[220px] object-contain"
+				className="h-8 sm:h-9 w-auto max-w-[140px] sm:max-w-[200px] object-contain rounded-lg"
 			  />
-			</Link>
-		  ) : clientBusinessName ? (
+			</div>
+		  </Link>
+		) : clientBusinessName ? (
 			<Link
 			  href={base || "/"}
 			  className="text-lg sm:text-xl font-extrabold text-gray-900 truncate max-w-[180px] sm:max-w-[260px]"
