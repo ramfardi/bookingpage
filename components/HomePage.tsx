@@ -227,11 +227,22 @@ return (
   <div className="mb-6 flex flex-col items-center justify-center">
     {(customer as CustomerConfig).branding?.showLogoInHero !== false &&
       (customer as CustomerConfig).branding?.logoUrl && (
-        <img
-          src={(customer as CustomerConfig).branding?.logoUrl}
-          alt={`${(customer as CustomerConfig).businessName || "Business"} logo`}
-          className="mb-3 h-20 sm:h-24 max-w-[220px] object-contain drop-shadow-lg"
-        />
+<div className="relative mb-4 flex justify-center">
+  <div className="absolute inset-0 bg-white/15 blur-3xl rounded-full scale-125" />
+
+  <img
+    src={(customer as CustomerConfig).branding?.logoUrl}
+    alt={`${(customer as CustomerConfig).businessName || "Business"} logo`}
+    className="
+      relative
+      h-20
+      sm:h-24
+      max-w-[220px]
+      object-contain
+      drop-shadow-[0_10px_25px_rgba(0,0,0,0.35)]
+    "
+  />
+</div>
       )}
 
     {(customer as CustomerConfig).branding?.servingCity && (
