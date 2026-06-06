@@ -227,19 +227,20 @@ return (
   <div className="mb-6 flex flex-col items-center justify-center">
     {(customer as CustomerConfig).branding?.showLogoInHero !== false &&
       (customer as CustomerConfig).branding?.logoUrl && (
-<div className="relative mb-4 flex justify-center">
-  <div className="absolute inset-0 bg-white/15 blur-3xl rounded-full scale-125" />
+<div className="relative mb-5 flex justify-center">
+  <div className="absolute left-1/2 top-1/2 h-28 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/30 blur-3xl" />
 
   <img
     src={(customer as CustomerConfig).branding?.logoUrl}
     alt={`${(customer as CustomerConfig).businessName || "Business"} logo`}
     className="
       relative
+      z-10
       h-20
       sm:h-24
       max-w-[220px]
       object-contain
-      drop-shadow-[0_10px_25px_rgba(0,0,0,0.35)]
+      drop-shadow-[0_12px_35px_rgba(0,0,0,0.55)]
     "
   />
 </div>
