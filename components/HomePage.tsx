@@ -551,6 +551,27 @@ return (
     </div>
 )}
   
+  
+  {/* CLIENT FOOTER */}
+{mode === "client" && (
+  <footer className="border-t bg-white py-8">
+    <div className="max-w-6xl mx-auto px-6 text-center">
+      <p className="text-xs uppercase tracking-wider text-gray-400">
+        Website powered by
+      </p>
+
+      <a
+        href="https://simplebookme.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-2 inline-block text-base font-semibold text-indigo-600 hover:text-indigo-700"
+      >
+        SimpleBookMe.com
+      </a>
+    </div>
+  </footer>
+)}
+  
       {/* ================= SALES ONLY ================= */}
       {mode === "sales" && (
         <>

@@ -391,9 +391,19 @@ function saveSliderToPortfolio() {
       {/* ================= LEFT: EDITOR ================= */}
       {isEditor && (
         <aside className="w-[42rem] border-r bg-gray-50 p-6 overflow-y-auto shrink-0">
-          <h2 className="text-lg font-semibold mb-6">
-            Edit your website
-          </h2>
+		<div className="sticky top-0 z-20 bg-gray-50 pb-4 mb-6 flex items-center justify-between">
+		  <h2 className="text-lg font-semibold">
+			Edit your website
+		  </h2>
+
+		  <button
+			onClick={saveChanges}
+			disabled={saving}
+			className="bg-indigo-600 text-white px-4 py-2 rounded-md font-medium shadow-sm disabled:opacity-60"
+		  >
+			{saving ? "Saving…" : "Save changes"}
+		  </button>
+		</div>
 
 {/* -------- BRANDING -------- */}
 <section className="mb-8 rounded-2xl border bg-white p-4">
