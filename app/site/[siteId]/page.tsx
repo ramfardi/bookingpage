@@ -140,6 +140,48 @@ async function uploadGalleryImage(file: File) {
     setUploading(false);
   }
 }
+
+async function uploadLogoImage(file: File) {
+  try {
+    setUploading(true);
+
+    const ext = file.name.split(".").pop();
+    const fileName = `logos/${crypto.randomUUID()}.${ext}`;
+
+    const compressedLogo = await imageCompression(file, {
+      maxSizeMB: 0.4,
+      maxWidthOrHeight: 800,
+    });
+
+    const { error } = await supabaseBrowser.storage
+      .from("gallery")
+      .upload(fileName, compressedLogo, {
+        upsert: true,
+      });
+
+    if (error) {
+      console.error(error);
+      alert("Logo upload failed");
+      return;
+    }
+
+    const { data } = supabaseBrowser.storage
+      .from("gallery")
+      .getPublicUrl(fileName);
+
+    setCustomer((prev) => ({
+      ...prev!,
+      branding: {
+        ...(prev!.branding || {}),
+        logoUrl: data.publicUrl,
+        showLogoInHero: prev!.branding?.showLogoInHero ?? true,
+        servingCity: prev!.branding?.servingCity || "",
+      },
+    }));
+  } finally {
+    setUploading(false);
+  }
+}
   
 async function saveChanges() {
   if (!siteId || !customer) return;
@@ -352,6 +394,108 @@ function saveSliderToPortfolio() {
           <h2 className="text-lg font-semibold mb-6">
             Edit your website
           </h2>
+
+{/* -------- BRANDING -------- */}
+<section className="mb-8 rounded-2xl border bg-white p-4">
+  <h3 className="font-medium mb-3">Branding</h3>
+
+  <p className="text-sm text-gray-500 mb-4">
+    Upload your business logo and add a service area such as “Serving North Vancouver”.
+  </p>
+
+  <div className="mb-5">
+    <label className="block text-sm text-gray-600 mb-2">
+      Business logo
+    </label>
+
+    <input
+      type="file"
+      accept="image/*"
+      onChange={async (e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+          await uploadLogoImage(file);
+        }
+      }}
+      className="block w-full text-sm text-gray-600
+      file:mr-4 file:rounded-xl file:border-0
+      file:bg-indigo-600 file:px-4 file:py-2
+      file:text-white hover:file:bg-indigo-700"
+    />
+
+    {customer.branding?.logoUrl && (
+      <div className="mt-4 rounded-xl border bg-gray-50 p-4">
+        <img
+          src={customer.branding.logoUrl}
+          alt="Business logo preview"
+          className="h-20 max-w-[220px] object-contain bg-white rounded-lg p-2 border"
+        />
+
+        <button
+          type="button"
+          className="mt-3 text-sm text-red-600"
+          onClick={() =>
+            setCustomer({
+              ...customer,
+              branding: {
+                ...(customer.branding || {}),
+                logoUrl: "",
+              },
+            })
+          }
+        >
+          Remove logo
+        </button>
+      </div>
+    )}
+  </div>
+
+  <div className="mb-5">
+    <label className="block text-sm text-gray-600 mb-1">
+      Serving city / area
+    </label>
+
+    <input
+      className="w-full border rounded-md p-2"
+      placeholder="North Vancouver"
+      value={customer.branding?.servingCity || ""}
+      onChange={(e) =>
+        setCustomer({
+          ...customer,
+          branding: {
+            ...(customer.branding || {}),
+            servingCity: e.target.value,
+            showLogoInHero:
+              customer.branding?.showLogoInHero ?? true,
+          },
+        })
+      }
+    />
+
+    <p className="mt-1 text-xs text-gray-500">
+      Example: Serving North Vancouver
+    </p>
+  </div>
+
+  <label className="flex items-center gap-2 text-sm text-gray-700">
+    <input
+      type="checkbox"
+      checked={customer.branding?.showLogoInHero ?? true}
+      onChange={(e) =>
+        setCustomer({
+          ...customer,
+          branding: {
+            ...(customer.branding || {}),
+            showLogoInHero: e.target.checked,
+            servingCity: customer.branding?.servingCity || "",
+          },
+        })
+      }
+    />
+    Show logo above homepage title
+  </label>
+</section>
+
 
           {/* -------- HERO -------- */}
           <section className="mb-8">

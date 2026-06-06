@@ -39,6 +39,9 @@ export default function ClientNavbar({
   const [customerKey, setCustomerKey] = useState<string | null>(null);
   const [bookingLink, setBookingLink] = useState<string | null>(null);
   const [isExternalBooking, setIsExternalBooking] = useState(false);
+  
+  const [clientLogoUrl, setClientLogoUrl] = useState<string | null>(null);
+const [clientBusinessName, setClientBusinessName] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -48,13 +51,15 @@ export default function ClientNavbar({
 
       setCustomerKey(result.key);
 
-      if (result.mode === "client") {
-        const customer = result.config as CustomerConfig;
+		if (result.mode === "client") {
+		  const customer = result.config as CustomerConfig;
 
-        setIsExternalBooking(!!customer.booking?.is_external);
+		  setIsExternalBooking(!!customer.booking?.is_external);
+		  setBookingLink(customer.booking?.bookingLink || null);
 
-        setBookingLink(customer.booking?.bookingLink || null);
-      }
+		  setClientLogoUrl(customer.branding?.logoUrl || null);
+		  setClientBusinessName(customer.businessName || "");
+		}
     }
 
     load();
@@ -101,13 +106,42 @@ export default function ClientNavbar({
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          {/* Logo */}
-          <Link
-            href={base || "/"}
-            className="text-xl font-extrabold text-gray-900"
-          >
-            Simple<span className="text-indigo-600">BookMe</span>
-          </Link>
+		{/* Logo / Brand */}
+		<div className="flex items-center min-w-0">
+		  {clientLogoUrl ? (
+			<Link href={base || "/"} className="flex items-center min-w-0">
+			  <img
+				src={clientLogoUrl}
+				alt={
+				  clientBusinessName
+					? `${clientBusinessName} logo`
+					: "Business logo"
+				}
+				className="h-9 sm:h-10 w-auto max-w-[150px] sm:max-w-[220px] object-contain"
+			  />
+			</Link>
+		  ) : clientBusinessName ? (
+			<Link
+			  href={base || "/"}
+			  className="text-lg sm:text-xl font-extrabold text-gray-900 truncate max-w-[180px] sm:max-w-[260px]"
+			>
+			  {clientBusinessName}
+			</Link>
+		  ) : (
+			<Link
+			  href={base || "/"}
+			  className="text-xl font-extrabold text-gray-900 shrink-0"
+			>
+			  Simple<span className="text-indigo-600">BookMe</span>
+			</Link>
+		  )}
+
+		  {isPreview && (
+			<span className="hidden sm:inline-flex ml-3 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600 border border-indigo-100">
+			  Preview by SimpleBookMe
+			</span>
+		  )}
+		</div>
 
           {/* Desktop menu */}
           <div className="hidden md:flex items-center gap-8">

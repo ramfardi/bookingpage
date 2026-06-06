@@ -169,6 +169,12 @@ const [socialLinks, setSocialLinks] = useState({
 
 const [uploading, setUploading] = useState(false);
 
+const [branding, setBranding] = useState({
+  logoUrl: "",
+  servingCity: "",
+  showLogoInHero: true,
+});
+
 /* ---------------- CONTENT ---------------- */
 
 	const [useDefaultHero, setUseDefaultHero] = useState(true);
@@ -291,6 +297,43 @@ async function uploadGalleryImage(file: File) {
   }
 }
 
+async function uploadLogoImage(file: File) {
+  try {
+    setUploading(true);
+
+    const ext = file.name.split(".").pop();
+    const fileName = `logos/${crypto.randomUUID()}.${ext}`;
+
+    const compressedLogo = await imageCompression(file, {
+      maxSizeMB: 0.4,
+      maxWidthOrHeight: 800,
+    });
+
+    const { error } = await supabaseBrowser.storage
+      .from("gallery")
+      .upload(fileName, compressedLogo, {
+        upsert: true,
+      });
+
+    if (error) {
+      console.error(error);
+      alert("Logo upload failed");
+      return;
+    }
+
+    const { data } = supabaseBrowser.storage
+      .from("gallery")
+      .getPublicUrl(fileName);
+
+    setBranding((prev) => ({
+      ...prev,
+      logoUrl: data.publicUrl,
+    }));
+  } finally {
+    setUploading(false);
+  }
+}
+
   async function handleCreate() {
   
   
@@ -305,6 +348,7 @@ async function uploadGalleryImage(file: File) {
 
       landing,
       about,
+	  branding,
 	  beforeAfter: [],
 	  
 
@@ -687,6 +731,77 @@ onClick={() => {
   </button>
 </div>
   </div>
+
+{/* ---------------- LOGO ---------------- */}
+<div className="space-y-4 border-t pt-6">
+  <h3 className="text-lg font-semibold">Branding</h3>
+
+  <p className="text-sm text-gray-500">
+    Optional. Add a logo and service area to make the website feel personalized.
+  </p>
+
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Business logo
+    </label>
+
+    <input
+      type="file"
+      accept="image/*"
+      onChange={async (e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+          await uploadLogoImage(file);
+        }
+      }}
+      className="block w-full text-sm text-gray-600
+      file:mr-4 file:rounded-xl file:border-0
+      file:bg-indigo-600 file:px-4 file:py-2
+      file:text-white hover:file:bg-indigo-700"
+    />
+
+    {branding.logoUrl && (
+      <img
+        src={branding.logoUrl}
+        alt="Logo preview"
+        className="mt-4 h-16 max-w-[180px] object-contain border rounded-xl p-2 bg-white"
+      />
+    )}
+  </div>
+
+  <div>
+    <input
+      className="w-full border p-3 rounded-md"
+      placeholder="Serving city, e.g. North Vancouver"
+      value={branding.servingCity}
+      onChange={(e) =>
+        setBranding({
+          ...branding,
+          servingCity: e.target.value,
+        })
+      }
+    />
+
+    <p className="text-xs text-gray-500 mt-1">
+      This can appear above the homepage title, for example: Serving North Vancouver
+    </p>
+  </div>
+
+  <label className="flex items-center gap-3 text-sm text-gray-700">
+    <input
+      type="checkbox"
+      checked={branding.showLogoInHero}
+      onChange={(e) =>
+        setBranding({
+          ...branding,
+          showLogoInHero: e.target.checked,
+        })
+      }
+    />
+    Show logo above homepage title
+  </label>
+</div>
+
 
 {/* ---------------- GALLERY ---------------- */}
 <div className="space-y-4 pt-6 border-t">

@@ -222,9 +222,29 @@ return (
         >
           {landing && (
 <>
+
+{mode === "client" && (
+  <div className="mb-6 flex flex-col items-center justify-center">
+    {(customer as CustomerConfig).branding?.showLogoInHero !== false &&
+      (customer as CustomerConfig).branding?.logoUrl && (
+        <img
+          src={(customer as CustomerConfig).branding?.logoUrl}
+          alt={`${(customer as CustomerConfig).businessName || "Business"} logo`}
+          className="mb-3 h-20 sm:h-24 max-w-[220px] object-contain drop-shadow-lg"
+        />
+      )}
+
+    {(customer as CustomerConfig).branding?.servingCity && (
+      <p className="inline-flex items-center rounded-full bg-white/15 px-4 py-2 text-sm sm:text-base font-semibold text-white border border-white/20 backdrop-blur-md">
+        Serving {(customer as CustomerConfig).branding?.servingCity}
+      </p>
+    )}
+  </div>
+)}
+
   {/* OVERLAY WRAPPER (important for readability) */}
 <div className="relative z-10 max-w-5xl px-6 text-center">
-  <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-white min-h-[180px]">
+  <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-white min-h-[130px] md:min-h-[180px]">
     
     <span>
       {typedHeader1}

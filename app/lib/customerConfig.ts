@@ -127,6 +127,12 @@ beforeAfter?: {
 	  gallery?: string[];
 	};
 	
+	branding?: {
+  logoUrl?: string;
+  servingCity?: string;
+  showLogoInHero?: boolean;
+};
+	
 	seo?: {
   title?: string;
   description?: string;
