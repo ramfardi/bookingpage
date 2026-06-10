@@ -143,19 +143,34 @@ const faqs = [
         </div>
 
 		<h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-		  Cleaning Service Price Calculator
+		  Free Cleaning Pricing Calculator
 		</h1>
 
-		<p className="mt-6 text-lg text-gray-600 leading-relaxed">
-		  Pricing cleaning services correctly is key to running a profitable and sustainable business. 
-		  Many cleaners set prices based on competitors or rough estimates, but this often leads to 
-		  underpricing and lost income. The most reliable approach is to base your pricing on real numbers. 
-		  This calculator helps you determine the right price for your cleaning services by factoring in 
-		  the time required per job, your target hourly earnings, travel time, cleaning supplies, and 
-		  monthly business expenses. It also applies your desired profit margin to generate clear and 
-		  realistic pricing suggestions. Whether you offer home cleaning, deep cleaning, or move-out 
-		  services, this tool helps ensure your pricing covers all costs and supports consistent business growth.
+		<p className="mt-6 text-xl text-gray-600 leading-relaxed">
+		  Find the right price for house cleaning, deep cleaning, move-out
+		  cleaning, and Airbnb turnover services. Calculate labor, supplies,
+		  overhead, and profit margins in seconds.
 		</p>
+		
+		<div className="mt-6 flex flex-wrap gap-3">
+
+  <span className="bg-blue-50 text-blue-700 px-3 py-2 rounded-full text-sm font-medium">
+    Residential Cleaning
+  </span>
+
+  <span className="bg-green-50 text-green-700 px-3 py-2 rounded-full text-sm font-medium">
+    Deep Cleaning
+  </span>
+
+  <span className="bg-purple-50 text-purple-700 px-3 py-2 rounded-full text-sm font-medium">
+    Move-Out Cleaning
+  </span>
+
+  <span className="bg-orange-50 text-orange-700 px-3 py-2 rounded-full text-sm font-medium">
+    Airbnb Cleaning
+  </span>
+
+</div>
 
         {/* Calculator */}
 
@@ -171,7 +186,7 @@ const faqs = [
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Business Type
+                🧹 Business Type
               </label>
 
               <select
@@ -181,7 +196,7 @@ const faqs = [
                   setBusinessType(type);
                   applyPreset(type);
                 }}
-                className="mt-2 w-full rounded-lg border px-4 py-2"
+                className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               >
                 <option>Cleaning</option>
               </select>
@@ -190,45 +205,67 @@ const faqs = [
             {/* Service Time */}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Service Time (minutes)
-              </label>
+			<label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+			  ⏱️ Service Time (minutes)
+			</label>
 
-              <input
-                type="number"
-                value={serviceTime}
-                onChange={(e) => setServiceTime(Number(e.target.value))}
-                className="mt-2 w-full rounded-lg border px-4 py-2"
-              />
+<input
+  type="range"
+  min="30"
+  max="480"
+  step="15"
+  value={serviceTime}
+  onChange={(e) => setServiceTime(Number(e.target.value))}
+  className="w-full mt-3"
+/>
+
+<div className="flex justify-between text-sm text-gray-500 mt-1">
+  <span>30 min</span>
+  <span className="font-semibold text-indigo-700">
+    {serviceTime} min
+  </span>
+  <span>8 hrs</span>
+</div>
             </div>
 
             {/* Hourly Goal */}
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Desired Hourly Income ($)
+                💵 Desired Hourly Income ($)
               </label>
 
-              <input
-                type="number"
-                value={hourlyGoal}
-                onChange={(e) => setHourlyGoal(Number(e.target.value))}
-                className="mt-2 w-full rounded-lg border px-4 py-2"
-              />
+<input
+  type="range"
+  min="20"
+  max="150"
+  step="5"
+  value={hourlyGoal}
+  onChange={(e) => setHourlyGoal(Number(e.target.value))}
+  className="w-full mt-3"
+/>
+
+<div className="flex justify-between text-sm text-gray-500 mt-1">
+  <span>$20/hr</span>
+  <span className="font-semibold text-indigo-700">
+    ${hourlyGoal}/hr
+  </span>
+  <span>$150/hr</span>
+</div>
             </div>
 
             {/* Monthly Expenses */}
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Monthly Business Expenses ($)
+                📋 Monthly Business Expenses ($)
               </label>
 
               <input
                 type="number"
                 value={monthlyExpenses}
                 onChange={(e) => setMonthlyExpenses(Number(e.target.value))}
-                className="mt-2 w-full rounded-lg border px-4 py-2"
+                className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
 
@@ -236,14 +273,14 @@ const faqs = [
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Customers Per Month
+                👥 Customers Per Month
               </label>
 
               <input
                 type="number"
                 value={customersPerMonth}
                 onChange={(e) => setCustomersPerMonth(Number(e.target.value))}
-                className="mt-2 w-full rounded-lg border px-4 py-2"
+                className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
 
@@ -251,14 +288,14 @@ const faqs = [
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Supplies Cost Per Service ($)
+                🧴 Supplies Cost Per Service ($)
               </label>
 
               <input
                 type="number"
                 value={suppliesCost}
                 onChange={(e) => setSuppliesCost(Number(e.target.value))}
-                className="mt-2 w-full rounded-lg border px-4 py-2"
+                className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
 
@@ -266,19 +303,72 @@ const faqs = [
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Desired Profit Margin (%)
+                📈 Desired Profit Margin (%)
               </label>
 
-              <input
-                type="number"
-                value={profitMargin}
-                onChange={(e) => setProfitMargin(Number(e.target.value))}
-                className="mt-2 w-full rounded-lg border px-4 py-2"
-              />
+<input
+  type="range"
+  min="0"
+  max="60"
+  step="1"
+  value={profitMargin}
+  onChange={(e) => setProfitMargin(Number(e.target.value))}
+  className="w-full mt-3"
+/>
+
+<div className="flex justify-between text-sm text-gray-500 mt-1">
+  <span>0%</span>
+  <span className="font-semibold text-indigo-700">
+    {profitMargin}%
+  </span>
+  <span>60%</span>
+</div>
+
+<div className="mt-3">
+
+  {profitMargin < 15 && (
+    <div className="bg-red-50 text-red-700 border border-red-200 rounded-lg p-3">
+      🔴 Low Profit Margin
+    </div>
+  )}
+
+  {profitMargin >= 15 && profitMargin < 25 && (
+    <div className="bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-lg p-3">
+      🟡 Fair Profit Margin
+    </div>
+  )}
+
+  {profitMargin >= 25 && (
+    <div className="bg-green-50 text-green-700 border border-green-200 rounded-lg p-3">
+      🟢 Healthy Profit Margin
+    </div>
+  )}
+
+</div>
             </div>
 
           </div>
+		<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+		  <div className="bg-white border rounded-xl p-4 text-center">
+			<div className="text-xs text-gray-500">Time</div>
+			<div className="font-bold">{serviceTime} min</div>
+		  </div>
 
+		  <div className="bg-white border rounded-xl p-4 text-center">
+			<div className="text-xs text-gray-500">Hourly Goal</div>
+			<div className="font-bold">${hourlyGoal}</div>
+		  </div>
+
+		  <div className="bg-white border rounded-xl p-4 text-center">
+			<div className="text-xs text-gray-500">Expenses</div>
+			<div className="font-bold">${monthlyExpenses}</div>
+		  </div>
+
+		  <div className="bg-white border rounded-xl p-4 text-center">
+			<div className="text-xs text-gray-500">Margin</div>
+			<div className="font-bold">{profitMargin}%</div>
+		  </div>
+		</div>
           <button
             onClick={() => setCalculated(true)}
             className="mt-8 rounded-xl bg-indigo-600 text-white px-8 py-3 font-semibold hover:bg-indigo-700 transition"
@@ -286,38 +376,67 @@ const faqs = [
             Calculate Service Price
           </button>
 
-          {calculated && (
-            <div className="mt-10 space-y-4">
+{calculated && (
+  <div className="mt-10">
 
-              <p>
-                <strong>Labor Cost:</strong> ${laborCost.toFixed(2)}
-              </p>
+    <div className="grid md:grid-cols-3 gap-4">
 
-              <p>
-                <strong>Overhead Per Service:</strong> $
-                {overheadPerService.toFixed(2)}
-              </p>
+      <div className="bg-green-50 border border-green-200 rounded-xl p-5">
+        <div className="text-sm text-gray-600">
+          Budget Price
+        </div>
+        <div className="text-3xl font-bold text-green-700">
+          ${budgetPrice.toFixed(2)}
+        </div>
+      </div>
 
-              <p>
-                <strong>Supplies Cost:</strong> ${suppliesCost.toFixed(2)}
-              </p>
+      <div className="bg-indigo-50 border-2 border-indigo-500 rounded-xl p-5">
+        <div className="text-sm text-gray-600">
+          Recommended Price
+        </div>
+        <div className="text-4xl font-bold text-indigo-700">
+          ${recommendedPrice.toFixed(2)}
+        </div>
+      </div>
 
-              <hr className="my-4"/>
+      <div className="bg-purple-50 border border-purple-200 rounded-xl p-5">
+        <div className="text-sm text-gray-600">
+          Premium Price
+        </div>
+        <div className="text-3xl font-bold text-purple-700">
+          ${premiumPrice.toFixed(2)}
+        </div>
+      </div>
 
-              <p className="text-gray-700">
-                <strong>Budget Price:</strong> ${budgetPrice.toFixed(2)}
-              </p>
+    </div>
 
-              <p className="text-indigo-700 text-lg font-semibold">
-                Recommended Price: ${recommendedPrice.toFixed(2)}
-              </p>
+    <div className="mt-6 bg-white border rounded-xl p-5">
+      <h3 className="font-semibold text-lg mb-4">
+        Cost Breakdown
+      </h3>
 
-              <p className="text-gray-700">
-                <strong>Premium Price:</strong> ${premiumPrice.toFixed(2)}
-              </p>
+      <div className="space-y-2">
 
-            </div>
-          )}
+        <div className="flex justify-between">
+          <span>Labor Cost</span>
+          <span>${laborCost.toFixed(2)}</span>
+        </div>
+
+        <div className="flex justify-between">
+          <span>Overhead Per Service</span>
+          <span>${overheadPerService.toFixed(2)}</span>
+        </div>
+
+        <div className="flex justify-between">
+          <span>Supplies Cost</span>
+          <span>${suppliesCost.toFixed(2)}</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+)}
 
         </div>
 		
@@ -386,7 +505,18 @@ const faqs = [
   </p>
 
 </div>
-		
+	<div className="mt-16 bg-indigo-50 border border-indigo-100 rounded-2xl p-6 text-center">
+
+  <h3 className="font-semibold text-lg text-gray-900">
+    Trusted By Residential Cleaners
+  </h3>
+
+  <p className="text-gray-600 mt-2">
+    Designed for residential cleaning, move-out cleaning,
+    deep cleaning, Airbnb turnovers and maid services.
+  </p>
+
+</div>	
 				{/* FAQ Section */}
 <div className="mt-20">
   <h2 className="text-3xl font-bold text-gray-900 mb-8">

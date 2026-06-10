@@ -1,44 +1,74 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title:
-    "Cleaning Service Pricing Calculator (Free Tool for House Cleaning Rates) | SimpleBookMe",
-  description:
-    "Free cleaning service pricing calculator. Estimate how much to charge for house cleaning based on time, costs, and profit margin. Perfect for solo cleaners and small cleaning businesses.",
-  keywords: [
-    "cleaning service pricing calculator",
-    "house cleaning rates calculator",
-    "how much to charge for cleaning",
-    "cleaning service pricing",
-    "cleaning business pricing tool",
-    "deep cleaning pricing",
-    "cleaning cost estimator",
-    "price cleaning jobs",
-  ],
-  alternates: {
-    canonical:
-      "https://simplebookme.com/cleaning-pricing-calculator",
-  },
-  openGraph: {
-    title:
-      "Cleaning Service Pricing Calculator (House Cleaning Rates)",
-    description:
-      "Calculate profitable cleaning service prices based on your time, expenses, and desired income. Ideal for independent cleaners and small businesses.",
-    url: "https://simplebookme.com/cleaning-pricing-calculator",
-    siteName: "SimpleBookMe",
-    type: "article",
-  },
-  twitter: {
-    card: "summary",
-    title: "Cleaning Service Pricing Calculator",
-    description:
-      "Estimate how much to charge for cleaning services with this free calculator.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
+title:
+"Free Cleaning Service Price Calculator | House Cleaning & Deep Cleaning Rates",
+
+description:
+"Calculate how much to charge for house cleaning, deep cleaning, move-out cleaning, and Airbnb cleaning services. Estimate labor costs, supplies, overhead expenses, and profit margins with this free cleaning pricing calculator.",
+
+keywords: [
+"cleaning service price calculator",
+"cleaning pricing calculator",
+"house cleaning rates calculator",
+"how much should i charge for cleaning",
+"cleaning estimate calculator",
+"house cleaning estimate",
+"residential cleaning pricing",
+"cleaning service pricing",
+"cleaning quote calculator",
+"deep cleaning pricing",
+"move out cleaning rates",
+"airbnb cleaning pricing",
+"maid service pricing",
+"cleaning business pricing tool",
+"price cleaning jobs",
+"cleaning cost estimator",
+],
+
+alternates: {
+canonical:
+"https://simplebookme.com/cleaning-pricing-calculator",
+},
+
+openGraph: {
+title:
+"Free Cleaning Service Price Calculator",
+description:
+"Estimate profitable cleaning service prices based on labor, supplies, overhead costs, and profit margin.",
+url:
+"https://simplebookme.com/cleaning-pricing-calculator",
+siteName: "SimpleBookMe",
+images: [
+{
+url:
+"https://simplebookme.com/og-cleaning-pricing.jpg",
+width: 1200,
+height: 630,
+alt:
+"Cleaning Service Price Calculator",
+},
+],
+type: "website",
+},
+
+twitter: {
+card: "summary_large_image",
+title:
+"Free Cleaning Service Price Calculator",
+description:
+"Calculate cleaning service prices in seconds.",
+images: [
+"https://simplebookme.com/og-cleaning-pricing.jpg",
+],
+},
+
+robots: {
+index: true,
+follow: true,
+},
 };
+
 
 export default function CleaningPricingCalculatorLayout({
   children,
