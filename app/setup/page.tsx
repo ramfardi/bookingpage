@@ -365,7 +365,7 @@ async function uploadLogoImage(file: File) {
       templateId,
 
       businessName: form.businessName,
-      subdomain: form.subdomain.toLowerCase(),
+      subdomain: cleanedSubdomain,
 
       heroImage: template.defaultData.heroImage,
 
@@ -436,7 +436,7 @@ async function uploadLogoImage(file: File) {
 	  body: JSON.stringify({
 		email: form.email,
 		siteId,
-		subdomain: form.subdomain.toLowerCase(),
+		subdomain: cleanedSubdomain,
 	  }),
 	});
 
@@ -616,9 +616,11 @@ onClick={() => {
 			  })
 			}
             />
-            <p className="text-xs text-gray-500 mt-1">
-              will be live at: {form.subdomain || "yourbusiness"}.simplebookme.com
-            </p>
+		<p className="text-xs text-gray-500 mt-1">
+		  Will be live at: {form.subdomain || "yourbusiness"}.simplebookme.com
+		  <br />
+		  Only letters (a-z), numbers (0-9), and hyphens (-) are allowed. No spaces or special characters.
+		</p>
           </div>
         </section>
       )}
