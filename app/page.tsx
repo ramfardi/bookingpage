@@ -78,6 +78,16 @@ export async function generateMetadata() {
       },
     };
   }
+  
+  if (!customer) {
+  return {
+    title: "Site Not Found",
+    robots: {
+      index: false,
+      follow: false,
+    },
+  };
+}
 
   // CUSTOMER SUBDOMAIN
   const seo =
