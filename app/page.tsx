@@ -7,7 +7,7 @@ import { getSiteCleaningQuote } from "./lib/getSiteCleaningQuote";
 
 import { getCustomerServer } from "./lib/getCustomerServer";
 import { generateSeo } from "./lib/generateSeo";
-
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 export async function generateMetadata() {
@@ -16,9 +16,25 @@ export async function generateMetadata() {
 
   const customer =
     await getCustomerServer(host);
+	
+	const isMainSite =
+  host === "simplebookme.com" ||
+  host === "www.simplebookme.com" ||
+  host.includes("localhost") ||
+  host.includes("vercel.app");
+  
+  if (!customer && !isMainSite) {
+  return {
+    title: "Site Not Found",
+    robots: {
+      index: false,
+      follow: false,
+    },
+  };
+}
 
   // MAIN SIMPLEBOOKME SITE
-  if (!customer) {
+  if (!customer && isMainSite) {
     return {
       metadataBase: new URL("https://simplebookme.com"),
 
@@ -98,7 +114,11 @@ export async function generateMetadata() {
 
 export default async function Page() {
   const host = (await headers()).get("host") || "";
-
+  const isMainSite =
+    host === "simplebookme.com" ||
+    host === "www.simplebookme.com" ||
+    host.includes("localhost") ||
+    host.includes("vercel.app");
 
   // 🔥 try both
   const site = await getSiteFromHost(host);
@@ -126,5 +146,11 @@ if (customer) {
   );
 }
 
+// Unknown subdomain → 404
+if (!isMainSite) {
+  notFound();
+}
+
+// Main site → homepage
 return <HomePage />;
 }
