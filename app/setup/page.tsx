@@ -8,6 +8,19 @@ import { supabaseBrowser } from "@/app/lib/supabase-browser";
 import { generateSeo } from "@/app/lib/generateSeo";
 const scheduleDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
+function sanitizeSubdomain(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")      // spaces -> hyphen
+    .replace(/\./g, "")        // remove dots
+    .replace(/[^a-z0-9-]/g, "") // remove invalid chars
+    .replace(/--+/g, "-")      // no double hyphens
+    .replace(/^-+/, "")        // remove starting hyphen
+    .replace(/-+$/, "")        // remove ending hyphen
+    .slice(0, 25);             // max length
+}
+
 function buildTimeSlots(startHour: string, endHour: string) {
   const [startH, startM] = startHour.split(":").map(Number);
   const [endH, endM] = endHour.split(":").map(Number);
@@ -335,7 +348,17 @@ async function uploadLogoImage(file: File) {
 }
 
   async function handleCreate() {
-  
+	  const cleanedSubdomain = sanitizeSubdomain(form.subdomain);
+
+	if (
+	  cleanedSubdomain.length < 3 ||
+	  cleanedSubdomain.length > 25
+	) {
+	  alert(
+		"Subdomain must be between 3 and 25 characters."
+	  );
+	  return;
+	}
   
     const siteConfig: CustomerConfig = {
       siteId: crypto.randomUUID(),
@@ -584,10 +607,14 @@ onClick={() => {
             <input
               className="w-full border p-3 rounded-md"
               placeholder="yourbusiness"
+			  maxLength={25}
               value={form.subdomain}
-              onChange={(e) =>
-                setForm({ ...form, subdomain: e.target.value })
-              }
+			onChange={(e) =>
+			  setForm({
+				...form,
+				subdomain: sanitizeSubdomain(e.target.value),
+			  })
+			}
             />
             <p className="text-xs text-gray-500 mt-1">
               will be live at: {form.subdomain || "yourbusiness"}.simplebookme.com
