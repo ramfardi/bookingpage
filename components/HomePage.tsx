@@ -250,17 +250,22 @@ return (
 <div className="relative z-10 max-w-5xl px-6 text-center">
   <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-white min-h-[130px] md:min-h-[180px]">
     
-    <span>
-      {typedHeader1}
-    </span>
-
-    {" "}
-
+{mode === "sales" ? (
+  <>
+    <span>{typedHeader1}</span>{" "}
     <span className="bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent">
       {typedHeader2}
     </span>
-
     <span className="animate-pulse text-white">|</span>
+  </>
+) : (
+  <>
+    <span>{landing.header1}</span>{" "}
+    <span className="bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent">
+      {landing.header2}
+    </span>
+  </>
+)}
   </h1>
 </div>
 
