@@ -41,6 +41,24 @@ keywords: [
   "small business website",
   "website builder for service business",
   "no monthly fee website builder",
+  
+  "hair salon booking",
+  "hair salon appointment",
+  "hair salon appointment book",
+  
+  "cleaning booking system",
+  "cleaner schedule",
+  "free cleaning website template",
+  
+  "pet grooming booking software",
+  "pet grooming booking platform",
+  "pet care booking system",
+  
+  "car detailing booking system",
+  "mobile car wash booking app",
+  
+  "nail salon booking system",
+  "nail salon schedule online",
 ],
 
   alternates: {
