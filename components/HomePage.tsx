@@ -422,7 +422,7 @@ return (
     G
   </span>
 </div>
-			  Leave us a review 😊
+			  Leave Us a Review
 			</a>
 		  </div>
 		)}
@@ -580,7 +580,184 @@ return (
       {/* ================= SALES ONLY ================= */}
       {mode === "sales" && (
         <>
+{/* -------- EVERYTHING INCLUDED -------- */}
+<section className="bg-white py-28 border-b">
+  <div className="max-w-7xl mx-auto px-6">
 
+    {/* Heading */}
+    <div className="text-center max-w-4xl mx-auto">
+      <span className="inline-flex rounded-full bg-indigo-100 text-indigo-700 px-4 py-1 text-sm font-semibold">
+        Everything you need
+      </span>
+
+      <h2 className="mt-6 text-5xl font-bold tracking-tight text-gray-900">
+        One website for every service business
+      </h2>
+
+      <p className="mt-6 text-xl text-gray-600 leading-relaxed">
+        Whether you're a cleaner, mobile car detailer, pet groomer,
+        accountant, handyman, landscaper, barber, hair stylist,
+        beauty salon, nail salon or any appointment-based business,
+        SimpleBookMe helps you launch a beautiful website in minutes.
+      </p>
+    </div>
+
+    {/* Features + Screenshots */}
+    <div className="mt-20 grid lg:grid-cols-2 gap-16 items-center">
+
+      {/* LEFT */}
+      <div>
+
+        <h3 className="text-2xl font-bold text-gray-900 mb-8">
+          Everything included
+        </h3>
+
+        <div className="grid sm:grid-cols-2 gap-x-10 gap-y-5 text-lg">
+
+          <div className="flex items-start gap-3">
+            <span className="text-green-500 text-xl">✓</span>
+            <span>Online appointment booking</span>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <span className="text-green-500 text-xl">✓</span>
+            <span>Portfolio gallery</span>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <span className="text-green-500 text-xl">✓</span>
+            <span>Before & After slider</span>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <span className="text-green-500 text-xl">✓</span>
+            <span>Weekly availability calendar</span>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <span className="text-green-500 text-xl">✓</span>
+            <span>Service & pricing list</span>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <span className="text-green-500 text-xl">✓</span>
+            <span>Google Maps integration</span>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <span className="text-green-500 text-xl">✓</span>
+            <span>Custom logo & branding</span>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <span className="text-green-500 text-xl">✓</span>
+            <span>Automatic SEO optimization</span>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <span className="text-green-500 text-xl">✓</span>
+            <span>Google Reviews support</span>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <span className="text-green-500 text-xl">✓</span>
+            <span>Works on desktop & mobile</span>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <span className="text-green-500 text-xl">✓</span>
+            <span>Email & contact page</span>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <span className="text-green-500 text-xl">✓</span>
+            <span>Use your own booking system</span>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* RIGHT */}
+      <div className="relative">
+
+        <div className="absolute inset-0 bg-indigo-200 blur-3xl opacity-30 rounded-full"></div>
+
+        <div className="relative">
+
+          <div className="grid grid-cols-2 gap-5">
+
+            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border">
+              <img
+                src="/images/summary-home.png"
+                alt="Homepage"
+                 className="w-full aspect-[16/14] object-cover"
+              />
+
+              <div className="p-4 text-center">
+                <p className="font-semibold text-gray-900">
+                  Car Detailing
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border mt-12">
+              <img
+                src="/images/summary-booking.png"
+                alt="Booking"
+                className="w-full aspect-[16/12] object-cover"
+              />
+
+              <div className="p-4 text-center">
+                <p className="font-semibold text-gray-900">
+                  Pet Grooming
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          <div className="mt-5 bg-white rounded-3xl shadow-2xl overflow-hidden border max-w-sm mx-auto">
+
+            <img
+              src="/images/summary-portfolio.png"
+              alt="Portfolio"
+              className="w-full"
+            />
+
+            <div className="p-4 text-center">
+              <p className="font-semibold text-gray-900">
+                Cleaning Service
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    {/* Bottom CTA */}
+
+    <div className="mt-24 text-center">
+
+      <p className="text-2xl font-semibold text-gray-900">
+        Everything your business needs — in one beautiful website.
+      </p>
+
+      <button
+        onClick={() => router.push("/setup")}
+        className="mt-8 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 px-10 py-4 text-lg font-semibold text-white shadow-xl hover:scale-105 transition"
+      >
+        Create Your Website Free
+      </button>
+
+    </div>
+
+  </div>
+</section>
 		  
 		  
 		  {/* -------- FEATURE SHOWCASE -------- */}
@@ -748,6 +925,91 @@ return (
       </div>
     </motion.div>
 	
+{/* PORTFOLIO */}
+<motion.div
+  initial={{ opacity: 0, y: 40 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.7 }}
+  className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+>
+  {/* TEXT */}
+  <div className="order-2 lg:order-1">
+    <p className="text-indigo-600 font-semibold uppercase tracking-[0.25em] mb-6">
+      PORTFOLIO
+    </p>
+
+    <blockquote className="text-4xl md:text-5xl leading-tight font-light italic text-gray-900">
+      “Showcase your best work!”
+    </blockquote>
+
+    <p className="mt-8 text-lg text-gray-600 leading-relaxed max-w-xl">
+      Upload images or clips of your worka dn they will be organized in a beautiful gallary.
+    </p>
+
+    <div className="mt-8 space-y-3 text-gray-700">
+      <div>✓ Unlimited portfolio projects</div>
+      <div>✓ Interactive before & after comparison</div>
+      <div>✓ Mobile friendly experience</div>
+      <div>✓ Builds trust and increases bookings</div>
+    </div>
+  </div>
+
+  {/* SLIDER DEMO */}
+  <div className="relative order-1 lg:order-2">
+    <div className="absolute inset-0 bg-indigo-200 blur-3xl opacity-30 rounded-full"></div>
+
+        <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
+          <img
+            src="/images/portfolio.png"
+            alt="Availability feature"
+            className="w-full object-cover"
+          />
+        </div>
+  </div>
+</motion.div>
+
+
+    {/* contact */}
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7 }}
+      className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+    >
+
+      {/* LEFT IMAGE */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-indigo-200 blur-3xl opacity-30 rounded-full"></div>
+
+        <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
+          <img
+            src="/images/contact.png"
+            alt="Availability feature"
+            className="w-full object-cover"
+          />
+        </div>
+      </div>
+
+      {/* RIGHT TEXT */}
+      <div>
+        <p className="text-indigo-600 font-semibold uppercase tracking-[0.25em] mb-6">
+          Contact info
+        </p>
+
+        <blockquote className="text-4xl md:text-5xl leading-tight font-light italic text-gray-900">
+          “Be Connected to the Clients”
+        </blockquote>
+
+        <p className="mt-8 text-lg text-gray-600 leading-relaxed max-w-xl">
+          Show your location on Google map and share your contact info —
+          make it easy for clients to find you.
+        </p>
+      </div>
+    </motion.div>
+
+
 {/* BEFORE & AFTER PORTFOLIO */}
 <motion.div
   initial={{ opacity: 0, y: 40 }}
@@ -773,12 +1035,6 @@ return (
       results by dragging the slider.
     </p>
 
-    <div className="mt-8 space-y-3 text-gray-700">
-      <div>✓ Unlimited portfolio projects</div>
-      <div>✓ Interactive before & after comparison</div>
-      <div>✓ Mobile friendly experience</div>
-      <div>✓ Builds trust and increases bookings</div>
-    </div>
   </div>
 
   {/* SLIDER DEMO */}
