@@ -59,7 +59,7 @@ export default function LandingBeforeAfter({
         max="100"
         value={position}
         onChange={(e) => setPosition(Number(e.target.value))}
-        className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize"
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
       />
     </div>
   );
