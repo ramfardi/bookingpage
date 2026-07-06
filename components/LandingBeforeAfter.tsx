@@ -12,8 +12,7 @@ export default function LandingBeforeAfter({
   const [position, setPosition] = useState(50);
 
   return (
-<div className="relative w-full overflow-hidden rounded-3xl shadow-xl
-                aspect-[4/5] md:aspect-[4/3] lg:aspect-[16/10]">
+    <div className="relative w-full aspect-[4/5] overflow-hidden rounded-3xl shadow-xl">
       {/* AFTER IMAGE */}
       <img
         src={afterImage}
