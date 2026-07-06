@@ -944,7 +944,7 @@ return (
     </blockquote>
 
     <p className="mt-8 text-lg text-gray-600 leading-relaxed max-w-xl">
-      Upload images or clips of your worka dn they will be organized in a beautiful gallary.
+      Upload images or clips of your work and they will be organized in a beautiful gallery.
     </p>
 
     <div className="mt-8 space-y-3 text-gray-700">
