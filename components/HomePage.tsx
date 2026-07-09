@@ -1078,7 +1078,7 @@ return (
                   },
                   {
                     title: "Easy One-time setup",
-                    desc: "Choose from pre-built templates",
+                    desc: "Choose from pre-built templates tailored for each service catagory",
                   },
                 ].map((f) => (
                   <motion.div
