@@ -1077,8 +1077,8 @@ return (
                     desc: "Clients book via email with automatic confirmation and calendar invites (.ics).",
                   },
                   {
-                    title: "One-time setup. No monthly fees.",
-                    desc: "Pay once and keep using it — no subscriptions.",
+                    title: "Easy One-time setup",
+                    desc: "Choose from pre-built templates",
                   },
                 ].map((f) => (
                   <motion.div
