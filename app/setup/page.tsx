@@ -348,7 +348,7 @@ async function uploadLogoImage(file: File) {
   }
 }
 
-  async function handleCreate() {async function handleCreate() {
+async function handleCreate() {
   const cleanedSubdomain = sanitizeSubdomain(form.subdomain);
   const cleanedEmail = form.email.trim();
 
