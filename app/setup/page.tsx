@@ -195,6 +195,7 @@ const [branding, setBranding] = useState({
 	
 	const [createdSiteId, setCreatedSiteId] = useState<string | null>(null);
 	const [createdSubdomain, setCreatedSubdomain] = useState<string | null>(null);
+	const [activating, setActivating] = useState(false);
 
 	const [landing, setLanding] = useState(template.defaultData.landing);
 
@@ -347,102 +348,144 @@ async function uploadLogoImage(file: File) {
   }
 }
 
-  async function handleCreate() {
-	  const cleanedSubdomain = sanitizeSubdomain(form.subdomain);
+  async function handleCreate() {async function handleCreate() {
+  const cleanedSubdomain = sanitizeSubdomain(form.subdomain);
+  const cleanedEmail = form.email.trim();
 
-	if (
-	  cleanedSubdomain.length < 3 ||
-	  cleanedSubdomain.length > 25
-	) {
-	  alert(
-		"Subdomain must be between 3 and 25 characters."
-	  );
-	  return;
-	}
-  
-    const siteConfig: CustomerConfig = {
-      siteId: crypto.randomUUID(),
-      templateId,
-
-      businessName: form.businessName,
-      subdomain: cleanedSubdomain,
-
-      heroImage: template.defaultData.heroImage,
-
-      landing,
-      about,
-	  branding,
-	  beforeAfter: [],
-	  
-
-      services: services
-        .filter((s) => s.enabled)
-        .map((s) => s.name),
-
-      pricing: {
-        title: "Pricing",
-        rows: services
-          .filter((s) => s.enabled && s.price)
-          .map((s) => ({
-            id: crypto.randomUUID(),
-            name: s.name,
-            price: s.price!,
-          })),
-      },
-
-      booking,
-      deposit,
-	  
-		schedule,
-		testimonials,
-		contact,
-		socialLinks,
-	  
-	    isPaid: true,
-  paidAt: new Date().toISOString(),
-		
-      email: {
-        bookingNotifications: form.email,
-        replyTo: form.email,
-      },
-
-    };
-	
-	siteConfig.seo = generateSeo(siteConfig);
-
-    const res = await fetch("/api/create-site", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(siteConfig),
-    });
-	
-	if (!res.ok) {
-	  const err = await res.json();
-
-	  if (res.status === 409) {
-		alert("This subdomain is already taken. Please choose another one.");
-		return;
-	  }
-
-	  alert("Failed to create website. Please try again.");
-	  return;
-	}
-
-	const { siteId } = await res.json();
-	
-	await fetch("/api/send-site-created-email", {
-	  method: "POST",
-	  headers: { "Content-Type": "application/json" },
-	  body: JSON.stringify({
-		email: form.email,
-		siteId,
-		subdomain: cleanedSubdomain,
-	  }),
-	});
-
-	setCreatedSiteId(siteId);
-	setCreatedSubdomain(form.subdomain.toLowerCase());
+  if (
+    cleanedSubdomain.length < 3 ||
+    cleanedSubdomain.length > 25
+  ) {
+    alert("Subdomain must be between 3 and 25 characters.");
+    return;
   }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanedEmail)) {
+    alert("Please enter a valid email address.");
+    return;
+  }
+
+  const siteConfig: CustomerConfig = {
+    siteId: crypto.randomUUID(),
+    templateId,
+
+    businessName: form.businessName,
+    subdomain: cleanedSubdomain,
+
+    heroImage: template.defaultData.heroImage,
+
+    landing,
+    about,
+    branding,
+    beforeAfter: [],
+
+    services: services
+      .filter((s) => s.enabled)
+      .map((s) => s.name),
+
+    pricing: {
+      title: "Pricing",
+      rows: services
+        .filter((s) => s.enabled && s.price)
+        .map((s) => ({
+          id: crypto.randomUUID(),
+          name: s.name,
+          price: s.price!,
+        })),
+    },
+
+    booking,
+    deposit,
+    schedule,
+    testimonials,
+    contact,
+    socialLinks,
+
+    isPaid: false,
+    paidAt: new Date().toISOString(),
+
+    email: {
+      bookingNotifications: cleanedEmail,
+      replyTo: cleanedEmail,
+    },
+  };
+
+  siteConfig.seo = generateSeo(siteConfig);
+
+  const res = await fetch("/api/create-site", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(siteConfig),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+
+    if (res.status === 409) {
+      alert(
+        "This subdomain is already taken. Please choose another one."
+      );
+      return;
+    }
+
+    console.error("Create-site error:", err);
+    alert("Failed to create website. Please try again.");
+    return;
+  }
+
+  const { siteId } = await res.json();
+
+  setCreatedSiteId(siteId);
+  setCreatedSubdomain(cleanedSubdomain);
+}
+
+async function handleActivate() {
+  if (!createdSiteId || !createdSubdomain || activating) {
+    return;
+  }
+
+  try {
+    setActivating(true);
+
+    const response = await fetch("/api/stripe/checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        siteId: createdSiteId,
+        email: form.email.trim(),
+        subdomain: createdSubdomain,
+      }),
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new Error(
+        data?.error || "Unable to start Stripe checkout."
+      );
+    }
+
+    if (!data?.url) {
+      throw new Error("Stripe did not return a checkout URL.");
+    }
+
+    window.location.assign(data.url);
+  } catch (error) {
+    console.error("Website activation error:", error);
+
+    alert(
+      error instanceof Error
+        ? error.message
+        : "Unable to open checkout. Please try again."
+    );
+
+    setActivating(false);
+  }
+}
 
   /* ---------------- UI HELPERS ---------------- */
 
@@ -475,8 +518,11 @@ async function uploadLogoImage(file: File) {
 
   /* ---------------- RENDER ---------------- */
 if (createdSiteId && createdSubdomain) {
-  const privateUrl = `${window.location.origin}/site/${createdSiteId}?mode=preview`;
-  const publicUrl = `https://${createdSubdomain}.simplebookme.com`;
+  const privateUrl =
+    `${window.location.origin}/site/${createdSiteId}?mode=preview`;
+
+  const publicUrl =
+    `https://${createdSubdomain}.simplebookme.com`;
 
   return (
     <div className="max-w-2xl mx-auto py-20 px-4 text-center">
@@ -486,7 +532,8 @@ if (createdSiteId && createdSubdomain) {
         </h1>
 
         <p className="mt-4 text-gray-600">
-          Save this private link. You can use it anytime to view and edit your website.
+          Review your website now and activate it if you want to
+          keep it online.
         </p>
 
         <div className="mt-8 text-left">
@@ -498,13 +545,20 @@ if (createdSiteId && createdSubdomain) {
             <input
               readOnly
               value={privateUrl}
-              className="flex-1 border rounded-xl p-3 text-sm bg-gray-50"
+              className="min-w-0 flex-1 border rounded-xl p-3 text-sm bg-gray-50"
             />
 
             <button
               type="button"
-              onClick={() => navigator.clipboard.writeText(privateUrl)}
-              className="bg-indigo-600 text-white px-4 rounded-xl font-semibold"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(privateUrl);
+                } catch (error) {
+                  console.error("Copy failed:", error);
+                  alert("Unable to copy the link.");
+                }
+              }}
+              className="bg-indigo-600 text-white px-4 rounded-xl font-semibold hover:bg-indigo-700 transition"
             >
               Copy
             </button>
@@ -524,18 +578,41 @@ if (createdSiteId && createdSubdomain) {
         </div>
 
         <p className="mt-6 text-sm text-red-600">
-          Do not share the private edit link with customers. Share only the public website link.
+          Do not share the private edit link with customers. Share
+          only the public website link.
         </p>
 
-        <button
-          type="button"
-onClick={() => {
-  window.location.href = `https://${createdSubdomain}.simplebookme.com`;
-}}
-          className="mt-8 bg-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition"
-        >
-          View your website
-        </button>
+        <div className="mt-8 space-y-3">
+          <button
+            type="button"
+            onClick={() => {
+              window.open(
+                publicUrl,
+                "_blank",
+                "noopener,noreferrer"
+              );
+            }}
+            className="w-full border border-indigo-600 text-indigo-600 px-8 py-3 rounded-xl font-semibold hover:bg-indigo-50 transition"
+          >
+            View Your Website
+          </button>
+
+          <button
+            type="button"
+            onClick={handleActivate}
+            disabled={activating}
+            className="w-full bg-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {activating
+              ? "Opening Secure Checkout..."
+              : "Activate Your Website — $39 CAD"}
+          </button>
+
+          <p className="text-xs leading-relaxed text-gray-500">
+            Payment is required to activate your website.
+            Unactivated websites may be permanently removed.
+          </p>
+        </div>
       </div>
     </div>
   );
