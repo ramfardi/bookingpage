@@ -189,23 +189,21 @@ function isGalleryVideo(url: string) {
 }
 
 function handleGalleryChange(nextGallery: string[]) {
-  const previousGallery = customer.about.gallery || [];
+  if (!customer) {
+    return;
+  }
+
+  const previousGallery = customer.about?.gallery ?? [];
 
   const removedUrls = previousGallery.filter(
     (url) => !nextGallery.includes(url)
   );
 
-  if (
-    beforeImage &&
-    removedUrls.includes(beforeImage)
-  ) {
+  if (beforeImage && removedUrls.includes(beforeImage)) {
     setBeforeImage(null);
   }
 
-  if (
-    afterImage &&
-    removedUrls.includes(afterImage)
-  ) {
+  if (afterImage && removedUrls.includes(afterImage)) {
     setAfterImage(null);
   }
 
@@ -214,12 +212,8 @@ function handleGalleryChange(nextGallery: string[]) {
       return previous;
     }
 
-    /*
-     * Remove saved sliders whose source image was deleted.
-     * Otherwise those sliders would point to deleted Storage files.
-     */
     const remainingSliders = (
-      previous.beforeAfter || []
+      previous.beforeAfter ?? []
     ).filter(
       (slider) =>
         nextGallery.includes(slider.beforeImage) &&
