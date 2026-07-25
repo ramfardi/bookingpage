@@ -7,7 +7,7 @@ import type { CustomerConfig, ScheduleDay } from "@/app/lib/customerConfig";
 import { supabaseBrowser } from "@/app/lib/supabase-browser";
 import imageCompression from "browser-image-compression";
 import { generateSeo } from "@/app/lib/generateSeo";
-import GalleryUploader from "@/app/components/GalleryUploader";
+import GalleryUploader from "@/components/GalleryUploader";
 import { MAX_GALLERY_FILES } from "@/app/lib/galleryLimits";
 
 export default function SitePage({

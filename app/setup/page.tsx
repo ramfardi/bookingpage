@@ -6,7 +6,7 @@ import type { CustomerConfig } from "@/app/lib/customerConfig";
 import imageCompression from "browser-image-compression";
 import { supabaseBrowser } from "@/app/lib/supabase-browser";
 import { generateSeo } from "@/app/lib/generateSeo";
-import GalleryUploader from "@/app/components/GalleryUploader";
+import GalleryUploader from "@/components/GalleryUploader";
 import { MAX_GALLERY_FILES } from "@/app/lib/galleryLimits";
 
 const scheduleDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
