@@ -6,6 +6,9 @@ import type { CustomerConfig } from "@/app/lib/customerConfig";
 import imageCompression from "browser-image-compression";
 import { supabaseBrowser } from "@/app/lib/supabase-browser";
 import { generateSeo } from "@/app/lib/generateSeo";
+import GalleryUploader from "@/app/components/GalleryUploader";
+import { MAX_GALLERY_FILES } from "@/app/lib/galleryLimits";
+
 const scheduleDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 function sanitizeSubdomain(value: string) {
@@ -910,106 +913,33 @@ if (createdSiteId && createdSubdomain) {
 
 
 {/* ---------------- GALLERY ---------------- */}
-<div className="space-y-4 pt-6 border-t">
-  <h3 className="text-lg font-semibold">
-    Sample work gallery
-  </h3>
+<div className="space-y-5 border-t pt-6">
+  <div>
+    <h3 className="text-lg font-semibold text-gray-900">
+      Sample work gallery
+    </h3>
 
-  <p className="text-sm text-gray-500 leading-relaxed">
-    Add photos/clips showing your work, portfolio, completed projects,
-    business space, or services.
-
-    <br />
-    <br />
-
-    You can either:
-    <br />
-    • Upload images directly using the uploader below
-    <br />
-    • OR paste image links manually (Google Drive still works)
-
-    <br />
-    <br />
-
-    <strong>For Google Drive links:</strong>
-    <br />
-    1. Upload your image to Google Drive
-    <br />
-    2. Right-click the image → Share
-    <br />
-    3. Change access to <strong>Anyone with the link</strong>
-    <br />
-    4. Copy the share link and paste it below
-
-    <br />
-    <br />
-
-    Your images will appear in a beautiful gallery on your website.
-  </p>
-
-  {/* ---------------- DIRECT UPLOAD ---------------- */}
-  <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-    <input
-      type="file"
-      accept="image/*,video/*"
-      multiple
-      onChange={async (e) => {
-        const files = Array.from(e.target.files || []);
-
-        for (const file of files) {
-          await uploadGalleryImage(file);
-        }
-      }}
-      className="block w-full text-sm text-gray-600
-      file:mr-4 file:rounded-xl file:border-0
-      file:bg-indigo-600 file:px-4 file:py-2
-      file:text-white hover:file:bg-indigo-700"
-    />
-
-    <p className="mt-3 text-sm text-gray-500">
-      Upload Clips/images
+    <p className="mt-2 text-sm leading-6 text-gray-500">
+      Upload photos or short clips showing your work, portfolio,
+      completed projects, business space, or services.
     </p>
 
-    {uploading && (
-      <p className="mt-3 text-sm text-indigo-600">
-        Uploading files...
-      </p>
-    )}
+    <p className="mt-2 text-xs leading-5 text-gray-400">
+      File size, file type, and maximum gallery limits are applied
+      automatically.
+    </p>
   </div>
 
-  {/* ---------------- PREVIEW GRID ---------------- */}
-  {about.gallery.length > 0 && (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-      {about.gallery.map((url, index) => (
-        <div
-          key={index}
-          className="relative rounded-xl overflow-hidden border bg-white"
-        >
-          <img
-            src={url}
-            alt={`Gallery ${index}`}
-            className="h-32 w-full object-cover"
-          />
-
-          <button
-            type="button"
-            className="absolute top-2 right-2 bg-white/90 text-red-500 rounded-lg px-2 py-1 text-xs shadow"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-
-              setAbout({
-                ...about,
-                gallery: about.gallery.filter((_, i) => i !== index),
-              });
-            }}
-          >
-            Remove
-          </button>
-        </div>
-      ))}
-    </div>
-  )}
+  <GalleryUploader
+    gallery={about.gallery ?? []}
+    onChange={(gallery) => {
+      setAbout((previous) => ({
+        ...previous,
+        gallery,
+      }));
+    }}
+  />
+</div>
 
   {/* ---------------- MANUAL URL INPUTS ---------------- */}
   <div className="space-y-3">

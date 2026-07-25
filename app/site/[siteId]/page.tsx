@@ -7,7 +7,8 @@ import type { CustomerConfig, ScheduleDay } from "@/app/lib/customerConfig";
 import { supabaseBrowser } from "@/app/lib/supabase-browser";
 import imageCompression from "browser-image-compression";
 import { generateSeo } from "@/app/lib/generateSeo";
-
+import GalleryUploader from "@/app/components/GalleryUploader";
+import { MAX_GALLERY_FILES } from "@/app/lib/galleryLimits";
 
 export default function SitePage({
   params,
@@ -182,9 +183,75 @@ async function uploadLogoImage(file: File) {
     setUploading(false);
   }
 }
+
+function isGalleryVideo(url: string) {
+  return /\.(mp4|webm)(?:\?.*)?$/i.test(url);
+}
+
+function handleGalleryChange(nextGallery: string[]) {
+  const previousGallery = customer.about.gallery || [];
+
+  const removedUrls = previousGallery.filter(
+    (url) => !nextGallery.includes(url)
+  );
+
+  if (
+    beforeImage &&
+    removedUrls.includes(beforeImage)
+  ) {
+    setBeforeImage(null);
+  }
+
+  if (
+    afterImage &&
+    removedUrls.includes(afterImage)
+  ) {
+    setAfterImage(null);
+  }
+
+  setCustomer((previous) => {
+    if (!previous) {
+      return previous;
+    }
+
+    /*
+     * Remove saved sliders whose source image was deleted.
+     * Otherwise those sliders would point to deleted Storage files.
+     */
+    const remainingSliders = (
+      previous.beforeAfter || []
+    ).filter(
+      (slider) =>
+        nextGallery.includes(slider.beforeImage) &&
+        nextGallery.includes(slider.afterImage)
+    );
+
+    return {
+      ...previous,
+
+      about: {
+        ...previous.about,
+        gallery: nextGallery,
+      },
+
+      beforeAfter: remainingSliders,
+    };
+  });
+}
   
 async function saveChanges() {
-  if (!siteId || !customer) return;
+  if (!siteId || !customer) {
+    return;
+  }
+
+  const gallery = customer.about.gallery || [];
+
+  if (gallery.length > MAX_GALLERY_FILES) {
+    alert(
+      `A website can have a maximum of ${MAX_GALLERY_FILES} gallery files.`
+    );
+    return;
+  }
 
   setSaving(true);
 
@@ -384,7 +451,9 @@ function saveSliderToPortfolio() {
   alert("Slider added. Click Save changes to publish.");
 }
 
-
+const galleryImages = (
+  customer.about.gallery || []
+).filter((url) => !isGalleryVideo(url));
 
   return (
     <div className="flex h-screen">
@@ -799,343 +868,299 @@ function saveSliderToPortfolio() {
 </section>			
 			
 {/* -------- GALLERY -------- */}
-<section className="mb-8">
-  <h3 className="font-medium mb-3">Gallery</h3>
+<section className="mb-8 rounded-2xl border bg-white p-4">
+  <div className="mb-5">
+    <h3 className="font-medium text-gray-900">
+      Gallery
+    </h3>
 
-  <p className="text-sm text-gray-500 mb-4 leading-relaxed">
-    Upload photos directly or paste image links manually.
-    Existing Google Drive image links still work exactly the same.
-  </p>
-
-  {/* ---------------- DIRECT UPLOAD ---------------- */}
-  <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 p-5 text-center mb-5">
-    <input
-      type="file"
-      accept="image/*,video/*"
-      multiple
-      onChange={async (e) => {
-        const files = Array.from(e.target.files || []);
-
-        for (const file of files) {
-          await uploadGalleryImage(file);
-        }
-      }}
-      className="block w-full text-sm text-gray-600
-      file:mr-4 file:rounded-xl file:border-0
-      file:bg-indigo-600 file:px-4 file:py-2
-      file:text-white hover:file:bg-indigo-700"
-    />
-
-    <p className="mt-3 text-xs text-gray-500">
-      Upload JPG, PNG, or WEBP images
+    <p className="mt-2 text-sm leading-6 text-gray-500">
+      Upload photos or short clips showing your work,
+      portfolio, completed projects, business space, or
+      services.
     </p>
 
-    {uploading && (
-      <p className="mt-3 text-sm text-indigo-600">
-        Uploading images...
+    <p className="mt-2 text-xs leading-5 text-gray-400">
+      File type, file size, and maximum gallery limits are
+      applied automatically.
+    </p>
+  </div>
+
+  {/* Upload, preview, and remove gallery files */}
+  <GalleryUploader
+    gallery={customer.about.gallery || []}
+    disabled={saving}
+    onChange={handleGalleryChange}
+  />
+
+  {/* Select photos for before/after */}
+  {galleryImages.length > 0 && (
+    <div className="mt-6 border-t pt-6">
+      <h4 className="font-medium text-gray-800">
+        Select Before / After Photos
+      </h4>
+
+      <p className="mt-2 text-xs leading-5 text-gray-500">
+        Drag photos into the Before and After boxes, or use
+        the buttons below each photo.
       </p>
-    )}
-  </div>
 
-{/* ---------------- IMAGE PREVIEW GRID ---------------- */}
-{(customer.about.gallery || []).length > 0 && (
-  <div className="grid grid-cols-2 gap-3 mb-5">
-    {(customer.about.gallery || []).map((url, index) => (
-      <div
-        key={index}
-        className="relative rounded-xl overflow-hidden border bg-white"
-      >
-        <img
-          src={url}
-          alt={`Gallery ${index}`}
-          draggable
-          onDragStart={(e) =>
-            handleImageDragStart(e, url)
-          }
-          className="h-28 w-full object-cover cursor-grab"
-        />
-
-        <div className="flex gap-2 p-2">
-          <button
-            type="button"
-            onClick={() => setBeforeImage(url)}
-            className={`flex-1 rounded-lg px-2 py-1 text-xs font-medium transition ${
-              beforeImage === url
-                ? "bg-black text-white"
-                : "bg-gray-100 text-gray-700"
-            }`}
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        {galleryImages.map((url, index) => (
+          <div
+            key={url}
+            className="overflow-hidden rounded-xl border bg-white"
           >
-            Set Before
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setAfterImage(url)}
-            className={`flex-1 rounded-lg px-2 py-1 text-xs font-medium transition ${
-              afterImage === url
-                ? "bg-indigo-600 text-white"
-                : "bg-indigo-100 text-indigo-700"
-            }`}
-          >
-            Set After
-          </button>
-        </div>
-
-        <button
-          type="button"
-          className="absolute top-2 right-2 bg-white/90 text-red-500 rounded-lg px-2 py-1 text-xs shadow"
-          onClick={() => {
-            setCustomer({
-              ...customer,
-              about: {
-                ...customer.about,
-                gallery: (customer.about.gallery || []).filter(
-                  (_, i) => i !== index
-                ),
-              },
-            });
-          }}
-        >
-          Remove
-        </button>
-      </div>
-    ))}
-  </div>
-)}
-
-{/* BEFORE / AFTER CREATOR */}
-{(customer.about.gallery || []).length >= 2 && (
-  <div className="mt-6 rounded-2xl border bg-white p-4">
-    <h4 className="font-medium text-gray-800 mb-2">
-      Before / After Creator
-    </h4>
-
-    <p className="text-xs text-gray-500 mb-4">
-      Drag two gallery photos into the boxes, or tap Set Before and Set After
-      above on mobile/tablet.
-    </p>
-
-    <div className="grid grid-cols-2 gap-3 mb-4">
-      <div
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) =>
-          handleBeforeAfterDrop(e, "before")
-        }
-        className="h-36 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center overflow-hidden"
-      >
-        {beforeImage ? (
-          <img
-            src={beforeImage}
-            alt="Before selected"
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <span className="text-xs text-gray-500 text-center px-2">
-            Drop BEFORE photo here
-          </span>
-        )}
-      </div>
-
-      <div
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) =>
-          handleBeforeAfterDrop(e, "after")
-        }
-        className="h-36 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center overflow-hidden"
-      >
-        {afterImage ? (
-          <img
-            src={afterImage}
-            alt="After selected"
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <span className="text-xs text-gray-500 text-center px-2">
-            Drop AFTER photo here
-          </span>
-        )}
-      </div>
-    </div>
-
-    {beforeImage && afterImage && (
-      <div className="space-y-3">
-        <select
-          value={beforeAfterMode}
-          onChange={(e) =>
-            setBeforeAfterMode(
-              e.target.value as
-                | "story"
-                | "square"
-                | "slider"
-            )
-          }
-          className="w-full border rounded-md p-2 text-sm"
-        >
-          <option value="story">
-            Instagram Story Image
-          </option>
-
-          <option value="square">
-            Square Post Image
-          </option>
-
-          <option value="slider">
-            Interactive Website Slider
-          </option>
-        </select>
-
-        {beforeAfterMode !== "slider" ? (
-          <button
-            type="button"
-            onClick={downloadBeforeAfterImage}
-            className="w-full bg-indigo-600 text-white py-2 rounded-md font-medium"
-          >
-            Download Image
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={saveSliderToPortfolio}
-            className="w-full bg-emerald-600 text-white py-2 rounded-md font-medium"
-          >
-            Save Slider to Website
-          </button>
-        )}
-
-        <button
-          type="button"
-          onClick={() => {
-            setBeforeImage(null);
-            setAfterImage(null);
-          }}
-          className="w-full text-sm text-gray-500"
-        >
-          Clear Selection
-        </button>
-      </div>
-    )}
-  </div>
-)}
-
-{/* SAVED BEFORE / AFTER SLIDERS */}
-{(customer.beforeAfter || []).length > 0 && (
-  <div className="mt-6 rounded-2xl border bg-white p-4">
-    <h4 className="font-medium text-gray-800 mb-3">
-      Saved Before / After Sliders
-    </h4>
-
-    <div className="space-y-3">
-      {(customer.beforeAfter || []).map((item) => (
-        <div
-          key={item.id}
-          className="rounded-xl border bg-gray-50 p-3"
-        >
-          <div className="grid grid-cols-2 gap-2 mb-3">
             <img
-              src={item.beforeImage}
-              alt="Before"
-              className="h-24 w-full object-cover rounded-lg"
+              src={url}
+              alt={`Gallery photo ${index + 1}`}
+              draggable
+              onDragStart={(event) =>
+                handleImageDragStart(event, url)
+              }
+              className="h-28 w-full cursor-grab object-cover active:cursor-grabbing"
             />
 
-            <img
-              src={item.afterImage}
-              alt="After"
-              className="h-24 w-full object-cover rounded-lg"
-            />
+            <div className="flex gap-2 p-2">
+              <button
+                type="button"
+                onClick={() => setBeforeImage(url)}
+                className={`flex-1 rounded-lg px-2 py-1.5 text-xs font-medium transition ${
+                  beforeImage === url
+                    ? "bg-gray-950 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                Set Before
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setAfterImage(url)}
+                className={`flex-1 rounded-lg px-2 py-1.5 text-xs font-medium transition ${
+                  afterImage === url
+                    ? "bg-indigo-600 text-white"
+                    : "bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
+                }`}
+              >
+                Set After
+              </button>
+            </div>
           </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {/* BEFORE / AFTER CREATOR */}
+  {galleryImages.length >= 2 && (
+    <div className="mt-6 rounded-2xl border bg-gray-50 p-4">
+      <h4 className="font-medium text-gray-800">
+        Before / After Creator
+      </h4>
+
+      <p className="mt-2 text-xs leading-5 text-gray-500">
+        Drag two gallery photos into the boxes, or tap Set
+        Before and Set After above on mobile or tablet.
+      </p>
+
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <div
+          onDragOver={(event) =>
+            event.preventDefault()
+          }
+          onDrop={(event) =>
+            handleBeforeAfterDrop(event, "before")
+          }
+          className="flex h-36 items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-white"
+        >
+          {beforeImage ? (
+            <img
+              src={beforeImage}
+              alt="Before selected"
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <span className="px-2 text-center text-xs text-gray-500">
+              Drop BEFORE photo here
+            </span>
+          )}
+        </div>
+
+        <div
+          onDragOver={(event) =>
+            event.preventDefault()
+          }
+          onDrop={(event) =>
+            handleBeforeAfterDrop(event, "after")
+          }
+          className="flex h-36 items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-white"
+        >
+          {afterImage ? (
+            <img
+              src={afterImage}
+              alt="After selected"
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <span className="px-2 text-center text-xs text-gray-500">
+              Drop AFTER photo here
+            </span>
+          )}
+        </div>
+      </div>
+
+      {beforeImage && afterImage && (
+        <div className="mt-4 space-y-3">
+          {beforeImage === afterImage && (
+            <p className="rounded-lg bg-amber-50 p-3 text-xs font-medium text-amber-700">
+              Choose two different photos for the best
+              before-and-after result.
+            </p>
+          )}
+
+          <select
+            value={beforeAfterMode}
+            onChange={(event) =>
+              setBeforeAfterMode(
+                event.target.value as
+                  | "story"
+                  | "square"
+                  | "slider"
+              )
+            }
+            className="w-full rounded-md border p-2 text-sm"
+          >
+            <option value="story">
+              Instagram Story Image
+            </option>
+
+            <option value="square">
+              Square Post Image
+            </option>
+
+            <option value="slider">
+              Interactive Website Slider
+            </option>
+          </select>
+
+          {beforeAfterMode !== "slider" ? (
+            <button
+              type="button"
+              onClick={downloadBeforeAfterImage}
+              disabled={beforeImage === afterImage}
+              className="w-full rounded-md bg-indigo-600 py-2 font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Download Image
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={saveSliderToPortfolio}
+              disabled={beforeImage === afterImage}
+              className="w-full rounded-md bg-emerald-600 py-2 font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Save Slider to Website
+            </button>
+          )}
 
           <button
             type="button"
-            className="w-full rounded-md bg-red-50 text-red-600 py-2 text-sm font-medium hover:bg-red-100"
             onClick={() => {
-              if (!confirm("Remove this before/after slider?")) return;
-
-              setCustomer({
-                ...customer,
-                beforeAfter: (customer.beforeAfter || []).filter(
-                  (slider) => slider.id !== item.id
-                ),
-              });
+              setBeforeImage(null);
+              setAfterImage(null);
             }}
+            className="w-full text-sm text-gray-500 hover:text-gray-700"
           >
-            Remove Slider
+            Clear Selection
           </button>
         </div>
-      ))}
+      )}
     </div>
+  )}
 
-    <p className="mt-3 text-xs text-gray-500">
-      Click “Save changes” after removing a slider.
-    </p>
-  </div>
-)}
+  {/* SAVED BEFORE / AFTER SLIDERS */}
+  {(customer.beforeAfter || []).length > 0 && (
+    <div className="mt-6 rounded-2xl border bg-white p-4">
+      <h4 className="font-medium text-gray-800">
+        Saved Before / After Sliders
+      </h4>
 
+      <div className="mt-4 space-y-3">
+        {(customer.beforeAfter || []).map(
+          (item) => (
+            <div
+              key={item.id}
+              className="rounded-xl border bg-gray-50 p-3"
+            >
+              <div className="mb-3 grid grid-cols-2 gap-2">
+                <div>
+                  <p className="mb-1 text-xs font-medium text-gray-500">
+                    Before
+                  </p>
 
-  {/* ---------------- MANUAL URL INPUTS ---------------- */}
-  <div className="space-y-3">
-    <h4 className="text-sm font-medium text-gray-700">
-      Add image links manually
-    </h4>
+                  <img
+                    src={item.beforeImage}
+                    alt="Before"
+                    className="h-24 w-full rounded-lg object-cover"
+                  />
+                </div>
 
-    {(customer.about.gallery || []).map((url, index) => (
-      <div key={index} className="flex gap-2 mb-2">
-        <input
-          className="flex-1 border rounded-md p-2"
-          placeholder="Google Drive image link"
-          value={url}
-          onChange={(e) => {
-            const updated = [...(customer.about.gallery || [])];
-            updated[index] = e.target.value;
+                <div>
+                  <p className="mb-1 text-xs font-medium text-gray-500">
+                    After
+                  </p>
 
-            setCustomer({
-              ...customer,
-              about: {
-                ...customer.about,
-                gallery: updated,
-              },
-            });
-          }}
-        />
+                  <img
+                    src={item.afterImage}
+                    alt="After"
+                    className="h-24 w-full rounded-lg object-cover"
+                  />
+                </div>
+              </div>
 
-        <button
-          type="button"
-          className="text-red-600 px-2"
-          onClick={() => {
-            setCustomer({
-              ...customer,
-              about: {
-                ...customer.about,
-                gallery: (customer.about.gallery || []).filter(
-                  (_, i) => i !== index
-                ),
-              },
-            });
-          }}
-        >
-          ✕
-        </button>
+              <button
+                type="button"
+                className="w-full rounded-md bg-red-50 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
+                onClick={() => {
+                  if (
+                    !confirm(
+                      "Remove this before/after slider?"
+                    )
+                  ) {
+                    return;
+                  }
+
+                  setCustomer((previous) => {
+                    if (!previous) {
+                      return previous;
+                    }
+
+                    return {
+                      ...previous,
+                      beforeAfter: (
+                        previous.beforeAfter || []
+                      ).filter(
+                        (slider) =>
+                          slider.id !== item.id
+                      ),
+                    };
+                  });
+                }}
+              >
+                Remove Slider
+              </button>
+            </div>
+          )
+        )}
       </div>
-    ))}
 
-    <button
-      type="button"
-      className="text-indigo-600 text-sm font-medium"
-      onClick={() => {
-        setCustomer({
-          ...customer,
-          about: {
-            ...customer.about,
-            gallery: [
-              ...(customer.about.gallery || []),
-              "",
-            ],
-          },
-        });
-      }}
-    >
-      + Add image link
-    </button>
-  </div>
+      <p className="mt-3 text-xs text-gray-500">
+        Click Save changes after adding or removing a
+        slider.
+      </p>
+    </div>
+  )}
 </section>
 
 
