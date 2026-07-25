@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 metadataBase: new URL("https://simplebookme.com"),
   title: "Create a Booking Website & Instagram Bio Link | No Monthly Fee | SimpleBookMe",
 description:
-  "100% FREE booking website builder for cleaners, hair salons, beauty businesses, handymen and service professionals. Accept bookings online, display pricing, showcase before & after portfolios, availability calendars, testimonials, Google reviews, contact information and social media links. No monthly fees.",
+  "Professional booking website builder for cleaners, hair salons, beauty businesses, handymen and service professionals. Accept bookings online, display pricing, showcase before & after portfolios, availability calendars, testimonials, Google reviews, contact information and social media links. No monthly fees.",
 
 keywords: [
   "booking website builder",
@@ -48,7 +48,6 @@ keywords: [
   
   "cleaning booking system",
   "cleaner schedule",
-  "free cleaning website template",
   
   "pet grooming booking software",
   "pet grooming booking platform",

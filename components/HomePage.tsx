@@ -1137,8 +1137,8 @@ return (
               <div className="space-y-4">
                 {[
                   {
-                    q: "What is the cost?",
-                    a: "SimpleBookMe is currently free.",
+                    q: "Is there any recurring monthly fee?",
+                    a: "No, there is only one-time activation fee.",
                   },
                   {
                     q: "Can I use my existing booking system?",
