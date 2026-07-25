@@ -925,7 +925,7 @@ if (createdSiteId && createdSubdomain) {
     </p>
 
     <p className="mt-2 text-xs leading-5 text-gray-400">
-      File size, file type, and maximum gallery limits are applied
+      File type, file size, and maximum gallery limits are applied
       automatically.
     </p>
   </div>
@@ -940,66 +940,8 @@ if (createdSiteId && createdSubdomain) {
     }}
   />
 </div>
-
-  {/* ---------------- MANUAL URL INPUTS ---------------- */}
-  <div className="space-y-3">
-    <p className="text-sm font-medium text-gray-700">
-      Add image links manually
-    </p>
-
-    {about.gallery.map((url, index) => (
-      <div key={index} className="flex gap-3">
-        <input
-          className="flex-1 border p-3 rounded-md"
-          placeholder="https://image-url.jpg"
-          value={url}
-          onChange={(e) => {
-            const updated = [...about.gallery];
-            updated[index] = e.target.value;
-
-            setAbout({
-              ...about,
-              gallery: updated,
-            });
-          }}
-        />
-
-        <button
-          type="button"
-          className="text-red-500"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            setAbout({
-              ...about,
-              gallery: about.gallery.filter((_, i) => i !== index),
-            });
-          }}
-        >
-          Remove
-        </button>
-      </div>
-    ))}
-
-    <button
-      type="button"
-      className="text-indigo-600 font-medium"
-      onClick={() =>
-        setAbout({
-          ...about,
-          gallery: [...about.gallery, ""],
-        })
-      }
-    >
-      + Add image link
-    </button>
-  </div>
-</div>
-	  
-	  
-	</section>
-      )}
+</section>
+)}
 
       {/* SERVICES */}
 	{step === "services" && (
