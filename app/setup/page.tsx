@@ -605,7 +605,7 @@ if (createdSiteId && createdSubdomain) {
           >
             {activating
               ? "Opening Secure Checkout..."
-              : "Activate Your Website — $39 CAD"}
+              : "Activate Your Website — $19.9 USD"}
           </button>
 
           <p className="text-xs leading-relaxed text-gray-500">

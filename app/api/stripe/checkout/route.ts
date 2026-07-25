@@ -71,11 +71,11 @@ export async function POST(req: Request) {
       line_items: [
         {
           price_data: {
-            currency: "cad",
+            currency: "USD",
             product_data: {
               name: "SimpleBookMe – Website Activation",
             },
-            unit_amount: 3900,
+            unit_amount: 1990,
           },
           quantity: 1,
         },
