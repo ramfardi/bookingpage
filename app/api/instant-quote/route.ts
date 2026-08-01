@@ -9,11 +9,11 @@ function isValidEmail(email: string) {
 
 function escapeHtml(value: string) {
   return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 export async function POST(req: Request) {
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
     const safeBusinessName = escapeHtml(businessName);
     const safeCustomerName = escapeHtml(customerName);
     const safeCustomerContact = escapeHtml(customerContact);
-    const safeMessage = escapeHtml(message).replaceAll("\n", "<br />");
+	const safeMessage = escapeHtml(message).replace(/\n/g, "<br />");
     const safePageUrl = escapeHtml(pageUrl);
     const safeSubdomain = escapeHtml(subdomain);
     const safeSiteId = escapeHtml(siteId);
