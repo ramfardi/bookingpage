@@ -356,6 +356,7 @@ export default function PricingPage() {
                       "Unique public website link",
                       "Private website editing link",
                       "Built-in or external booking",
+					  "Instant Quote tab",
                       "Services and pricing display",
                       "Weekly availability schedule",
                       "Photo and video portfolio",

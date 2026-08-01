@@ -852,6 +852,11 @@ return (
             <span className="text-green-500 text-xl">✓</span>
             <span>Online appointment booking</span>
           </div>
+		  
+		  <div className="flex items-start gap-3">
+            <span className="text-green-500 text-xl">✓</span>
+            <span>Instant Quote</span>
+          </div>
 
           <div className="flex items-start gap-3">
             <span className="text-green-500 text-xl">✓</span>
@@ -1038,6 +1043,44 @@ return (
       </div>
     </motion.div>
 
+
+    {/* Instant Quote */}
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7 }}
+      className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+    >
+
+      {/* TEXT FIRST */}
+      <div className="order-2 lg:order-1">
+        <p className="text-indigo-600 font-semibold uppercase tracking-[0.25em] mb-6">
+          Instant Quote
+        </p>
+
+        <blockquote className="text-4xl md:text-5xl leading-tight font-light italic text-gray-900">
+          “Let customers quickly ask what they want”
+        </blockquote>
+
+        <p className="mt-8 text-lg text-gray-600 leading-relaxed max-w-xl">
+          Add optional instant quote button for better communication with the potential clients.
+        </p>
+      </div>
+
+      {/* IMAGE */}
+      <div className="relative order-1 lg:order-2">
+        <div className="absolute inset-0 bg-purple-200 blur-3xl opacity-30 rounded-full"></div>
+
+        <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
+          <img
+            src="/images/quote.png"
+            alt="Quote generator feature"
+            className="w-full object-cover"
+          />
+        </div>
+      </div>
+    </motion.div>
 
     {/* schedule */}
     <motion.div
