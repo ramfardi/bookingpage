@@ -28,6 +28,16 @@ export default function HomePage({
   const [customerKey, setCustomerKey] = useState<string | null>(null);
   const [mode, setMode] = useState<"sales" | "client">("sales");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [quoteOpen, setQuoteOpen] = useState(false);
+const [quoteSubmitting, setQuoteSubmitting] = useState(false);
+const [quoteSent, setQuoteSent] = useState(false);
+const [quoteError, setQuoteError] = useState("");
+
+const [quoteForm, setQuoteForm] = useState({
+  name: "",
+  contact: "",
+  message: "",
+});
   
   const [typedSubheader1, setTypedSubheader1] = useState("");
   const [typedSubheader2, setTypedSubheader2] = useState("");
@@ -130,9 +140,20 @@ useEffect(() => {
 
   if (!customer) return null;
 
-  const landing = customer.landing;
+const landing = customer.landing;
 
-  function handleBookAppointment() {
+const customerConfig =
+  mode === "client" ? (customer as CustomerConfig) : null;
+
+const instantQuoteEnabled =
+  customerConfig?.instantQuote?.enabled === true;
+
+const quoteNotificationEmail =
+  customerConfig?.email?.bookingNotifications ||
+  customerConfig?.contact?.email ||
+  "";
+
+function handleBookAppointment() {
     if (mode !== "client") {
       router.push("/setup");
       return;
@@ -147,6 +168,75 @@ useEffect(() => {
     }
 	router.push("/booking");
   }
+  
+  async function handleInstantQuoteSubmit(
+  e: React.FormEvent<HTMLFormElement>
+) {
+  e.preventDefault();
+
+  if (!customerConfig) return;
+
+  const name = quoteForm.name.trim();
+  const contact = quoteForm.contact.trim();
+  const message = quoteForm.message.trim();
+
+  if (!name || !contact || !message) {
+    setQuoteError("Please fill in your name, contact info, and message.");
+    return;
+  }
+
+  if (message.length < 10) {
+    setQuoteError("Please add a little more detail to your message.");
+    return;
+  }
+
+  try {
+    setQuoteSubmitting(true);
+    setQuoteError("");
+
+    const response = await fetch("/api/instant-quote", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        businessName: customerConfig.businessName,
+        siteId: customerConfig.siteId,
+        subdomain: customerConfig.subdomain,
+        toEmail: quoteNotificationEmail,
+        customerName: name,
+        customerContact: contact,
+        message,
+        pageUrl: window.location.href,
+      }),
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new Error(
+        data?.error || "Unable to send quote request."
+      );
+    }
+
+    setQuoteSent(true);
+    setQuoteForm({
+      name: "",
+      contact: "",
+      message: "",
+    });
+  } catch (error) {
+    console.error("Instant quote error:", error);
+
+    setQuoteError(
+      error instanceof Error
+        ? error.message
+        : "Unable to send quote request."
+    );
+  } finally {
+    setQuoteSubmitting(false);
+  }
+}
 
 return (
   <>
@@ -285,13 +375,27 @@ return (
 
           <div className="mt-10 flex justify-center">
 {mode === "client" ? (
-  <div className="flex flex-col items-center gap-6">
+  <div className="flex flex-col items-center gap-3">
     <button
       onClick={handleBookAppointment}
-      className="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
+      className="bg-indigo-600 text-white px-7 py-3 rounded-xl text-sm font-semibold hover:bg-indigo-700 transition shadow-lg"
     >
       Book appointment
     </button>
+
+    {instantQuoteEnabled && (
+      <button
+        type="button"
+        onClick={() => {
+          setQuoteOpen(true);
+          setQuoteSent(false);
+          setQuoteError("");
+        }}
+        className="bg-amber-500 text-white px-7 py-3 rounded-xl text-sm font-semibold hover:bg-amber-600 transition shadow-lg"
+      >
+        Instant Quote
+      </button>
+    )}
   </div>
 ) : (
 <div className="flex flex-col items-center gap-5">
@@ -575,6 +679,136 @@ return (
       </a>
     </div>
   </footer>
+)}
+
+{/* INSTANT QUOTE MODAL */}
+{mode === "client" && quoteOpen && instantQuoteEnabled && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+    <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">
+            Instant Quote
+          </h2>
+
+          <p className="mt-2 text-sm text-gray-500">
+            Send a quick message about pricing, availability, or service
+            details. The business will reply directly to you.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setQuoteOpen(false)}
+          className="rounded-full bg-gray-100 px-3 py-1 text-gray-600 hover:bg-gray-200"
+          aria-label="Close instant quote form"
+        >
+          ×
+        </button>
+      </div>
+
+      {quoteSent ? (
+        <div className="mt-6 rounded-2xl bg-emerald-50 p-5 text-emerald-800">
+          <p className="font-semibold">
+            Your quote request was sent.
+          </p>
+
+          <p className="mt-2 text-sm">
+            The business will contact you soon.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => setQuoteOpen(false)}
+            className="mt-5 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-700 transition"
+          >
+            Close
+          </button>
+        </div>
+      ) : (
+        <form onSubmit={handleInstantQuoteSubmit} className="mt-6 space-y-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Your name
+            </label>
+
+            <input
+              className="w-full rounded-xl border p-3 text-sm"
+              placeholder="Jane Smith"
+              value={quoteForm.name}
+              onChange={(e) =>
+                setQuoteForm({
+                  ...quoteForm,
+                  name: e.target.value,
+                })
+              }
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Phone or email
+            </label>
+
+            <input
+              className="w-full rounded-xl border p-3 text-sm"
+              placeholder="Your phone number or email"
+              value={quoteForm.contact}
+              onChange={(e) =>
+                setQuoteForm({
+                  ...quoteForm,
+                  contact: e.target.value,
+                })
+              }
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              What do you need?
+            </label>
+
+            <textarea
+              className="w-full rounded-xl border p-3 text-sm"
+              rows={5}
+              placeholder="Example: I need a deep cleaning for a 2-bedroom apartment. How much would it cost?"
+              value={quoteForm.message}
+              onChange={(e) =>
+                setQuoteForm({
+                  ...quoteForm,
+                  message: e.target.value,
+                })
+              }
+            />
+          </div>
+
+          {quoteError && (
+            <div className="rounded-xl bg-red-50 p-3 text-sm text-red-700">
+              {quoteError}
+            </div>
+          )}
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              onClick={() => setQuoteOpen(false)}
+              className="rounded-xl border px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              disabled={quoteSubmitting}
+              className="rounded-xl bg-amber-500 px-5 py-3 text-sm font-semibold text-white hover:bg-amber-600 transition disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {quoteSubmitting ? "Sending..." : "Send quote request"}
+            </button>
+          </div>
+        </form>
+      )}
+    </div>
+  </div>
 )}
   
       {/* ================= SALES ONLY ================= */}

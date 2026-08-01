@@ -255,6 +255,10 @@ const [booking, setBooking] = useState<{
   bookingLink: template.defaultData.booking.bookingLink ?? "",
 });
 
+const [instantQuote, setInstantQuote] = useState({
+  enabled: false,
+});
+
 
   const [deposit, setDeposit] = useState(template.defaultData.deposit);
 
@@ -593,6 +597,7 @@ async function handleCreate() {
     },
 
     booking,
+	instantQuote,
     deposit,
     schedule,
     testimonials,
@@ -1448,6 +1453,40 @@ if (createdSiteId && createdSubdomain) {
 				}
 			  />
 			)}
+			
+		{/* ---------------- INSTANT QUOTE ---------------- */}
+		<div className="space-y-4 border-t pt-8">
+		  <div>
+			<h2 className="text-xl font-semibold">Instant Quote</h2>
+
+			<p className="mt-2 text-sm text-gray-500">
+			  Optional. Add an Instant Quote button below Book Now so customers can
+			  send a short message asking about price, availability, or service details.
+			</p>
+		  </div>
+
+		  <label className="flex items-center gap-3">
+			<input
+			  type="checkbox"
+			  checked={instantQuote.enabled}
+			  onChange={(e) =>
+				setInstantQuote({
+				  enabled: e.target.checked,
+				})
+			  }
+			/>
+
+			<span>Enable Instant Quote button on my website</span>
+		  </label>
+
+		  {instantQuote.enabled && (
+			<div className="rounded-2xl border bg-amber-50 p-4 text-sm text-amber-900">
+			  Instant Quote will appear as a second button below Book Now.
+			  Customers can send a short quote request, and it will be emailed to you.
+			</div>
+		  )}
+		</div>
+			
 		  </section>
 		)}
 
@@ -1784,14 +1823,28 @@ if (createdSiteId && createdSubdomain) {
 )}
 
       {/* REVIEW */}
-      {step === "review" && (
-        <section className="space-y-4">
-          <h2 className="text-xl font-semibold">Review</h2>
-          <p><strong>Business:</strong> {form.businessName}</p>
-          <p><strong>Website:</strong> {form.subdomain}.simplebookme.com</p>
-          <p><strong>Services:</strong> {services.filter(s => s.enabled).length}</p>
-        </section>
-      )}
+		{step === "review" && (
+		  <section className="space-y-4">
+			<h2 className="text-xl font-semibold">Review</h2>
+
+			<p>
+			  <strong>Business:</strong> {form.businessName}
+			</p>
+
+			<p>
+			  <strong>Website:</strong> {form.subdomain}.simplebookme.com
+			</p>
+
+			<p>
+			  <strong>Services:</strong> {services.filter((s) => s.enabled).length}
+			</p>
+
+			<p>
+			  <strong>Instant Quote:</strong>{" "}
+			  {instantQuote.enabled ? "Enabled" : "Disabled"}
+			</p>
+		  </section>
+		)}
 
       {/* NAV */}
       <div className="flex justify-between pt-10">

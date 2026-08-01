@@ -80,6 +80,10 @@ export type CustomerConfig = {
 	  bookingLink?: string;
 	};
 
+instantQuote?: {
+  enabled: boolean;
+};
+
   email?: {
     bookingNotifications?: string;
     replyTo?: string;
@@ -132,7 +136,7 @@ beforeAfter?: {
   servingCity?: string;
   showLogoInHero?: boolean;
 };
-	
+
 	seo?: {
   title?: string;
   description?: string;

@@ -759,7 +759,39 @@ const galleryImages = (
               + Add service
             </button>
           </section>
+{/* -------- INSTANT QUOTE -------- */}
+<section className="mb-8 rounded-2xl border bg-white p-4">
+  <h3 className="font-medium mb-3">Instant Quote</h3>
 
+  <p className="text-sm text-gray-500 mb-4">
+    Optional. Show an Instant Quote button below Book appointment so customers
+    can send a short message asking about price, availability, or service details.
+  </p>
+
+  <label className="flex items-center gap-2 text-sm text-gray-700">
+    <input
+      type="checkbox"
+      checked={customer.instantQuote?.enabled ?? false}
+      onChange={(e) =>
+        setCustomer({
+          ...customer,
+          instantQuote: {
+            enabled: e.target.checked,
+          },
+        })
+      }
+    />
+
+    Enable Instant Quote button
+  </label>
+
+  {customer.instantQuote?.enabled && (
+    <div className="mt-4 rounded-xl bg-amber-50 border border-amber-100 p-3 text-sm text-amber-900">
+      Instant Quote is enabled. It will appear below the Book appointment
+      button on your homepage.
+    </div>
+  )}
+</section>
           {/* -------- ABOUT -------- */}
           <section className="mb-8">
             <h3 className="font-medium mb-3">About</h3>
