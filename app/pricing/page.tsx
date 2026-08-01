@@ -92,14 +92,14 @@ const businessTypes = [
 
 const faqs = [
   {
-    question: "Is the $19.90 payment recurring?",
+    question: "Is the there any recurring or hidden fees?",
     answer:
       "No. It is a one-time website activation payment. There is no monthly SimpleBookMe subscription.",
   },
   {
     question: "Can I review my website before paying?",
     answer:
-      "Yes. You create the complete website first and receive both the public website link and private edit link. You then decide whether to activate it.",
+      "Yes. You create the complete website first and receive both the public website link and private edit link. You then decide whether to activate it within a week.",
   },
   {
     question: "Can I update the website later?",
@@ -318,19 +318,31 @@ export default function PricingPage() {
                     Complete website activation
                   </p>
 
-                  <div className="mt-6 flex items-end gap-3">
-                    <span className="text-6xl font-extrabold tracking-tight">
-                      $19.90
-                    </span>
+<div className="mt-6">
+  <div className="flex items-center gap-3">
+    <span className="text-2xl font-bold text-gray-400 line-through">
+      $59.90
+    </span>
 
-                    <span className="pb-2 text-lg font-semibold text-gray-300">
-                      USD
-                    </span>
-                  </div>
+    <span className="rounded-full bg-amber-400/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-200">
+      Launch discount
+    </span>
+  </div>
 
-                  <p className="mt-3 text-lg text-gray-300">
-                    One payment. No monthly subscription.
-                  </p>
+  <div className="mt-2 flex items-end gap-3">
+    <span className="text-6xl font-extrabold tracking-tight">
+      $19.90
+    </span>
+
+    <span className="pb-2 text-lg font-semibold text-gray-300">
+      USD
+    </span>
+  </div>
+</div>
+
+<p className="mt-3 text-lg text-gray-300">
+  Limited-time launch price. One payment. No monthly subscription.
+</p>
 
                   <button
                     type="button"

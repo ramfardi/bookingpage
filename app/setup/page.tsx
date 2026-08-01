@@ -960,9 +960,27 @@ if (createdSiteId && createdSubdomain) {
             disabled={activating}
             className="w-full bg-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {activating
-              ? "Opening Secure Checkout..."
-              : "Activate Your Website — $19.9 USD"}
+		{activating ? (
+		  "Opening Secure Checkout..."
+		) : (
+		  <span className="flex flex-col items-center leading-tight">
+			<span>Activate Your Website</span>
+
+			<span className="mt-1 flex items-center gap-2 text-sm">
+			  <span className="text-white/70 line-through">
+				$59.90 USD
+			  </span>
+
+			  <span className="font-bold text-white">
+				$19.90 USD
+			  </span>
+			</span>
+
+			<span className="mt-1 text-xs font-medium text-white/80">
+			  Limited-time launch discount
+			</span>
+		  </span>
+		)}
           </button>
 
 		<p className="text-xs leading-relaxed text-gray-500">
