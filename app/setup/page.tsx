@@ -58,6 +58,15 @@ type ServiceItem = {
 
 type Step = "basic" | "content" | "services" | "booking" | "schedule" | "review";
 
+type WebsiteHealthItem = {
+  id: string;
+  label: string;
+  points: number;
+  max: number;
+  step: Step;
+  tip: string;
+};
+
 /* ---------------- ACCENT CLASSES (SAFE FOR TAILWIND) ---------------- */
 
 const accentClass = {
@@ -106,6 +115,25 @@ const accentClass = {
 };
 
 /* ---------------- COMPONENT ---------------- */
+
+function hasText(value?: string | null) {
+  return Boolean(value && value.trim().length > 0);
+}
+
+function looksLikeUrl(value?: string | null) {
+  if (!value || !value.trim()) return false;
+
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function clampScore(value: number, max: number) {
+  return Math.max(0, Math.min(value, max));
+}
 
 export default function SetupPage() {
   const [templateId, setTemplateId] =
@@ -273,6 +301,173 @@ const [booking, setBooking] = useState<{
     }),
   });
 }, [step, templateId]);
+
+  /* ---------------- WEBSITE HEALTH SCORE ---------------- */
+
+  const enabledServices = services.filter((service) => service.enabled);
+  const pricedServices = enabledServices.filter((service) =>
+    hasText(service.price)
+  );
+
+  const selectedScheduleSlots = Object.values(schedule.days).reduce(
+    (total, slots) => total + slots.length,
+    0
+  );
+
+  const completedReviews = testimonials.reviews.filter(
+    (review) => hasText(review.name) && hasText(review.text)
+  );
+
+  const socialLinkCount = Object.values(socialLinks).filter((link) =>
+    hasText(link)
+  ).length;
+
+  const locationPoints =
+    (hasText(contact.city) ? 6 : 0) +
+    (hasText(contact.province) ? 4 : 0) +
+    (hasText(contact.country) ? 3 : 0) +
+    (hasText(branding.servingCity) ? 2 : 0);
+
+  const portfolioPoints =
+    about.gallery.length >= 3
+      ? 15
+      : about.gallery.length === 2
+      ? 10
+      : about.gallery.length === 1
+      ? 6
+      : 0;
+
+  const reviewPoints =
+    (testimonials.enabled ? 3 : 0) +
+    (looksLikeUrl(testimonials.googleReviewLink) ? 4 : 0) +
+    clampScore(completedReviews.length * 5, 5);
+
+  const schedulePoints =
+    schedule.enabled && selectedScheduleSlots > 0
+      ? 10
+      : schedule.enabled
+      ? 4
+      : 0;
+
+  const websiteHealthItems: WebsiteHealthItem[] = [
+    {
+      id: "business-identity",
+      label: "Business identity",
+      points:
+        (hasText(form.businessName) ? 4 : 0) +
+        (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()) ? 4 : 0) +
+        (sanitizeSubdomain(form.subdomain).length >= 3 ? 4 : 0),
+      max: 12,
+      step: "basic",
+      tip: "Add business name, email, and website name.",
+    },
+    {
+      id: "services",
+      label: "Services",
+      points:
+        (enabledServices.length > 0 ? 10 : 0) +
+        (pricedServices.length > 0 ? 5 : 0),
+      max: 15,
+      step: "services",
+      tip: "Select at least one service and add pricing.",
+    },
+    {
+      id: "booking",
+      label: "Booking setup",
+      points: booking.is_external
+        ? looksLikeUrl(booking.bookingLink)
+          ? 12
+          : 0
+        : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())
+        ? 12
+        : 0,
+      max: 12,
+      step: "booking",
+      tip: "Use built-in booking or add a valid external booking link.",
+    },
+    {
+      id: "location",
+      label: "Location / local SEO",
+      points: locationPoints,
+      max: 15,
+      step: "booking",
+      tip: "Add city, province/state, country, and serving area.",
+    },
+    {
+      id: "portfolio",
+      label: "Portfolio",
+      points: portfolioPoints,
+      max: 15,
+      step: "content",
+      tip: "Upload at least 3 gallery photos or videos.",
+    },
+    {
+      id: "reviews",
+      label: "Reviews",
+      points: clampScore(reviewPoints, 12),
+      max: 12,
+      step: "booking",
+      tip: "Enable testimonials and add at least one real review.",
+    },
+    {
+      id: "schedule",
+      label: "Availability",
+      points: schedulePoints,
+      max: 10,
+      step: "schedule",
+      tip: "Select available time slots in your weekly schedule.",
+    },
+    {
+      id: "branding-social",
+      label: "Branding & social",
+      points:
+        (hasText(branding.logoUrl) ? 5 : 0) +
+        (socialLinkCount > 0 ? 4 : 0),
+      max: 9,
+      step: "content",
+      tip: "Add a logo or at least one social media link.",
+    },
+  ];
+
+  const totalHealthPoints = websiteHealthItems.reduce(
+    (sum, item) => sum + item.max,
+    0
+  );
+
+  const earnedHealthPoints = websiteHealthItems.reduce(
+    (sum, item) => sum + clampScore(item.points, item.max),
+    0
+  );
+
+  const websiteHealthScore = Math.round(
+    (earnedHealthPoints / totalHealthPoints) * 100
+  );
+
+  const currentStepHealthItems = websiteHealthItems.filter(
+    (item) => item.step === step
+  );
+
+  const currentStepMaxPoints = currentStepHealthItems.reduce(
+    (sum, item) => sum + item.max,
+    0
+  );
+
+  const currentStepEarnedPoints = currentStepHealthItems.reduce(
+    (sum, item) => sum + clampScore(item.points, item.max),
+    0
+  );
+
+  const currentStepScore =
+    currentStepMaxPoints > 0
+      ? Math.round((currentStepEarnedPoints / currentStepMaxPoints) * 100)
+      : 100;
+
+  const completedHealthItems = websiteHealthItems.filter(
+    (item) => item.points >= item.max
+  );
+
+  const nextHealthSuggestion =
+    websiteHealthItems.find((item) => item.points < item.max) ?? null;
 
   /* ---------------- SUBMIT ---------------- */
 
@@ -511,6 +706,126 @@ async function handleActivate() {
     );
   }
 
+  function WebsiteHealthScoreCard() {
+    const outerRadius = 46;
+    const innerRadius = 34;
+
+    const outerCircumference = 2 * Math.PI * outerRadius;
+    const innerCircumference = 2 * Math.PI * innerRadius;
+
+    const outerOffset =
+      outerCircumference -
+      (websiteHealthScore / 100) * outerCircumference;
+
+    const innerOffset =
+      innerCircumference -
+      (currentStepScore / 100) * innerCircumference;
+
+    return (
+      <div className="fixed right-4 top-20 z-40 hidden lg:block">
+        <div className="w-52 rounded-3xl border border-gray-200 bg-white/95 p-4 shadow-xl backdrop-blur">
+          <div className="flex items-center gap-3">
+            <div className="relative h-28 w-28 shrink-0">
+              <svg viewBox="0 0 112 112" className="h-28 w-28 -rotate-90">
+                {/* Outer background circle */}
+                <circle
+                  cx="56"
+                  cy="56"
+                  r={outerRadius}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  className="text-gray-200"
+                />
+
+                {/* Outer website score circle */}
+                <circle
+                  cx="56"
+                  cy="56"
+                  r={outerRadius}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeDasharray={outerCircumference}
+                  strokeDashoffset={outerOffset}
+                  className={`${accent.text} transition-all duration-500`}
+                />
+
+                {/* Inner background circle */}
+                <circle
+                  cx="56"
+                  cy="56"
+                  r={innerRadius}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  className="text-gray-100"
+                />
+
+                {/* Inner current-step circle */}
+                <circle
+                  cx="56"
+                  cy="56"
+                  r={innerRadius}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray={innerCircumference}
+                  strokeDashoffset={innerOffset}
+                  className="text-emerald-500 transition-all duration-500"
+                />
+              </svg>
+
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-2xl font-bold text-gray-900">
+                  {websiteHealthScore}
+                </span>
+                <span className="text-[10px] font-medium uppercase tracking-wide text-gray-500">
+                  Score
+                </span>
+              </div>
+            </div>
+
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-gray-900">
+                AI site score
+              </p>
+
+              <p className="mt-1 text-xs text-gray-500">
+                {completedHealthItems.length}/{websiteHealthItems.length} complete
+              </p>
+
+              <div className="mt-3 space-y-1 text-[11px] text-gray-500">
+                <div className="flex items-center gap-1.5">
+                  <span className={`h-2 w-2 rounded-full ${accent.bg}`} />
+                  <span>Website</span>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                  <span>This step</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {nextHealthSuggestion && (
+            <div className="mt-4 rounded-2xl bg-gray-50 p-3">
+              <p className="text-xs font-semibold text-gray-700">
+                Next improvement
+              </p>
+              <p className="mt-1 text-xs leading-5 text-gray-500">
+                {nextHealthSuggestion.tip}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   function nextStep() {
     setStep(steps[steps.indexOf(step) + 1]);
   }
@@ -621,7 +936,45 @@ if (createdSiteId && createdSubdomain) {
   );
 }
   return (
-    <div className="max-w-2xl mx-auto py-20 px-4">
+    <>
+      <WebsiteHealthScoreCard />
+
+      <div className="lg:hidden mb-6 rounded-2xl border bg-white p-4 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-bold text-gray-900">
+              AI site score
+            </p>
+            <p className="text-xs text-gray-500">
+              {completedHealthItems.length}/{websiteHealthItems.length} complete
+            </p>
+          </div>
+
+          <div className="text-right">
+            <p className="text-2xl font-bold text-gray-900">
+              {websiteHealthScore}
+            </p>
+            <p className="text-xs text-gray-500">
+              This step: {currentStepScore}%
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-3 h-2 rounded-full bg-gray-100">
+          <div
+            className={`${accent.bg} h-2 rounded-full transition-all duration-500`}
+            style={{ width: `${websiteHealthScore}%` }}
+          />
+        </div>
+
+        {nextHealthSuggestion && (
+          <p className="mt-3 text-xs text-gray-500">
+            Next: {nextHealthSuggestion.tip}
+          </p>
+        )}
+      </div>
+
+      <div className="max-w-2xl mx-auto py-20 px-4">
       <h1 className="text-3xl font-bold text-center mb-6">
         Set up your booking site
       </h1>
@@ -1464,6 +1817,7 @@ if (createdSiteId && createdSubdomain) {
           </button>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }
