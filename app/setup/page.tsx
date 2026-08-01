@@ -638,10 +638,44 @@ async function handleCreate() {
     return;
   }
 
-  const { siteId } = await res.json();
+const { siteId } = await res.json();
 
-  setCreatedSiteId(siteId);
-  setCreatedSubdomain(cleanedSubdomain);
+const origin = window.location.origin;
+
+const publicUrl = `https://${cleanedSubdomain}.simplebookme.com`;
+
+const privateUrl = `${origin}/site/${siteId}?mode=preview`;
+
+const activationUrl =
+  `${origin}/activate/${siteId}` +
+  `?email=${encodeURIComponent(cleanedEmail)}` +
+  `&subdomain=${encodeURIComponent(cleanedSubdomain)}`;
+
+try {
+  const emailRes = await fetch("/api/send-website-links", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: cleanedEmail,
+      businessName: form.businessName || cleanedSubdomain,
+      publicUrl,
+      privateUrl,
+      activationUrl,
+    }),
+  });
+
+  if (!emailRes.ok) {
+    const emailErr = await emailRes.json().catch(() => null);
+    console.error("Website links email failed:", emailErr);
+  }
+} catch (error) {
+  console.error("Website links email request failed:", error);
+}
+
+setCreatedSiteId(siteId);
+setCreatedSubdomain(cleanedSubdomain);
 }
 
 async function handleActivate() {
@@ -854,10 +888,10 @@ if (createdSiteId && createdSubdomain) {
           Your website is ready 🎉
         </h1>
 
-        <p className="mt-4 text-gray-600">
-          Review your website now and activate it if you want to
-          keep it online.
-        </p>
+		<p className="mt-4 text-gray-600">
+		  Review your website now. We also emailed you the public link,
+		  private edit link, and activation link.
+		</p>
 
         <div className="mt-8 text-left">
           <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -931,10 +965,11 @@ if (createdSiteId && createdSubdomain) {
               : "Activate Your Website — $19.9 USD"}
           </button>
 
-          <p className="text-xs leading-relaxed text-gray-500">
-            Payment is required to activate your website.
-            Unactivated websites may be permanently removed.
-          </p>
+		<p className="text-xs leading-relaxed text-gray-500">
+		  You can use your website for one week. After that, please activate it
+		  to keep it online. Unactivated websites may be removed and you may
+		  lose access to your links.
+		</p>
         </div>
       </div>
     </div>
