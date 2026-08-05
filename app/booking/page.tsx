@@ -15,7 +15,7 @@ export default function BookingPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // ✅ FIX: controlled service selection
+  // Controlled service selection
   const [selectedService, setSelectedService] = useState<string>("");
 
   useEffect(() => {
@@ -30,17 +30,17 @@ export default function BookingPage() {
 
     load();
   }, []);
-  
+
   useEffect(() => {
-  if (!customer || mode !== "client") return;
+    if (!customer || mode !== "client") return;
 
-  const customerConfig = customer as CustomerConfig;
-  const services = customerConfig.services || [];
+    const customerConfig = customer as CustomerConfig;
+    const services = customerConfig.services || [];
 
-  if (selectedService && !services.includes(selectedService)) {
-    setSelectedService("");
-  }
-}, [customer, mode, selectedService]);
+    if (selectedService && !services.includes(selectedService)) {
+      setSelectedService("");
+    }
+  }, [customer, mode, selectedService]);
 
   // Loading state
   if (!customer) {
@@ -51,15 +51,16 @@ export default function BookingPage() {
     );
   }
 
-  // Booking page is CLIENT-ONLY
+  // Booking page is client-only
   if (mode !== "client") {
     return null;
   }
-  
+
   const customerConfig = customer as CustomerConfig;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
     if (!customerKey || !selectedService) return;
 
     setLoading(true);
@@ -69,17 +70,24 @@ export default function BookingPage() {
 
     const payload = {
       customerKey,
-      service: selectedService, // ✅ use React state
+      service: selectedService,
       preferred_date: formData.get("preferred_date"),
       preferred_time: formData.get("preferred_time"),
       customer_email: formData.get("email"),
-      company: formData.get("company"), // honeypot
+
+      // Optional customer information
+      customer_name: formData.get("customer_name"),
+      customer_message: formData.get("customer_message"),
+
+      company: formData.get("company"), // Honeypot
     };
 
     try {
       const res = await fetch("/api/send-booking-email", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(payload),
       });
 
@@ -107,8 +115,11 @@ export default function BookingPage() {
       <main className="min-h-screen flex items-center justify-center px-6">
         <div className="bg-white rounded-2xl shadow-md p-8 text-center max-w-md">
           <h1 className="text-2xl font-bold">Request sent</h1>
+
           <p className="mt-3 text-gray-600">
-            Check your email for confirmation and calendar invite.
+            Check your email for your booking-request receipt. You will receive
+            a confirmation email and calendar invitation after the business
+            approves the appointment.
           </p>
         </div>
       </main>
@@ -116,7 +127,7 @@ export default function BookingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center px-6">
+    <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center px-6 py-10">
       <div className="bg-white rounded-3xl shadow-xl p-10 max-w-xl w-full">
         <h1 className="text-3xl font-bold text-center">
           Book an appointment
@@ -142,7 +153,7 @@ export default function BookingPage() {
             className="hidden"
           />
 
-          {/* ✅ FIXED SELECT */}
+          {/* Service */}
           <select
             name="service"
             required
@@ -151,6 +162,7 @@ export default function BookingPage() {
             className="w-full border rounded-xl p-3"
           >
             <option value="">Select service</option>
+
             {(customerConfig.services || []).map((service) => (
               <option key={service} value={service}>
                 {service}
@@ -158,6 +170,7 @@ export default function BookingPage() {
             ))}
           </select>
 
+          {/* Date */}
           <input
             type="date"
             name="preferred_date"
@@ -165,6 +178,7 @@ export default function BookingPage() {
             className="w-full border rounded-xl p-3"
           />
 
+          {/* Time */}
           <input
             type="time"
             name="preferred_time"
@@ -172,12 +186,33 @@ export default function BookingPage() {
             className="w-full border rounded-xl p-3"
           />
 
+          {/* Customer name */}
+          <input
+            type="text"
+            name="customer_name"
+            maxLength={100}
+            autoComplete="name"
+            placeholder="Your name (optional)"
+            className="w-full border rounded-xl p-3"
+          />
+
+          {/* Customer email */}
           <input
             type="email"
             name="email"
             required
+            autoComplete="email"
             placeholder="Your email"
             className="w-full border rounded-xl p-3"
+          />
+
+          {/* Questions or special requests */}
+          <textarea
+            name="customer_message"
+            maxLength={1000}
+            rows={4}
+            placeholder="Questions or special requests (optional)"
+            className="w-full border rounded-xl p-3 resize-y"
           />
 
           <button
