@@ -6,8 +6,6 @@ import { signToken } from "@/app/lib/bookingTokens";
 import crypto from "crypto";
 import { getSupabase } from "@/app/lib/supabase";
 
-import { createICS } from "@/app/lib/calendar";
-
 
 const supabase = getSupabase();
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -107,42 +105,81 @@ export async function POST(req: Request) {
       `${baseUrl}/api/booking/reschedule?token=${encodeURIComponent(token)}`;
 
 
-    /* =====================
-       PROVIDER EMAIL (CONFIRM + MODIFY)
-    ===================== */
-	await resend.emails.send({
-	  from: "Booking <booking@simplebookme.com>",
-	  to: customer_email,
-	  replyTo: customer.email.replyTo ?? providerEmail,
-	  subject: `Booking request received – ${customer.businessName}`,
-	  html: `
-		<h2>Booking request received</h2>
-		<p>Your request has been sent to <strong>${customer.businessName}</strong>.</p>
-		<p><strong>Service:</strong> ${service}</p>
-		<p><strong>Date:</strong> ${preferred_date}</p>
-		<p><strong>Time:</strong> ${preferred_time}</p>
-		<p>You will receive a confirmation email and calendar invitation once the provider approves it.</p>
-	  `,
-	});
+/* =====================
+   PROVIDER EMAIL (CONFIRM + MODIFY)
+===================== */
+await resend.emails.send({
+  from: "Booking <booking@simplebookme.com>",
+  to: providerEmail,
+  subject: "New booking request",
+  html: `
+    <h2>New booking request</h2>
 
-    /* =====================
-       CLIENT EMAIL (NO CONFIRM)
-    ===================== */
-    await resend.emails.send({
-      from: "Booking <booking@simplebookme.com>",
-      to: customer_email,
-      replyTo: customer.email.replyTo ?? providerEmail,
-      subject: `Booking request received – ${customer.businessName}`,
-      html: `
-        <h2>Booking request received</h2>
-        <p>Your request has been sent to <strong>${customer.businessName}</strong>.</p>
-        <p><strong>Service:</strong> ${service}</p>
-        <p><strong>Date:</strong> ${preferred_date}</p>
-        <p><strong>Time:</strong> ${preferred_time}</p>
-        <p>You will receive a confirmation once the provider approves it.</p>
-      `,
-      attachments: [calendarAttachment],
-    });
+    <p><strong>Client:</strong> ${customer_email}</p>
+    <p><strong>Service:</strong> ${service}</p>
+    <p><strong>Date:</strong> ${preferred_date}</p>
+    <p><strong>Time:</strong> ${preferred_time}</p>
+
+    <p style="margin-top:20px;">
+      <a
+        href="${confirmUrl}"
+        style="
+          display:inline-block;
+          margin-right:8px;
+          padding:10px 14px;
+          background:#16a34a;
+          color:white;
+          text-decoration:none;
+          border-radius:6px;
+        "
+      >
+        Confirm
+      </a>
+
+      <a
+        href="${rescheduleUrl}"
+        style="
+          display:inline-block;
+          padding:10px 14px;
+          background:#f59e0b;
+          color:white;
+          text-decoration:none;
+          border-radius:6px;
+        "
+      >
+        Modify time
+      </a>
+    </p>
+  `,
+});
+
+/* =====================
+   CLIENT EMAIL
+   NO CALENDAR BEFORE CONFIRMATION
+===================== */
+await resend.emails.send({
+  from: "Booking <booking@simplebookme.com>",
+  to: customer_email,
+  replyTo: customer.email.replyTo ?? providerEmail,
+  subject: `Booking request received – ${customer.businessName}`,
+  html: `
+    <h2>Booking request received</h2>
+
+    <p>
+      Your request has been sent to
+      <strong>${customer.businessName}</strong>.
+    </p>
+
+    <p><strong>Service:</strong> ${service}</p>
+    <p><strong>Date:</strong> ${preferred_date}</p>
+    <p><strong>Time:</strong> ${preferred_time}</p>
+
+    <p>
+      You will receive a confirmation email and calendar invitation
+      once the provider approves the appointment.
+    </p>
+  `,
+});
 
     return Response.json({ success: true });
   } catch (err) {
