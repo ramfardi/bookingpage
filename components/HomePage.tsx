@@ -997,7 +997,150 @@ return (
 
   </div>
 </section>
-		  
+
+
+{/* -------- BOOKING WORKFLOW SUMMARY -------- */}
+<section className="border-b border-indigo-100 bg-gradient-to-r from-indigo-50 via-white to-purple-50 py-20">
+  <div className="mx-auto max-w-7xl px-6">
+    {/* Heading */}
+    <div className="mx-auto max-w-3xl text-center">
+      <span className="inline-flex rounded-full bg-indigo-100 px-4 py-1 text-sm font-semibold text-indigo-700">
+        Built-in appointment management
+      </span>
+
+      <h2 className="mt-5 text-4xl font-bold tracking-tight text-gray-900 md:text-5xl">
+        A complete booking flow, without complicated software
+      </h2>
+
+      <p className="mt-5 text-lg leading-relaxed text-gray-600">
+        Customers request appointments, businesses approve or adjust them,
+        and both sides receive clear email updates and calendar invitations.
+      </p>
+    </div>
+
+    {/* Horizontal workflow */}
+    <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+      {/* Step 1 */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="relative rounded-2xl border border-indigo-100 bg-white p-6 shadow-sm"
+      >
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-600 text-lg font-bold text-white">
+          1
+        </div>
+
+        <h3 className="mt-5 text-xl font-semibold text-gray-900">
+          Appointment requested
+        </h3>
+
+        <p className="mt-3 text-sm leading-6 text-gray-600">
+          Customers select a service, date and time, and can include their
+          name, questions or special requests.
+        </p>
+
+        <span className="absolute -right-4 top-1/2 hidden -translate-y-1/2 text-2xl text-indigo-300 lg:block">
+          →
+        </span>
+      </motion.div>
+
+      {/* Step 2 */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="relative rounded-2xl border border-indigo-100 bg-white p-6 shadow-sm"
+      >
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-600 text-lg font-bold text-white">
+          2
+        </div>
+
+        <h3 className="mt-5 text-xl font-semibold text-gray-900">
+          Confirm or propose a new time
+        </h3>
+
+        <p className="mt-3 text-sm leading-6 text-gray-600">
+          The business can approve the appointment immediately or propose a
+          different date and time for the customer to accept.
+        </p>
+
+        <span className="absolute -right-4 top-1/2 hidden -translate-y-1/2 text-2xl text-indigo-300 lg:block">
+          →
+        </span>
+      </motion.div>
+
+      {/* Step 3 */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="relative rounded-2xl border border-indigo-100 bg-white p-6 shadow-sm"
+      >
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-600 text-lg font-bold text-white">
+          3
+        </div>
+
+        <h3 className="mt-5 text-xl font-semibold text-gray-900">
+          Both sides receive updates
+        </h3>
+
+        <p className="mt-3 text-sm leading-6 text-gray-600">
+          The customer and business receive email updates throughout the
+          booking, confirmation and time-change process.
+        </p>
+
+        <span className="absolute -right-4 top-1/2 hidden -translate-y-1/2 text-2xl text-indigo-300 lg:block">
+          →
+        </span>
+      </motion.div>
+
+      {/* Step 4 */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="rounded-2xl border border-indigo-100 bg-white p-6 shadow-sm"
+      >
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-600 text-lg font-bold text-white">
+          4
+        </div>
+
+        <h3 className="mt-5 text-xl font-semibold text-gray-900">
+          Calendar-ready confirmation
+        </h3>
+
+        <p className="mt-3 text-sm leading-6 text-gray-600">
+          After confirmation, both sides receive an .ics calendar file
+          compatible with Google Calendar, Apple Calendar, Outlook and other
+          calendar apps.
+        </p>
+      </motion.div>
+    </div>
+
+    {/* Supporting highlights */}
+    <div className="mt-10 flex flex-wrap justify-center gap-3">
+      {[
+        "No customer account required",
+        "Confirm appointments by email",
+        "Propose and accept new times",
+        "Calendar-compatible .ics files",
+      ].map((item) => (
+        <div
+          key={item}
+          className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm"
+        >
+          <span className="text-green-500">✓</span>
+          {item}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>		  
 		  
 		  {/* -------- FEATURE SHOWCASE -------- */}
 <section className="w-full bg-gradient-to-b from-white to-indigo-50 py-32 overflow-hidden">
