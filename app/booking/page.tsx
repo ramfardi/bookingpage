@@ -116,11 +116,16 @@ export default function BookingPage() {
         <div className="bg-white rounded-2xl shadow-md p-8 text-center max-w-md">
           <h1 className="text-2xl font-bold">Request sent</h1>
 
-          <p className="mt-3 text-gray-600">
-            Check your email for your booking-request receipt. You will receive
-            a confirmation email and calendar invitation after the business
-            approves the appointment.
-          </p>
+<p className="mt-3 text-gray-600">
+  Check your email for your booking-request receipt. You will receive
+  a confirmation email and calendar invitation after the business
+  approves the appointment.
+</p>
+
+<div className="mt-5 rounded-xl border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-900">
+  <strong>Please check your spam or junk folder as well.</strong>{" "}
+  Look for an email from SimpleBookMe or booking@simplebookme.com.
+</div>
         </div>
       </main>
     );
