@@ -52,14 +52,14 @@ export async function GET(req: Request) {
     /* =====================
        Calendar (.ics)
     ===================== */
-    const start = new Date(`${preferred_date}T${preferred_time}`);
 
-    const ics = createICS({
-      uid: eventUID,
-      title: `Booking with ${customer.businessName}`,
-      description: `Service: ${service}`,
-      start,
-    });
+	const ics = createICS({
+	  uid: eventUID,
+	  title: `Booking with ${customer.businessName}`,
+	  description: `Service: ${service}`,
+	  date: preferred_date,
+	  time: preferred_time,
+	});
 
     const attachment = {
       filename: "booking.ics",
