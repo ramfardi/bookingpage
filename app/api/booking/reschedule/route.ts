@@ -39,8 +39,8 @@ type RescheduleEmailPayload = {
   to: string | string[];
   replyTo?: string | string[];
   subject: string;
-  text?: string;
-  html?: string;
+  text: string;
+  html: string;
 };
 
 type PublicBusinessContact = {
