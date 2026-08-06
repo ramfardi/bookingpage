@@ -1,7 +1,7 @@
 import "server-only";
 
 import { resend } from "@/app/lib/resend";
-import { supabaseAdmin } from "@/app/lib/supabase-admin";
+import { supabaseAdmin } from "@/app/lib/supabase";
 
 export type MeteredEmailType =
   | "booking"
