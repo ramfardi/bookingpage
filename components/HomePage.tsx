@@ -14,6 +14,12 @@ import { FaXTwitter } from "react-icons/fa6";
 
 import LandingBeforeAfter from "@/components/LandingBeforeAfter";
 
+type InstantQuoteContact = {
+  businessName: string | null;
+  phone: string | null;
+  email: string | null;
+};
+
 export default function HomePage({
   activeCustomer,
 }: {
@@ -29,15 +35,42 @@ export default function HomePage({
   const [mode, setMode] = useState<"sales" | "client">("sales");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [quoteOpen, setQuoteOpen] = useState(false);
-const [quoteSubmitting, setQuoteSubmitting] = useState(false);
-const [quoteSent, setQuoteSent] = useState(false);
-const [quoteError, setQuoteError] = useState("");
 
-const [quoteForm, setQuoteForm] = useState({
-  name: "",
-  contact: "",
-  message: "",
-});
+  const [quoteSubmitting, setQuoteSubmitting] =
+    useState(false);
+
+  const [quoteSent, setQuoteSent] =
+    useState(false);
+
+  const [quoteError, setQuoteError] =
+    useState("");
+
+  const [
+    quoteUnavailableMessage,
+    setQuoteUnavailableMessage,
+  ] = useState("");
+
+  const [
+    quoteDirectContact,
+    setQuoteDirectContact,
+  ] = useState<InstantQuoteContact | null>(
+    null
+  );
+
+  /*
+   * Reused if the same form submission is retried.
+   * This prevents accidental duplicate emails.
+   */
+  const [
+    quoteRequestId,
+    setQuoteRequestId,
+  ] = useState<string | null>(null);
+
+  const [quoteForm, setQuoteForm] = useState({
+    name: "",
+    contact: "",
+    message: "",
+  });
   
   const [typedSubheader1, setTypedSubheader1] = useState("");
   const [typedSubheader2, setTypedSubheader2] = useState("");
@@ -148,10 +181,6 @@ const customerConfig =
 const instantQuoteEnabled =
   customerConfig?.instantQuote?.enabled === true;
 
-const quoteNotificationEmail =
-  customerConfig?.email?.bookingNotifications ||
-  customerConfig?.contact?.email ||
-  "";
 
 function handleBookAppointment() {
     if (mode !== "client") {
@@ -170,73 +199,171 @@ function handleBookAppointment() {
   }
   
   async function handleInstantQuoteSubmit(
-  e: React.FormEvent<HTMLFormElement>
-) {
-  e.preventDefault();
+    e: React.FormEvent<HTMLFormElement>
+  ) {
+    e.preventDefault();
 
-  if (!customerConfig) return;
-
-  const name = quoteForm.name.trim();
-  const contact = quoteForm.contact.trim();
-  const message = quoteForm.message.trim();
-
-  if (!name || !contact || !message) {
-    setQuoteError("Please fill in your name, contact info, and message.");
-    return;
-  }
-
-  if (message.length < 10) {
-    setQuoteError("Please add a little more detail to your message.");
-    return;
-  }
-
-  try {
-    setQuoteSubmitting(true);
-    setQuoteError("");
-
-    const response = await fetch("/api/instant-quote", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        businessName: customerConfig.businessName,
-        siteId: customerConfig.siteId,
-        subdomain: customerConfig.subdomain,
-        toEmail: quoteNotificationEmail,
-        customerName: name,
-        customerContact: contact,
-        message,
-        pageUrl: window.location.href,
-      }),
-    });
-
-    const data = await response.json().catch(() => null);
-
-    if (!response.ok) {
-      throw new Error(
-        data?.error || "Unable to send quote request."
-      );
+    if (!customerConfig) {
+      return;
     }
 
-    setQuoteSent(true);
-    setQuoteForm({
-      name: "",
-      contact: "",
-      message: "",
-    });
-  } catch (error) {
-    console.error("Instant quote error:", error);
+    const name =
+      quoteForm.name.trim();
 
-    setQuoteError(
-      error instanceof Error
-        ? error.message
-        : "Unable to send quote request."
-    );
-  } finally {
-    setQuoteSubmitting(false);
+    const contact =
+      quoteForm.contact.trim();
+
+    const message =
+      quoteForm.message.trim();
+
+    if (
+      !name ||
+      !contact ||
+      !message
+    ) {
+      setQuoteError(
+        "Please fill in your name, contact info, and message."
+      );
+
+      return;
+    }
+
+    if (message.length < 10) {
+      setQuoteError(
+        "Please add a little more detail to your message."
+      );
+
+      return;
+    }
+
+    /*
+     * Keep the same request ID when a failed request is retried.
+     */
+    const requestId =
+      quoteRequestId ||
+      window.crypto.randomUUID();
+
+    if (!quoteRequestId) {
+      setQuoteRequestId(requestId);
+    }
+
+    try {
+      setQuoteSubmitting(true);
+      setQuoteError("");
+
+      const response = await fetch(
+        "/api/instant-quote",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            requestId,
+
+            businessName:
+              customerConfig.businessName,
+
+            siteId:
+              customerConfig.siteId,
+
+            subdomain:
+              customerConfig.subdomain,
+
+            customerName:
+              name,
+
+            customerContact:
+              contact,
+
+            message,
+
+            pageUrl:
+              window.location.href,
+          }),
+        }
+      );
+
+      const data = await response
+        .json()
+        .catch(() => null);
+
+      /* =====================
+         Email limit reached
+      ===================== */
+
+      if (
+        data?.code ===
+          "EMAIL_LIMIT_REACHED" ||
+        data?.code ===
+          "EMAIL_QUOTA_UNAVAILABLE"
+      ) {
+        setQuoteUnavailableMessage(
+          data.error ||
+            "Online quote requests are temporarily unavailable. Please contact the business directly."
+        );
+
+        setQuoteDirectContact({
+          businessName:
+            data.contact?.businessName ??
+            customerConfig.businessName ??
+            null,
+
+          phone:
+            data.contact?.phone ??
+            customerConfig.contact?.phone ??
+            null,
+
+          email:
+            data.contact?.email ??
+            customerConfig.contact?.email ??
+            null,
+        });
+
+        return;
+      }
+
+      /* =====================
+         Other API failure
+      ===================== */
+
+      if (
+        !response.ok ||
+        !data?.ok
+      ) {
+        throw new Error(
+          data?.error ||
+            "Unable to send quote request."
+        );
+      }
+
+      setQuoteSent(true);
+
+      setQuoteRequestId(null);
+
+      setQuoteForm({
+        name: "",
+        contact: "",
+        message: "",
+      });
+    } catch (error) {
+      console.error(
+        "Instant quote error:",
+        error
+      );
+
+      setQuoteError(
+        error instanceof Error
+          ? error.message
+          : "Unable to send quote request."
+      );
+    } finally {
+      setQuoteSubmitting(false);
+    }
   }
-}
 
 return (
   <>
@@ -390,6 +517,13 @@ return (
           setQuoteOpen(true);
           setQuoteSent(false);
           setQuoteError("");
+
+          setQuoteUnavailableMessage("");
+          setQuoteDirectContact(null);
+
+          setQuoteRequestId(
+            window.crypto.randomUUID()
+          );
         }}
         className="bg-amber-500 text-white px-7 py-3 rounded-xl text-sm font-semibold hover:bg-amber-600 transition shadow-lg"
       >
@@ -699,7 +833,13 @@ return (
 
         <button
           type="button"
-          onClick={() => setQuoteOpen(false)}
+          onClick={() => {
+            setQuoteOpen(false);
+            setQuoteError("");
+            setQuoteDirectContact(null);
+            setQuoteUnavailableMessage("");
+            setQuoteRequestId(null);
+          }}
           className="rounded-full bg-gray-100 px-3 py-1 text-gray-600 hover:bg-gray-200"
           aria-label="Close instant quote form"
         >
@@ -707,7 +847,69 @@ return (
         </button>
       </div>
 
-      {quoteSent ? (
+            {quoteDirectContact ? (
+        <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <p className="font-semibold text-amber-900">
+            Contact the business directly
+          </p>
+
+          <p className="mt-2 text-sm leading-6 text-amber-800">
+            {quoteUnavailableMessage}
+          </p>
+
+          {quoteDirectContact.businessName && (
+            <p className="mt-4 font-semibold text-gray-900">
+              {
+                quoteDirectContact.businessName
+              }
+            </p>
+          )}
+
+          <div className="mt-4 flex flex-col gap-3">
+            {quoteDirectContact.phone && (
+              <a
+                href={`tel:${quoteDirectContact.phone.replace(
+                  /[^\d+]/g,
+                  ""
+                )}`}
+                className="inline-flex items-center justify-center rounded-xl bg-amber-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-amber-700"
+              >
+                Call{" "}
+                {quoteDirectContact.phone}
+              </a>
+            )}
+
+            {quoteDirectContact.email && (
+              <a
+                href={`mailto:${quoteDirectContact.email}`}
+                className="inline-flex items-center justify-center rounded-xl border border-amber-300 bg-white px-5 py-3 text-sm font-semibold text-gray-900 transition hover:bg-amber-100"
+              >
+                Email{" "}
+                {quoteDirectContact.email}
+              </a>
+            )}
+          </div>
+
+          {!quoteDirectContact.phone &&
+            !quoteDirectContact.email && (
+              <p className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                This business has not provided
+                public phone or email contact
+                information.
+              </p>
+            )}
+
+          <button
+            type="button"
+            onClick={() =>
+              setQuoteOpen(false)
+            }
+            className="mt-5 rounded-xl border border-amber-300 bg-white px-5 py-3 text-sm font-semibold text-gray-800 transition hover:bg-amber-100"
+          >
+            Close
+          </button>
+        </div>
+      ) : quoteSent ? (
         <div className="mt-6 rounded-2xl bg-emerald-50 p-5 text-emerald-800">
           <p className="font-semibold">
             Your quote request was sent.
@@ -791,7 +993,13 @@ return (
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
             <button
               type="button"
-              onClick={() => setQuoteOpen(false)}
+              onClick={() => {
+                setQuoteOpen(false);
+                setQuoteError("");
+                setQuoteDirectContact(null);
+                setQuoteUnavailableMessage("");
+                setQuoteRequestId(null);
+              }}
               className="rounded-xl border px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
             >
               Cancel
