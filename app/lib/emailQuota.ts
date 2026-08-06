@@ -88,13 +88,11 @@ export function countEmailUnits(
   emails: ResendEmailPayload[]
 ): number {
   return emails.reduce((total, email) => {
-    const emailRecord = email as Record<string, unknown>;
-
     return (
       total +
-      countAddresses(emailRecord.to) +
-      countAddresses(emailRecord.cc) +
-      countAddresses(emailRecord.bcc)
+      countAddresses(email.to) +
+      countAddresses(email.cc) +
+      countAddresses(email.bcc)
     );
   }, 0);
 }
