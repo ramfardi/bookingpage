@@ -5,7 +5,9 @@ import { verifyToken } from "@/app/lib/bookingTokens";
 import { createICS } from "@/app/lib/calendar";
 import { Resend } from "resend";
 import { getSupabase } from "@/app/lib/supabase";
-
+import {
+  syncConfirmedAppointment,
+} from "@/app/lib/appointmentEmailScheduler";
 const supabase = getSupabase();
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
@@ -954,6 +956,71 @@ export async function GET(req: Request) {
 
         errorMessage: null,
       });
+	  
+	  /* =====================================================
+   AUTOMATIC REMINDER + REVIEW EMAILS
+===================================================== */
+
+try {
+  await syncConfirmedAppointment({
+    eventUID:
+      String(
+        data.eventUID
+      ),
+
+    siteId:
+      String(
+        data.siteId
+      ),
+
+    customerEmail:
+      String(
+        data.customer_email
+      ).trim(),
+
+    customerName:
+      String(
+        data.customer_name ||
+        ""
+      )
+        .trim()
+        .slice(
+          0,
+          100
+        ),
+
+    service:
+      String(
+        data.service
+      ).trim(),
+
+    appointmentDate:
+      String(
+        data.preferred_date
+      ),
+
+    appointmentTime:
+      String(
+        data.preferred_time
+      ),
+
+    appointmentAt:
+      String(
+        data.appointment_at
+      ),
+  });
+} catch (
+  automationError
+) {
+  /*
+   * Do NOT undo a valid appointment confirmation
+   * just because reminder automation had a problem.
+   */
+  console.error(
+    "Appointment automation setup failed:",
+    automationError
+  );
+}
 
     return createMessageResponse({
       title:

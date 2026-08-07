@@ -168,16 +168,17 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const {
-      customerKey,
-      service,
-      preferred_date,
-      preferred_time,
-      customer_email,
-      customer_name,
-      customer_message,
-      company,
-    } = body;
+const {
+  customerKey,
+  service,
+  preferred_date,
+  preferred_time,
+  appointment_at,
+  customer_email,
+  customer_name,
+  customer_message,
+  company,
+} = body;
 
     /* =====================
        Honeypot
@@ -233,6 +234,39 @@ export async function POST(req: Request) {
     const cleanTime = String(
       preferred_time ?? ""
     ).trim();
+	
+	const cleanAppointmentAt =
+  String(
+    appointment_at ?? ""
+  ).trim();
+
+
+const parsedAppointmentAt =
+  new Date(
+    cleanAppointmentAt
+  );
+
+
+if (
+  !cleanAppointmentAt ||
+  Number.isNaN(
+    parsedAppointmentAt.getTime()
+  )
+) {
+  return Response.json(
+    {
+      error:
+        "Invalid appointment date/time",
+    },
+    {
+      status: 400,
+    }
+  );
+}
+
+
+const normalizedAppointmentAt =
+  parsedAppointmentAt.toISOString();
 
     const cleanCustomerName = String(
       customer_name ?? ""
@@ -381,16 +415,36 @@ export async function POST(req: Request) {
      * This allows confirmation and rescheduling routes to
      * preserve them.
      */
-    const token = signToken({
-      siteId: cleanCustomerKey,
-      service: cleanService,
-      preferred_date: cleanDate,
-      preferred_time: cleanTime,
-      customer_email: clientEmail,
-      customer_name: cleanCustomerName,
-      customer_message: cleanCustomerMessage,
-      eventUID,
-    });
+const token = signToken({
+  siteId:
+    cleanCustomerKey,
+
+  service:
+    cleanService,
+
+  preferred_date:
+    cleanDate,
+
+  preferred_time:
+    cleanTime,
+
+  /*
+   * Absolute appointment time.
+   */
+  appointment_at:
+    normalizedAppointmentAt,
+
+  customer_email:
+    clientEmail,
+
+  customer_name:
+    cleanCustomerName,
+
+  customer_message:
+    cleanCustomerMessage,
+
+  eventUID,
+});
 
     const baseUrl =
       process.env.NEXT_PUBLIC_BASE_URL ??

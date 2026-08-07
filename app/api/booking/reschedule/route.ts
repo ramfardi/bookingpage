@@ -497,7 +497,10 @@ export async function GET(req: Request) {
               ${description}
             </p>
 
-            <form method="POST">
+<form
+  method="POST"
+  id="rescheduleForm"
+>
               <label style="display:block;margin-top:20px;">
                 <strong>Date</strong><br />
 
@@ -533,7 +536,11 @@ export async function GET(req: Request) {
                   "
                 />
               </label>
-
+<input
+  type="hidden"
+  name="appointment_at"
+  id="appointment_at"
+/>
               <input
                 type="hidden"
                 name="token"
@@ -563,6 +570,73 @@ export async function GET(req: Request) {
                 ${buttonText}
               </button>
             </form>
+			<script>
+  const rescheduleForm =
+    document.getElementById(
+      "rescheduleForm"
+    );
+
+  rescheduleForm.addEventListener(
+    "submit",
+    function (event) {
+      const dateInput =
+        rescheduleForm.querySelector(
+          '[name="date"]'
+        );
+
+      const timeInput =
+        rescheduleForm.querySelector(
+          '[name="time"]'
+        );
+
+      const appointmentAtInput =
+        document.getElementById(
+          "appointment_at"
+        );
+
+      const date =
+        dateInput.value;
+
+      const time =
+        timeInput.value;
+
+      /*
+       * The browser interprets this as local time.
+       *
+       * Example:
+       * 2026-08-20 at 14:00
+       *
+       * in Vancouver becomes an absolute UTC timestamp.
+       *
+       * This is invisible to the user.
+       */
+      const localAppointment =
+        new Date(
+          date +
+          "T" +
+          time +
+          ":00"
+        );
+
+      if (
+        Number.isNaN(
+          localAppointment.getTime()
+        )
+      ) {
+        event.preventDefault();
+
+        alert(
+          "Please choose a valid date and time."
+        );
+
+        return;
+      }
+
+      appointmentAtInput.value =
+        localAppointment.toISOString();
+    }
+  );
+</script>
           </main>
         </body>
       </html>
@@ -584,28 +658,41 @@ export async function POST(req: Request) {
   try {
     const form = await req.formData();
 
-    const token =
-      form.get("token")?.toString();
+const token =
+  form.get("token")?.toString();
 
-    const date =
-      form.get("date")?.toString().trim();
+const date =
+  form.get("date")?.toString().trim();
 
-    const time =
-      form.get("time")?.toString().trim();
+const time =
+  form.get("time")?.toString().trim();
+
+const appointmentAtRaw =
+  form
+    .get("appointment_at")
+    ?.toString()
+    .trim();
 
     const actor: RescheduleActor =
       form.get("actor")?.toString() === "client"
         ? "client"
         : "provider";
 
-    if (!token || !date || !time) {
-      return createMessageResponse({
-        title: "Invalid request",
-        message:
-          "The appointment-change request is incomplete.",
-        status: 400,
-      });
-    }
+if (
+  !token ||
+  !date ||
+  !time ||
+  !appointmentAtRaw
+) {
+  return createMessageResponse({
+    title: "Invalid request",
+
+    message:
+      "The appointment-change request is incomplete.",
+
+    status: 400,
+  });
+}
 
     if (
       !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
@@ -618,6 +705,27 @@ export async function POST(req: Request) {
         status: 400,
       });
     }
+
+const parsedAppointmentAt =
+  new Date(
+    appointmentAtRaw
+  );
+
+if (
+  Number.isNaN(
+    parsedAppointmentAt.getTime()
+  )
+) {
+  return createMessageResponse({
+    title:
+      "Invalid appointment time",
+
+    message:
+      "Please choose a valid appointment date and time.",
+
+    status: 400,
+  });
+}
 
     let data;
 
@@ -760,11 +868,19 @@ export async function POST(req: Request) {
        Create updated token
     ====================== */
 
-    const newToken = signToken({
-      ...data,
-      preferred_date: date,
-      preferred_time: time,
-    });
+const newToken = signToken({
+  ...data,
+
+  preferred_date:
+    date,
+
+  preferred_time:
+    time,
+
+  appointment_at:
+    parsedAppointmentAt
+      .toISOString(),
+});
 
     const baseUrl =
       process.env.NEXT_PUBLIC_BASE_URL ??

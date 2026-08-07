@@ -107,34 +107,82 @@ export default function BookingPage() {
 
     setLoading(true);
 
-    const form = e.currentTarget;
-    const formData = new FormData(form);
+const form = e.currentTarget;
+const formData = new FormData(form);
 
-    const payload = {
-      customerKey,
+const preferredDate =
+  String(
+    formData.get("preferred_date") || ""
+  );
 
-      service: selectedService,
+const preferredTime =
+  String(
+    formData.get("preferred_time") || ""
+  );
 
-      preferred_date:
-        formData.get("preferred_date"),
+/*
+ * The browser interprets this as LOCAL time.
+ *
+ * Example:
+ *
+ * Vancouver browser:
+ * 2026-08-20 14:00 local
+ *
+ * becomes:
+ * 2026-08-20T21:00:00.000Z
+ *
+ * No timezone setup is needed.
+ */
+const appointmentDate =
+  new Date(
+    `${preferredDate}T${preferredTime}:00`
+  );
 
-      preferred_time:
-        formData.get("preferred_time"),
+if (
+  Number.isNaN(
+    appointmentDate.getTime()
+  )
+) {
+  alert(
+    "Please choose a valid appointment date and time."
+  );
 
-      customer_email:
-        formData.get("email"),
+  setLoading(false);
+  return;
+}
 
-      // Optional customer information
-      customer_name:
-        formData.get("customer_name"),
 
-      customer_message:
-        formData.get("customer_message"),
+const payload = {
+  customerKey,
 
-      // Honeypot
-      company:
-        formData.get("company"),
-    };
+  service:
+    selectedService,
+
+  preferred_date:
+    preferredDate,
+
+  preferred_time:
+    preferredTime,
+
+  /*
+   * Invisible absolute timestamp used only for
+   * automatic email scheduling.
+   */
+  appointment_at:
+    appointmentDate.toISOString(),
+
+  customer_email:
+    formData.get("email"),
+
+  customer_name:
+    formData.get("customer_name"),
+
+  customer_message:
+    formData.get("customer_message"),
+
+  company:
+    formData.get("company"),
+};
 
     try {
       const res = await fetch(
