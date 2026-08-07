@@ -410,10 +410,6 @@ export async function POST(req: Request) {
        Escaped email values
     ===================== */
 
-    const safeBusinessName = escapeHtml(
-      customer.businessName ||
-        "the business"
-    );
 
     const safeClientEmail =
       escapeHtml(clientEmail);
@@ -443,7 +439,7 @@ export async function POST(req: Request) {
      *
      * Therefore, one booking request requires 2 quota units.
      */
-    const requiredEmailUnits = 2;
+    const requiredEmailUnits = 1;
 
     /* =====================
        Reserve email quota
@@ -507,44 +503,35 @@ export async function POST(req: Request) {
        Handle duplicate request
     ===================== */
 
-    if (quota.duplicate) {
-      if (quota.status === "sent") {
-        return Response.json({
-          success: true,
-          duplicate: true,
-          clientEmailSent: true,
+if (quota.duplicate) {
+  if (
+    quota.status === "sent" ||
+    quota.status === "partial"
+  ) {
+    return Response.json({
+      success: true,
+      duplicate: true,
 
-          message:
-            "This booking request was already sent.",
-        });
-      }
+      message:
+        "This booking request was already sent to the business.",
+    });
+  }
 
-      if (quota.status === "partial") {
-        return Response.json({
-          success: true,
-          duplicate: true,
-          clientEmailSent: false,
+  return Response.json(
+    {
+      success: false,
 
-          warning:
-            "The business already received this booking request, but the client confirmation email was not sent.",
-        });
-      }
+      code:
+        "BOOKING_ALREADY_PROCESSING",
 
-      return Response.json(
-        {
-          success: false,
-
-          code:
-            "BOOKING_ALREADY_PROCESSING",
-
-          error:
-            "This booking request is already being processed.",
-        },
-        {
-          status: 409,
-        }
-      );
+      error:
+        "This booking request is already being processed.",
+    },
+    {
+      status: 409,
     }
+  );
+}
 
     /* =====================
        Monthly quota reached
@@ -775,168 +762,20 @@ export async function POST(req: Request) {
     resendEmailIds.push(
       providerEmailData.id
     );
+	
+	quotaFinalized =
+  await finalizeEmailBatch({
+    batchId: reservedBatchId,
+    unitsSent: 1,
+    resendEmailIds,
+    errorMessage: null,
+  });
 
-    /* =====================
-       Client email
-       No calendar before confirmation
-    ===================== */
+return Response.json({
+  success: true,
+});
 
-    const {
-      data: clientEmailData,
-      error: clientEmailError,
-    } = await resend.emails.send(
-      {
-        from:
-          "Booking <booking@simplebookme.com>",
 
-        to: clientEmail,
-
-        replyTo:
-          customer.email.replyTo?.trim() ||
-          providerEmail,
-
-        subject:
-          `Booking request received – ${
-            customer.businessName
-          }`,
-
-        html: `
-          <h2>Booking request received</h2>
-
-          <p>
-            Your request has been sent to
-            <strong>${safeBusinessName}</strong>.
-          </p>
-
-          ${
-            safeCustomerName
-              ? `
-                <p>
-                  <strong>Name:</strong>
-                  ${safeCustomerName}
-                </p>
-              `
-              : ""
-          }
-
-          <p>
-            <strong>Service:</strong>
-            ${safeService}
-          </p>
-
-          <p>
-            <strong>Date:</strong>
-            ${safeDate}
-          </p>
-
-          <p>
-            <strong>Time:</strong>
-            ${safeTime}
-          </p>
-
-          ${
-            safeCustomerMessage
-              ? `
-                <div
-                  style="
-                    margin-top:16px;
-                    padding:14px;
-                    background:#f3f4f6;
-                    border-radius:8px;
-                  "
-                >
-                  <strong>Your message:</strong>
-
-                  <p style="margin-bottom:0;">
-                    ${safeCustomerMessage}
-                  </p>
-                </div>
-              `
-              : ""
-          }
-
-          <p>
-            You will receive a confirmation email and calendar
-            invitation once the provider approves the appointment.
-          </p>
-        `,
-      },
-      {
-        idempotencyKey:
-          `booking-client/${eventUID}`.slice(
-            0,
-            256
-          ),
-      }
-    );
-
-    if (
-      clientEmailError ||
-      !clientEmailData?.id
-    ) {
-      const clientErrorMessage =
-        clientEmailError?.message ??
-        "Resend did not return a client email ID.";
-
-      console.error(
-        "Client booking email error:",
-        clientEmailError ??
-          clientErrorMessage
-      );
-
-      /*
-       * Provider email succeeded: count 1 unit.
-       * Client email failed: return the second unit.
-       */
-      quotaFinalized =
-        await finalizeEmailBatch({
-          batchId: reservedBatchId,
-          unitsSent: 1,
-          resendEmailIds,
-          errorMessage:
-            clientErrorMessage,
-        });
-
-      /*
-       * This is considered successful because the business
-       * received the booking request. Returning a server error
-       * could cause the customer to submit the same request
-       * repeatedly.
-       */
-      return Response.json({
-        success: true,
-        clientEmailSent: false,
-
-        warning:
-          "The business received the booking request, but the confirmation email could not be sent to the client.",
-      });
-    }
-
-    successfullySentUnits = 2;
-
-    resendEmailIds.push(
-      clientEmailData.id
-    );
-
-    /* =====================
-       Both emails succeeded
-    ===================== */
-
-    quotaFinalized =
-      await finalizeEmailBatch({
-        batchId: reservedBatchId,
-        unitsSent: 2,
-        resendEmailIds,
-        errorMessage: null,
-      });
-
-    return Response.json({
-      success: true,
-      clientEmailSent: true,
-
-      quotaTrackingFinalized:
-        quotaFinalized,
-    });
   } catch (err) {
     const errorMessage =
       getErrorMessage(err);

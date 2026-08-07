@@ -24,12 +24,6 @@ export default function BookingPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  /*
-   * False means the business received the request, but the
-   * client acknowledgement email could not be sent.
-   */
-  const [clientEmailSent, setClientEmailSent] =
-    useState(true);
 
   /*
    * Set when the site's email quota has been reached or when
@@ -241,13 +235,6 @@ export default function BookingPage() {
         );
       }
 
-      /*
-       * The provider may receive the booking even when the
-       * acknowledgement email to the client fails.
-       */
-      setClientEmailSent(
-        result.clientEmailSent !== false
-      );
 
       /* =====================
          Deposit redirect
@@ -295,40 +282,17 @@ export default function BookingPage() {
             Request sent
           </h1>
 
-          {clientEmailSent ? (
-            <>
-              <p className="mt-3 text-gray-600">
-                Check your email for your
-                booking-request receipt. You will
-                receive a confirmation email and
-                calendar invitation after the
-                business approves the appointment.
-              </p>
+<p className="mt-3 text-gray-600">
+  Your booking request has been sent to the business.
+  You will receive a confirmation email and calendar
+  invitation after the business approves the appointment.
+</p>
 
-              <div className="mt-5 rounded-xl border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-900">
-                <strong>
-                  Please check your spam or junk
-                  folder as well.
-                </strong>{" "}
-                Look for an email from
-                SimpleBookMe or
-                booking@simplebookme.com.
-              </div>
-            </>
-          ) : (
-            <div className="mt-5 rounded-xl border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-900">
-              <strong>
-                The business received your booking
-                request.
-              </strong>
-
-              <p className="mt-2">
-                We could not send the receipt email
-                to you. The business can still
-                review and respond to your request.
-              </p>
-            </div>
-          )}
+<div className="mt-5 rounded-xl border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-900">
+  <strong>No confirmation email is sent yet.</strong>{" "}
+  You will receive one after the business accepts your
+  appointment.
+</div>
         </div>
       </main>
     );
