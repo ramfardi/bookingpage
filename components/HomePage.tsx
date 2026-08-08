@@ -1239,12 +1239,12 @@ return (
         Built-in booking automation
       </span>
 
-      <h2 className="mt-6 text-4xl font-bold tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
-        From booking to review,
-        <span className="block bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-          the whole journey is handled.
-        </span>
-      </h2>
+<h2 className="mt-6 text-4xl font-bold tracking-tight leading-[1.15] text-gray-900 md:text-5xl lg:text-6xl">
+  From booking to review,
+  <span className="block pb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+    the whole journey is handled.
+  </span>
+</h2>
 
       <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-gray-600 md:text-xl">
         Customers request appointments, you stay in control of the schedule,
