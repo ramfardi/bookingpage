@@ -1241,8 +1241,11 @@ return (
 
 <h2 className="mt-6 text-4xl font-bold tracking-tight leading-[1.15] text-gray-900 md:text-5xl lg:text-6xl">
   From booking to review,
-  <span className="block pb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-    the whole journey is handled.
+
+  <span className="block">
+    <span className="inline-block pb-3 leading-[1.25] bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+      the whole journey is handled.
+    </span>
   </span>
 </h2>
 
