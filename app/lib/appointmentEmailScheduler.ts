@@ -401,6 +401,16 @@ function buildReminderEmail({
           5
         )
     );
+	
+	const contactEmail =
+  customer.contact
+    ?.email
+    ?.trim();
+
+const contactPhone =
+  customer.contact
+    ?.phone
+    ?.trim();
 
 
   return {
@@ -467,9 +477,59 @@ function buildReminderEmail({
 
         </div>
 
-        <p>
-          We look forward to seeing you.
+${
+  contactEmail || contactPhone
+    ? `
+      <div
+        style="
+          margin:20px 0;
+          padding:16px;
+          background:#f9fafb;
+          border:1px solid #e5e7eb;
+          border-radius:8px;
+        "
+      >
+        <p style="margin-top:0;">
+          <strong>Need to make a change?</strong>
         </p>
+
+        <p>
+          Please contact ${safeBusinessName} directly:
+        </p>
+
+        ${
+          contactEmail
+            ? `
+              <p>
+                <strong>Email:</strong>
+                <a
+                  href="mailto:${escapeHtml(contactEmail)}"
+                >
+                  ${escapeHtml(contactEmail)}
+                </a>
+              </p>
+            `
+            : ""
+        }
+
+        ${
+          contactPhone
+            ? `
+              <p>
+                <strong>Phone:</strong>
+                ${escapeHtml(contactPhone)}
+              </p>
+            `
+            : ""
+        }
+      </div>
+    `
+    : ""
+}
+
+<p>
+  We look forward to seeing you.
+</p>
 
       </div>
     `,
