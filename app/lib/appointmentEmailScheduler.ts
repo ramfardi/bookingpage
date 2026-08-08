@@ -138,6 +138,8 @@ function escapeHtml(
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
 
 function sanitizeEmailDisplayName(
   value: string
