@@ -425,6 +425,24 @@ const providerEmail =
 
     const safeTime =
       escapeHtml(cleanTime);
+	  
+	  /* =====================
+   Business contact info
+===================== */
+
+const businessContactEmail =
+  customer.contact?.email?.trim() ||
+  customer.email?.replyTo?.trim() ||
+  providerEmail;
+
+const businessContactPhone =
+  customer.contact?.phone?.trim() || "";
+
+const safeBusinessContactEmail =
+  escapeHtml(businessContactEmail);
+
+const safeBusinessContactPhone =
+  escapeHtml(businessContactPhone);
 
     /* =====================
        Calendar attachment
@@ -454,14 +472,23 @@ const providerEmail =
         ),
     };
 
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BASE_URL ??
-      "https://simplebookme.com";
+/*
+ * OLD CLIENT RESCHEDULE LINK
+ *
+ * Disabled because long tokenized links in confirmation
+ * emails may increase the chance of spam filtering.
+ */
 
-    const rescheduleUrl =
-      `${baseUrl}/api/booking/reschedule?token=${encodeURIComponent(
-        token
-      )}&actor=client`;
+/*
+const baseUrl =
+  process.env.NEXT_PUBLIC_BASE_URL ??
+  "https://simplebookme.com";
+
+const rescheduleUrl =
+  `${baseUrl}/api/booking/reschedule?token=${encodeURIComponent(
+    token
+  )}&actor=client`;
+*/
 
     /*
      * Confirmation sends:
@@ -710,41 +737,60 @@ from:
               : ""
           }
 
-          <p style="margin-top:20px;">
-            If you need to change the appointment
-            time, you can request a modification:
-          </p>
-
-          <p>
-            <a
-              href="${rescheduleUrl}"
-              style="
-                display:inline-block;
-                padding:12px 18px;
-                background:#f59e0b;
-                color:white;
-                text-decoration:none;
-                border-radius:6px;
-                font-weight:600;
-              "
-            >
-              Modify appointment
-            </a>
-          </p>
-
-          <p
+          <div
             style="
-              margin-top:16px;
-              font-size:12px;
-              color:#666;
+              margin-top:24px;
+              padding-top:18px;
+              border-top:1px solid #e5e7eb;
             "
           >
-            A modification request will be sent
-            to the business for approval.
-          </p>
+            <p
+              style="
+                margin-top:0;
+                margin-bottom:10px;
+              "
+            >
+              <strong>Need to reschedule or make a change?</strong>
+            </p>
+
+            <p
+              style="
+                margin-top:0;
+                color:#4b5563;
+                line-height:1.6;
+              "
+            >
+              Please contact ${safeBusinessName}
+              directly using the contact information below.
+            </p>
+
+            ${
+              safeBusinessContactEmail
+                ? `
+                  <p style="margin:6px 0;">
+                    <strong>Email:</strong>
+                    ${safeBusinessContactEmail}
+                  </p>
+                `
+                : ""
+            }
+
+            ${
+              safeBusinessContactPhone
+                ? `
+                  <p style="margin:6px 0;">
+                    <strong>Phone:</strong>
+                    ${safeBusinessContactPhone}
+                  </p>
+                `
+                : ""
+            }
+          </div>
         `,
 
-        attachments: [attachment],
+        // OLD: calendar attachment sent to client
+        // attachments: [attachment],
+
       },
       {
         idempotencyKey:
@@ -863,28 +909,6 @@ from:
             ${safeTime}
           </p>
 
-          ${
-            safeCustomerMessage
-              ? `
-                <div
-                  style="
-                    margin-top:16px;
-                    padding:14px;
-                    background:#f3f4f6;
-                    border-radius:8px;
-                  "
-                >
-                  <strong>
-                    Questions or special requests:
-                  </strong>
-
-                  <p style="margin-bottom:0;">
-                    ${safeCustomerMessage}
-                  </p>
-                </div>
-              `
-              : ""
-          }
         `,
 
         attachments: [attachment],
@@ -937,8 +961,8 @@ from:
         title:
           "Appointment confirmed",
 
-        message:
-          "The confirmation and calendar invitation were sent to the client, but the business copy could not be delivered.",
+message:
+  "The confirmation email was sent to the client, but the business copy could not be delivered.",
 
         status: 200,
 
