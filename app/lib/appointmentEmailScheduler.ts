@@ -138,8 +138,16 @@ function escapeHtml(
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
-}
 
+function sanitizeEmailDisplayName(
+  value: string
+) {
+  return value
+    .replace(/[\r\n]+/g, " ")
+    .replace(/[<>"]/g, "")
+    .trim()
+    .slice(0, 100);
+}
 
 function validUrl(
   value?: string | null
@@ -981,6 +989,12 @@ async function ensureOneEmail({
     }
   }
 
+const senderName =
+  sanitizeEmailDisplayName(
+    customer.businessName ||
+      "SimpleBookMe Bookings"
+  ) ||
+  "SimpleBookMe Bookings";
 
   const email =
     kind === "reminder"
@@ -1022,12 +1036,12 @@ async function ensureOneEmail({
       60 * 1000;
 
 
-  const emailPayload = {
-    from:
-      "SimpleBookMe Bookings <booking@simplebookme.com>",
+const emailPayload = {
+  from:
+    `${senderName} <booking@simplebookme.com>`,
 
-    to:
-      row.customer_email,
+  to:
+    row.customer_email,
 
     ...(replyTo
       ? {

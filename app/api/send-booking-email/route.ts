@@ -93,6 +93,14 @@ function escapeHtml(value: string) {
     .replace(/'/g, "&#039;");
 }
 
+function sanitizeEmailDisplayName(value: string) {
+  return value
+    .replace(/[\r\n]+/g, " ")
+    .replace(/[<>"]/g, "")
+    .trim()
+    .slice(0, 100);
+}
+
 /* =====================
    Error message helper
 ===================== */
@@ -344,6 +352,11 @@ const normalizedAppointmentAt =
 
     const customer =
       site.data as CustomerConfig;
+	  
+	  const senderName =
+  sanitizeEmailDisplayName(
+    customer.businessName || "Booking"
+  ) || "Booking";
 
     if (
       !customer.email?.bookingNotifications
@@ -662,8 +675,8 @@ if (quota.duplicate) {
       error: providerEmailError,
     } = await resend.emails.send(
       {
-        from:
-          "Booking <booking@simplebookme.com>",
+from:
+  `${senderName} <booking@simplebookme.com>`,
 
         to: providerEmail,
 

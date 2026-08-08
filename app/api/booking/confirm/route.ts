@@ -52,6 +52,14 @@ function escapeHtml(value: string) {
     .replace(/'/g, "&#039;");
 }
 
+function sanitizeEmailDisplayName(value: string) {
+  return value
+    .replace(/[\r\n]+/g, " ")
+    .replace(/[<>"]/g, "")
+    .trim()
+    .slice(0, 100);
+}
+
 /* =====================
    Error message helper
 ===================== */
@@ -345,11 +353,16 @@ export async function GET(req: Request) {
       });
     }
 
-    const customer =
-      site.data as CustomerConfig;
+const customer =
+  site.data as CustomerConfig;
 
-    const providerEmail =
-      customer.email?.bookingNotifications?.trim();
+const senderName =
+  sanitizeEmailDisplayName(
+    customer.businessName || "Booking"
+  ) || "Booking";
+
+const providerEmail =
+  customer.email?.bookingNotifications?.trim();
 
     if (!providerEmail) {
       return createMessageResponse({
@@ -628,8 +641,8 @@ export async function GET(req: Request) {
       error: clientEmailError,
     } = await resend.emails.send(
       {
-        from:
-          "Booking <booking@simplebookme.com>",
+from:
+  `${senderName} <booking@simplebookme.com>`,
 
         to: clientEmail,
 
@@ -806,8 +819,8 @@ export async function GET(req: Request) {
       error: providerEmailError,
     } = await resend.emails.send(
       {
-        from:
-          "Booking <booking@simplebookme.com>",
+from:
+  `${senderName} <booking@simplebookme.com>`,
 
         to: providerEmail,
 
