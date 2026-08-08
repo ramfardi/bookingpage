@@ -7,7 +7,18 @@ import type { CustomerConfig } from "@/app/lib/customerConfig";
 import type { LandingConfig } from "@/app/lib/landingConfig";
 import { useRouter } from "next/navigation";
 import SeoSchema from "@/components/SeoSchema";
-import { ArrowRight, Instagram } from "lucide-react";
+import {
+  ArrowRight,
+  Instagram,
+  CalendarDays,
+  CheckCircle2,
+  MailCheck,
+  BellRing,
+  CalendarCheck,
+  Star,
+  RefreshCw,
+  Clock3,
+} from "lucide-react";
 
 import { FaInstagram, FaTiktok, FaLinkedin } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
@@ -1207,148 +1218,337 @@ return (
 </section>
 
 
-{/* -------- BOOKING WORKFLOW SUMMARY -------- */}
-<section className="border-b border-indigo-100 bg-gradient-to-r from-indigo-50 via-white to-purple-50 py-20">
-  <div className="mx-auto max-w-7xl px-6">
+{/* -------- COMPLETE BOOKING WORKFLOW -------- */}
+<section className="relative overflow-hidden border-b bg-white py-28">
+  {/* Background decoration */}
+  <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[900px] -translate-x-1/2 rounded-full bg-indigo-100/60 blur-3xl" />
+  <div className="pointer-events-none absolute -bottom-40 -right-40 h-[420px] w-[420px] rounded-full bg-purple-100 blur-3xl" />
+
+  <div className="relative mx-auto max-w-7xl px-6">
+
     {/* Heading */}
-    <div className="mx-auto max-w-3xl text-center">
-      <span className="inline-flex rounded-full bg-indigo-100 px-4 py-1 text-sm font-semibold text-indigo-700">
-        Built-in appointment management
+    <motion.div
+      initial={{ opacity: 0, y: 25 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
+      className="mx-auto max-w-4xl text-center"
+    >
+      <span className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700">
+        <CalendarCheck className="h-4 w-4" />
+        Built-in booking automation
       </span>
 
-      <h2 className="mt-5 text-4xl font-bold tracking-tight text-gray-900 md:text-5xl">
-        A complete booking flow, without complicated software
+      <h2 className="mt-6 text-4xl font-bold tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
+        From booking to review,
+        <span className="block bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          the whole journey is handled.
+        </span>
       </h2>
 
-      <p className="mt-5 text-lg leading-relaxed text-gray-600">
-        Customers request appointments, businesses approve or adjust them,
-        and both sides receive clear email updates and calendar invitations.
+      <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-gray-600 md:text-xl">
+        Customers request appointments, you stay in control of the schedule,
+        and SimpleBookMe automatically keeps everyone informed before and
+        after the appointment.
       </p>
+    </motion.div>
+
+
+    {/* Main workflow */}
+    <div className="relative mt-20">
+
+      {/* Desktop connecting line */}
+      <div className="absolute left-[8%] right-[8%] top-12 hidden h-px bg-gradient-to-r from-indigo-200 via-purple-300 to-indigo-200 lg:block" />
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+        {/* STEP 1 */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="group relative rounded-3xl border border-gray-200 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+        >
+          <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200">
+            <CalendarDays className="h-7 w-7" />
+          </div>
+
+          <div className="mt-6 flex items-center gap-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-indigo-600">
+              Step 1
+            </span>
+
+            <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+              Customer
+            </span>
+          </div>
+
+          <h3 className="mt-3 text-2xl font-bold text-gray-900">
+            Customer requests a time
+          </h3>
+
+          <p className="mt-3 leading-7 text-gray-600">
+            Your customer chooses a service, date and time and can include
+            their name, questions or special requests.
+          </p>
+        </motion.div>
+
+
+        {/* STEP 2 */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.08 }}
+          className="group relative rounded-3xl border border-gray-200 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+        >
+          <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-600 text-white shadow-lg shadow-purple-200">
+            <CheckCircle2 className="h-7 w-7" />
+          </div>
+
+          <div className="mt-6 flex items-center gap-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-purple-600">
+              Step 2
+            </span>
+
+            <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+              Business
+            </span>
+          </div>
+
+          <h3 className="mt-3 text-2xl font-bold text-gray-900">
+            Confirm or change the time
+          </h3>
+
+          <p className="mt-3 leading-7 text-gray-600">
+            Approve the appointment directly from the email, or propose a
+            different date and time for the customer to accept.
+          </p>
+
+          <div className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-purple-700">
+            <RefreshCw className="h-4 w-4" />
+            Two-way rescheduling
+          </div>
+        </motion.div>
+
+
+        {/* STEP 3 */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.16 }}
+          className="group relative rounded-3xl border border-gray-200 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+        >
+          <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-lg shadow-emerald-200">
+            <MailCheck className="h-7 w-7" />
+          </div>
+
+          <div className="mt-6 flex items-center gap-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-emerald-600">
+              Step 3
+            </span>
+
+            <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+              Automatic
+            </span>
+          </div>
+
+          <h3 className="mt-3 text-2xl font-bold text-gray-900">
+            Confirmation is sent
+          </h3>
+
+          <p className="mt-3 leading-7 text-gray-600">
+            Once confirmed, both sides receive an email update and a calendar
+            file that works with Google Calendar, Apple Calendar, Outlook and
+            other calendar apps.
+          </p>
+        </motion.div>
+
+
+        {/* STEP 4 */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.24 }}
+          className="group relative overflow-hidden rounded-3xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+        >
+          <div className="absolute right-0 top-0 rounded-bl-3xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white">
+            NEW
+          </div>
+
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200">
+            <BellRing className="h-7 w-7" />
+          </div>
+
+          <div className="mt-6 flex items-center gap-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-indigo-600">
+              Step 4
+            </span>
+
+            <span className="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">
+              Automatic
+            </span>
+          </div>
+
+          <h3 className="mt-3 text-2xl font-bold text-gray-900">
+            Reminder before the appointment
+          </h3>
+
+          <p className="mt-3 leading-7 text-gray-600">
+            The customer automatically receives an appointment reminder
+            24 hours before the scheduled time.
+          </p>
+
+          <div className="mt-5 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-indigo-700 shadow-sm">
+            <Clock3 className="h-4 w-4" />
+            24-hour reminder
+          </div>
+        </motion.div>
+
+
+        {/* STEP 5 */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.32 }}
+          className="group relative rounded-3xl border border-gray-200 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+        >
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-900 text-white shadow-lg">
+            <CalendarCheck className="h-7 w-7" />
+          </div>
+
+          <div className="mt-6 flex items-center gap-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-gray-600">
+              Step 5
+            </span>
+
+            <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+              Appointment
+            </span>
+          </div>
+
+          <h3 className="mt-3 text-2xl font-bold text-gray-900">
+            Serve your customer
+          </h3>
+
+          <p className="mt-3 leading-7 text-gray-600">
+            The booking is handled. You can focus on the actual service instead
+            of manually sending confirmation and reminder messages.
+          </p>
+        </motion.div>
+
+
+        {/* STEP 6 */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="group relative overflow-hidden rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+        >
+          <div className="absolute right-0 top-0 rounded-bl-3xl bg-amber-500 px-4 py-2 text-xs font-bold text-white">
+            NEW
+          </div>
+
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-lg shadow-amber-200">
+            <Star className="h-7 w-7" />
+          </div>
+
+          <div className="mt-6 flex items-center gap-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-amber-600">
+              Step 6
+            </span>
+
+            <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+              Automatic
+            </span>
+          </div>
+
+          <h3 className="mt-3 text-2xl font-bold text-gray-900">
+            Ask for a review
+          </h3>
+
+          <p className="mt-3 leading-7 text-gray-600">
+            After the appointment, your customer automatically receives a
+            friendly feedback request with your Google Review link when
+            available.
+          </p>
+
+          <div className="mt-5 flex items-center gap-1 text-amber-400">
+            ★ ★ ★ ★ ★
+          </div>
+        </motion.div>
+
+      </div>
     </div>
 
-    {/* Horizontal workflow */}
-    <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-      {/* Step 1 */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="relative rounded-2xl border border-indigo-100 bg-white p-6 shadow-sm"
-      >
-        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-600 text-lg font-bold text-white">
-          1
+
+    {/* Automation summary */}
+    <motion.div
+      initial={{ opacity: 0, y: 25 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
+      className="mt-16 overflow-hidden rounded-3xl border border-indigo-200 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 p-[1px] shadow-xl"
+    >
+      <div className="rounded-[23px] bg-white px-6 py-8 md:px-10">
+        <div className="grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
+
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-indigo-600">
+              Less manual follow-up
+            </p>
+
+            <h3 className="mt-2 text-2xl font-bold text-gray-900 md:text-3xl">
+              Your booking doesn't end when the customer clicks “Book”.
+            </h3>
+
+            <p className="mt-3 max-w-3xl leading-7 text-gray-600">
+              SimpleBookMe keeps the process moving with confirmation emails,
+              rescheduling, calendar invitations, appointment reminders and
+              review requests.
+            </p>
+          </div>
+
+          <button
+            onClick={() => router.push("/setup")}
+            className="group inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl bg-indigo-600 px-7 py-4 font-semibold text-white shadow-lg transition hover:bg-indigo-700 hover:shadow-xl"
+          >
+            Create Your Website
+            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+          </button>
+
         </div>
+      </div>
+    </motion.div>
 
-        <h3 className="mt-5 text-xl font-semibold text-gray-900">
-          Appointment requested
-        </h3>
 
-        <p className="mt-3 text-sm leading-6 text-gray-600">
-          Customers select a service, date and time, and can include their
-          name, questions or special requests.
-        </p>
-
-        <span className="absolute -right-4 top-1/2 hidden -translate-y-1/2 text-2xl text-indigo-300 lg:block">
-          →
-        </span>
-      </motion.div>
-
-      {/* Step 2 */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="relative rounded-2xl border border-indigo-100 bg-white p-6 shadow-sm"
-      >
-        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-600 text-lg font-bold text-white">
-          2
-        </div>
-
-        <h3 className="mt-5 text-xl font-semibold text-gray-900">
-          Confirm or propose a new time
-        </h3>
-
-        <p className="mt-3 text-sm leading-6 text-gray-600">
-          The business can approve the appointment immediately or propose a
-          different date and time for the customer to accept.
-        </p>
-
-        <span className="absolute -right-4 top-1/2 hidden -translate-y-1/2 text-2xl text-indigo-300 lg:block">
-          →
-        </span>
-      </motion.div>
-
-      {/* Step 3 */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="relative rounded-2xl border border-indigo-100 bg-white p-6 shadow-sm"
-      >
-        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-600 text-lg font-bold text-white">
-          3
-        </div>
-
-        <h3 className="mt-5 text-xl font-semibold text-gray-900">
-          Both sides receive updates
-        </h3>
-
-        <p className="mt-3 text-sm leading-6 text-gray-600">
-          The customer and business receive email updates throughout the
-          booking, confirmation and time-change process.
-        </p>
-
-        <span className="absolute -right-4 top-1/2 hidden -translate-y-1/2 text-2xl text-indigo-300 lg:block">
-          →
-        </span>
-      </motion.div>
-
-      {/* Step 4 */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="rounded-2xl border border-indigo-100 bg-white p-6 shadow-sm"
-      >
-        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-600 text-lg font-bold text-white">
-          4
-        </div>
-
-        <h3 className="mt-5 text-xl font-semibold text-gray-900">
-          Calendar-ready confirmation
-        </h3>
-
-        <p className="mt-3 text-sm leading-6 text-gray-600">
-          After confirmation, both sides receive an .ics calendar file
-          compatible with Google Calendar, Apple Calendar, Outlook and other
-          calendar apps.
-        </p>
-      </motion.div>
-    </div>
-
-    {/* Supporting highlights */}
+    {/* Small benefits */}
     <div className="mt-10 flex flex-wrap justify-center gap-3">
       {[
         "No customer account required",
-        "Confirm appointments by email",
-        "Propose and accept new times",
-        "Calendar-compatible .ics files",
+        "Email confirmation",
+        "Two-way rescheduling",
+        "Calendar invitation",
+        "24-hour reminder",
+        "Automatic review request",
       ].map((item) => (
         <div
           key={item}
-          className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm"
+          className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm"
         >
-          <span className="text-green-500">✓</span>
+          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
           {item}
         </div>
       ))}
     </div>
+
   </div>
-</section>		  
+</section>	  
 		  
 		  {/* -------- FEATURE SHOWCASE -------- */}
 <section className="w-full bg-gradient-to-b from-white to-indigo-50 py-32 overflow-hidden">

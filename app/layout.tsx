@@ -7,110 +7,165 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://simplebookme.com"),
 
-metadataBase: new URL("https://simplebookme.com"),
-  title: "Create a Booking Website & Instagram Bio Link | No Monthly Fee | SimpleBookMe",
-description:
-  "Professional booking website builder for cleaners, hair salons, beauty businesses, handymen and service professionals. Accept bookings online, display pricing, showcase before & after portfolios, availability calendars, testimonials, Google reviews, contact information and social media links. No monthly fees.",
+  title:
+    "Booking Website with Reminders & Review Follow-Ups | No Monthly Fee | SimpleBookMe",
 
-keywords: [
-  "booking website builder",
-  "appointment booking website",
-  "online booking system",
-  "service business website",
+  description:
+    "Create a professional booking website for your service business. Accept appointments online, send booking confirmations, calendar invites and automatic appointment reminders, request Google reviews after appointments, display pricing, availability and portfolios — with no monthly fee.",
 
-  "cleaning business website",
-  "hair salon website",
-  "beauty salon website",
-  "handyman website",
-  "landscaping website",
+  keywords: [
+    // Core booking
+    "booking website builder",
+    "appointment booking website",
+    "online booking system",
+    "online appointment scheduling",
+    "service business website",
+    "small business booking website",
 
-  "availability calendar",
-  "booking calendar",
-  "online appointment scheduling",
+    // Email automation
+    "appointment reminder email",
+    "automatic appointment reminders",
+    "booking confirmation email",
+    "appointment confirmation email",
+    "customer appointment reminders",
+    "automated booking reminders",
 
-  "before and after gallery",
-  "portfolio website for service business",
-  "customer testimonial website",
-  "google review showcase",
+    // Reviews
+    "automatic review request",
+    "google review request",
+    "google review follow up",
+    "customer review request",
+    "google review automation",
 
-  "instagram booking page",
-  "instagram bio link",
-  "tiktok booking page",
+    // Calendar / scheduling
+    "availability calendar",
+    "booking calendar",
+    "appointment calendar",
+    "calendar invite booking",
+    "appointment rescheduling",
 
-  "small business website",
-  "website builder for service business",
-  "no monthly fee website builder",
-  
-  "hair salon booking",
-  "hair salon appointment",
-  "hair salon appointment book",
-  
-  "cleaning booking system",
-  "cleaner schedule",
-  
-  "pet grooming booking software",
-  "pet grooming booking platform",
-  "pet care booking system",
-  
-  "car detailing booking system",
-  "mobile car wash booking app",
-  
-  "nail salon booking system",
-  "nail salon schedule online",
-],
+    // Business website
+    "small business website",
+    "website builder for service business",
+    "no monthly fee website builder",
+    "one time payment website builder",
+
+    // Portfolio
+    "before and after gallery",
+    "portfolio website for service business",
+    "before and after slider",
+    "service business portfolio",
+    "customer testimonial website",
+    "google review showcase",
+
+    // Social
+    "instagram booking page",
+    "instagram bio link",
+    "tiktok booking page",
+    "social media booking link",
+
+    // Cleaning
+    "cleaning business website",
+    "cleaning booking system",
+    "cleaner schedule",
+    "house cleaning booking system",
+
+    // Hair / beauty
+    "hair salon website",
+    "hair salon booking",
+    "hair salon appointment",
+    "hair salon appointment book",
+    "beauty salon website",
+
+    // Nails
+    "nail salon booking system",
+    "nail salon schedule online",
+
+    // Pet
+    "pet grooming booking software",
+    "pet grooming booking platform",
+    "pet care booking system",
+
+    // Automotive
+    "car detailing booking system",
+    "mobile car wash booking app",
+    "car detailing website",
+
+    // Home services
+    "handyman website",
+    "handyman booking system",
+    "landscaping website",
+    "home service booking system",
+  ],
 
   alternates: {
     canonical: "https://simplebookme.com",
   },
 
-	openGraph: {
-	  title:
-		"Create a Booking Website & Instagram Bio Link | SimpleBookMe",
+  openGraph: {
+    title:
+      "Booking Website with Automatic Reminders & Review Requests | SimpleBookMe",
 
-	  description:
-		"Build a booking website for your service business and turn your Instagram bio into a booking page.",
+    description:
+      "Accept bookings online, send appointment reminders automatically and request Google reviews after appointments. Build your service business website with no monthly fee.",
 
-	  url: "/",
+    url: "/",
 
-	  siteName: "SimpleBookMe",
+    siteName: "SimpleBookMe",
 
-	  type: "website",
+    type: "website",
 
-	  images: [
-		{
-		  url: "/images/og-home.jpg",
-		  width: 1200,
-		  height: 630,
-		  alt: "SimpleBookMe Booking Website Builder",
-		},
-	  ],
-	},
-  
-    icons: {
+    images: [
+      {
+        url: "/images/og-home.jpg",
+        width: 1200,
+        height: 630,
+        alt: "SimpleBookMe Booking Website Builder",
+      },
+    ],
+  },
+
+  icons: {
     icon: [
       { url: "/favicon.ico" },
-      { url: "/favicon_192.png", sizes: "192x192", type: "image/png" },
+      {
+        url: "/favicon_192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
     ],
+
     apple: [
-      { url: "/favicon_180.png", sizes: "180x180", type: "image/png" },
+      {
+        url: "/favicon_180.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
     ],
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "Create a Booking Website & Instagram Bio Link",
+
+    title:
+      "Booking Website with Automatic Reminders | SimpleBookMe",
+
     description:
-      "Launch a booking website for your business and turn your Instagram bio into a booking link. No monthly fees.",
+      "Create a booking website that confirms appointments, sends automatic reminders and asks customers for Google reviews. No monthly fee.",
+
+    images: ["/images/og-home.jpg"],
   },
 
   robots: {
     index: true,
     follow: true,
   },
-  
-    other: {
-    "google-site-verification": "_9XPHh7SY5Gvnydgm5jhkLwhbaswIr3RsACqQhq580A",
+
+  other: {
+    "google-site-verification":
+      "_9XPHh7SY5Gvnydgm5jhkLwhbaswIr3RsACqQhq580A",
   },
 };
 
@@ -119,106 +174,143 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const host = (await headers()).get("host") || "";
 
-const host = (await headers()).get("host") || "";
+  const cleanHost = host.split(":")[0];
 
-// adjust this if needed
-const cleanHost = host.split(":")[0];
-
-const isSubdomain =
-  cleanHost.endsWith("simplebookme.com") &&
-  cleanHost !== "simplebookme.com" &&
-  cleanHost !== "www.simplebookme.com";
+  const isSubdomain =
+    cleanHost.endsWith("simplebookme.com") &&
+    cleanHost !== "simplebookme.com" &&
+    cleanHost !== "www.simplebookme.com";
 
   return (
     <html lang="en">
       <head>
-        {/* Google Ads / Google Tag */}
+        {/* =====================================================
+            GOOGLE ADS / GOOGLE TAG
+            ===================================================== */}
         <script
           async
           src="https://www.googletagmanager.com/gtag/js?id=AW-17894933160"
         ></script>
+
         <script
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
+
+              function gtag(){
+                dataLayer.push(arguments);
+              }
+
               gtag('js', new Date());
               gtag('config', 'AW-17894933160');
             `,
           }}
         />
-		
-{!isSubdomain && (
-  <script
-    type="application/ld+json"
-    dangerouslySetInnerHTML={{
-      __html: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
 
-        name: "SimpleBookMe",
+        {/* =====================================================
+            SIMPLEBOOKME STRUCTURED DATA
+            Only shown on the main SimpleBookMe domain.
+            Customer subdomains can have their own SEO/schema.
+            ===================================================== */}
+        {!isSubdomain && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "SoftwareApplication",
 
-        applicationCategory:
-          "BusinessApplication",
+                name: "SimpleBookMe",
 
-        operatingSystem: "Web",
+                applicationCategory: "BusinessApplication",
 
-        url: "https://simplebookme.com",
+                applicationSubCategory:
+                  "Appointment Scheduling Software",
 
-        image:
-          "https://simplebookme.com/images/og-home.jpg",
+                operatingSystem: "Web",
 
-        description:
-          "Booking website builder for cleaners, hair salons, beauty businesses, handymen and service professionals.",
+                url: "https://simplebookme.com",
 
-        featureList: [
-          "Online booking",
-          "Availability calendar",
-          "Instagram bio link",
-          "Portfolio gallery",
-          "Before and after slider",
-          "Video portfolio",
-          "Google Maps location",
-          "Testimonials",
-          "Google review links",
-          "Social media links",
-          "Pricing display",
-          "Contact section",
-        ],
+                image:
+                  "https://simplebookme.com/images/og-home.jpg",
 
-        offers: {
-          "@type": "Offer",
-          price: "0",
-          priceCurrency: "CAD",
-        },
+                description:
+                  "SimpleBookMe helps service businesses create a professional booking website, accept appointment requests, send booking confirmations and calendar invitations, automatically remind customers before appointments, and request Google reviews after appointments.",
 
-        creator: {
-          "@type": "Organization",
-          name: "SimpleBookMe",
-          url: "https://simplebookme.com",
-        },
-      }),
-    }}
-  />
-)}
-		
+                featureList: [
+                  "Professional booking website",
+                  "Online appointment booking",
+                  "Custom business subdomain",
+                  "Customer booking confirmation emails",
+                  "Calendar invitation attachments",
+                  "Automatic appointment reminder emails",
+                  "Post-appointment review request emails",
+                  "Google review link integration",
+                  "Customer rescheduling links",
+                  "Availability calendar",
+                  "Service and pricing display",
+                  "Portfolio gallery",
+                  "Before and after portfolio slider",
+                  "Video portfolio",
+                  "Customer testimonials",
+                  "Google Maps location",
+                  "Business contact information",
+                  "Social media links",
+                  "Instagram bio booking link",
+                  "Custom business logo",
+                  "Mobile-friendly booking pages",
+                ],
+
+                offers: {
+                  "@type": "Offer",
+
+                  price: "19.90",
+
+                  priceCurrency: "USD",
+
+                  category: "One-time activation",
+
+                  availability:
+                    "https://schema.org/InStock",
+                },
+
+                creator: {
+                  "@type": "Organization",
+
+                  name: "SimpleBookMe",
+
+                  url: "https://simplebookme.com",
+                },
+
+                provider: {
+                  "@type": "Organization",
+
+                  name: "SimpleBookMe",
+
+                  url: "https://simplebookme.com",
+                },
+              }),
+            }}
+          />
+        )}
       </head>
 
       <body className="bg-gradient-to-br from-indigo-50 via-white to-purple-50">
         <Providers>
           {/* Navbar is client-side and resolves mode async */}
-
-		  <Navbar />
+          <Navbar />
 
           {/* Offset for fixed navbar height */}
           <main className="pt-16 min-h-screen">
             {children}
           </main>
         </Providers>
-		<Analytics />
-		<SpeedInsights />
-		
+
+        <Analytics />
+
+        <SpeedInsights />
       </body>
     </html>
   );
