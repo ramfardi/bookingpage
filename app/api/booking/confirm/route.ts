@@ -60,6 +60,51 @@ function sanitizeEmailDisplayName(value: string) {
     .slice(0, 100);
 }
 
+function buildCalendarDateTimeRange(
+  date: string,
+  time: string,
+  durationMinutes = 60
+) {
+  const [year, month, day] =
+    date.split("-").map(Number);
+
+  const [hour, minute] =
+    time.split(":").map(Number);
+
+  const start = new Date(
+    Date.UTC(
+      year,
+      month - 1,
+      day,
+      hour,
+      minute,
+      0
+    )
+  );
+
+  const end = new Date(
+    start.getTime() +
+      durationMinutes * 60_000
+  );
+
+  const pad = (value: number) =>
+    String(value).padStart(2, "0");
+
+  const format = (value: Date) =>
+    `${value.getUTCFullYear()}` +
+    `${pad(value.getUTCMonth() + 1)}` +
+    `${pad(value.getUTCDate())}` +
+    `T` +
+    `${pad(value.getUTCHours())}` +
+    `${pad(value.getUTCMinutes())}` +
+    `${pad(value.getUTCSeconds())}`;
+
+  return {
+    start: format(start),
+    end: format(end),
+  };
+}
+
 /* =====================
    Error message helper
 ===================== */
@@ -445,32 +490,115 @@ const safeBusinessContactPhone =
   escapeHtml(businessContactPhone);
 
     /* =====================
-       Calendar attachment
+       Calendar
     ===================== */
 
+    const APPOINTMENT_DURATION_MINUTES =
+      60;
+
+    /*
+     * Calendar title:
+     *
+     * Haircut — John Smith
+     *
+     * or simply Haircut if
+     * no client name was provided.
+     */
+    const calendarTitle =
+      cleanCustomerName
+        ? `${cleanService} — ${cleanCustomerName}`
+        : cleanService;
+
+    /*
+     * Information stored inside
+     * the calendar event.
+     */
+    const calendarDescription = [
+      `Service: ${cleanService}`,
+
+      cleanCustomerName
+        ? `Client: ${cleanCustomerName}`
+        : null,
+
+      `Client email: ${clientEmail}`,
+
+      cleanCustomerMessage
+        ? `Client message: ${cleanCustomerMessage}`
+        : null,
+
+      customer.businessName
+        ? `Business: ${customer.businessName}`
+        : null,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    /*
+     * ICS attachment.
+     *
+     * Works with Apple Calendar,
+     * Outlook and most calendar apps.
+     */
     const ics = createICS({
-      uid: cleanEventUID,
+      uid:
+        cleanEventUID,
 
       title:
-        `Booking with ${
-          customer.businessName
-        }`,
+        calendarTitle,
 
       description:
-        `Service: ${cleanService}`,
+        calendarDescription,
 
-      date: cleanDate,
-      time: cleanTime,
+      date:
+        cleanDate,
+
+      time:
+        cleanTime,
+
+      durationMinutes:
+        APPOINTMENT_DURATION_MINUTES,
     });
 
     const attachment = {
-      filename: "booking.ics",
+      filename:
+        `appointment-${cleanDate}-${cleanTime.replace(
+          ":",
+          "-"
+        )}.ics`,
 
       content:
         Buffer.from(ics).toString(
           "base64"
         ),
     };
+
+    /*
+     * Google Calendar direct-add link.
+     */
+    const {
+      start: calendarStart,
+      end: calendarEnd,
+    } = buildCalendarDateTimeRange(
+      cleanDate,
+      cleanTime,
+      APPOINTMENT_DURATION_MINUTES
+    );
+
+    const googleCalendarUrl =
+      "https://calendar.google.com/calendar/render" +
+      "?action=TEMPLATE" +
+      `&text=${encodeURIComponent(
+        calendarTitle
+      )}` +
+      `&dates=${calendarStart}/${calendarEnd}` +
+      `&details=${encodeURIComponent(
+        calendarDescription
+      )}`;
+
+    const safeGoogleCalendarUrl =
+      escapeHtml(
+        googleCalendarUrl
+      );
 
 /*
  * OLD CLIENT RESCHEDULE LINK
@@ -873,7 +1001,9 @@ from:
         replyTo: clientEmail,
 
         subject:
-          `Appointment confirmed – ${cleanService} – ${cleanDate}`,
+          cleanCustomerName
+            ? `Appointment confirmed – ${cleanService} – ${cleanCustomerName} – ${cleanDate}`
+            : `Appointment confirmed – ${cleanService} – ${cleanDate}`,
 
         html: `
           <h2>Appointment confirmed</h2>
@@ -908,6 +1038,79 @@ from:
             <strong>Time:</strong>
             ${safeTime}
           </p>
+
+          ${
+            safeCustomerMessage
+              ? `
+                <div
+                  style="
+                    margin-top:16px;
+                    padding:14px;
+                    background:#f3f4f6;
+                    border-radius:8px;
+                  "
+                >
+                  <strong>Client message:</strong>
+
+                  <p
+                    style="
+                      margin-bottom:0;
+                      line-height:1.6;
+                    "
+                  >
+                    ${safeCustomerMessage}
+                  </p>
+                </div>
+              `
+              : ""
+          }
+
+          <div
+            style="
+              margin-top:24px;
+              padding-top:20px;
+              border-top:1px solid #e5e7eb;
+            "
+          >
+            <p
+              style="
+                margin-top:0;
+                margin-bottom:12px;
+                font-weight:600;
+              "
+            >
+              Add this appointment to your calendar
+            </p>
+
+            <a
+              href="${safeGoogleCalendarUrl}"
+              style="
+                display:inline-block;
+                padding:11px 18px;
+                background:#2563eb;
+                color:#ffffff;
+                text-decoration:none;
+                border-radius:8px;
+                font-weight:600;
+              "
+            >
+              Add to Google Calendar
+            </a>
+
+            <p
+              style="
+                margin-top:14px;
+                margin-bottom:0;
+                font-size:14px;
+                line-height:1.6;
+                color:#6b7280;
+              "
+            >
+              Using Apple Calendar, Outlook,
+              iPhone, iPad, or another calendar app?
+              Open the attached calendar file.
+            </p>
+          </div>
 
         `,
 
