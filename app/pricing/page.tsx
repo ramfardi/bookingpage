@@ -465,9 +465,9 @@ export default function PricingPage() {
                 },
                 {
                   number: "03",
-                  title: "Activate for $19.90",
+                  title: "Free",
                   description:
-                    "Activate the website with a one-time payment when you are satisfied with what was created.",
+                    "Use the website for free.",
                 },
               ].map((item) => (
                 <article
@@ -553,7 +553,7 @@ export default function PricingPage() {
                     </span>
 
                     <span className="font-bold text-gray-950">
-                      $19.90 USD
+                      Free
                     </span>
                   </div>
 
@@ -643,7 +643,7 @@ export default function PricingPage() {
             </button>
 
             <p className="mt-4 text-sm text-indigo-200">
-              One-time activation: $19.90 USD
+              Free
             </p>
           </div>
         </section>
