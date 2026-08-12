@@ -646,10 +646,14 @@ const publicUrl = `https://${cleanedSubdomain}.simplebookme.com`;
 
 const privateUrl = `${origin}/site/${siteId}?mode=preview`;
 
+
+/*
 const activationUrl =
   `${origin}/activate/${siteId}` +
   `?email=${encodeURIComponent(cleanedEmail)}` +
   `&subdomain=${encodeURIComponent(cleanedSubdomain)}`;
+*/
+
 
 try {
   const emailRes = await fetch("/api/send-website-links", {
@@ -662,7 +666,7 @@ try {
       businessName: form.businessName || cleanedSubdomain,
       publicUrl,
       privateUrl,
-      activationUrl,
+      //activationUrl,
     }),
   });
 
@@ -940,54 +944,44 @@ if (createdSiteId && createdSubdomain) {
         </p>
 
         <div className="mt-8 space-y-3">
-          <button
-            type="button"
-            onClick={() => {
-              window.open(
-                publicUrl,
-                "_blank",
-                "noopener,noreferrer"
-              );
-            }}
-            className="w-full border border-indigo-600 text-indigo-600 px-8 py-3 rounded-xl font-semibold hover:bg-indigo-50 transition"
-          >
-            View Your Website
-          </button>
+{/* TEMPORARILY HIDDEN - ACTIVATION
 
-          <button
-            type="button"
-            onClick={handleActivate}
-            disabled={activating}
-            className="w-full bg-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition disabled:cursor-not-allowed disabled:opacity-60"
-          >
-		{activating ? (
-		  "Opening Secure Checkout..."
-		) : (
-		  <span className="flex flex-col items-center leading-tight">
-			<span>Activate Your Website</span>
+<button
+  type="button"
+  onClick={handleActivate}
+  disabled={activating}
+  className="w-full bg-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition disabled:cursor-not-allowed disabled:opacity-60"
+>
+  {activating ? (
+    "Opening Secure Checkout..."
+  ) : (
+    <span className="flex flex-col items-center leading-tight">
+      <span>Activate Your Website</span>
 
-			<span className="mt-1 flex items-center gap-2 text-sm">
-			  <span className="text-white/70 line-through">
-				$59.90 USD
-			  </span>
+      <span className="mt-1 flex items-center gap-2 text-sm">
+        <span className="text-white/70 line-through">
+          $59.90 USD
+        </span>
 
-			  <span className="font-bold text-white">
-				$19.90 USD
-			  </span>
-			</span>
+        <span className="font-bold text-white">
+          $19.90 USD
+        </span>
+      </span>
 
-			<span className="mt-1 text-xs font-medium text-white/80">
-			  Limited-time launch discount
-			</span>
-		  </span>
-		)}
-          </button>
+      <span className="mt-1 text-xs font-medium text-white/80">
+        Limited-time launch discount
+      </span>
+    </span>
+  )}
+</button>
 
-		<p className="text-xs leading-relaxed text-gray-500">
-		  You can use your website for one week. After that, please activate it
-		  to keep it online. Unactivated websites may be removed and you may
-		  lose access to your links.
-		</p>
+<p className="text-xs leading-relaxed text-gray-500">
+  You can use your website for one week. After that, please activate it
+  to keep it online. Unactivated websites may be removed and you may
+  lose access to your links.
+</p>
+
+*/}
         </div>
       </div>
     </div>

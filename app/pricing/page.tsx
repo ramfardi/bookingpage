@@ -318,6 +318,7 @@ export default function PricingPage() {
                     Complete website activation
                   </p>
 
+{/* OLD PRICING
 <div className="mt-6">
   <div className="flex items-center gap-3">
     <span className="text-2xl font-bold text-gray-400 line-through">
@@ -339,9 +340,16 @@ export default function PricingPage() {
     </span>
   </div>
 </div>
+*/}
+
+<div className="mt-6">
+  <span className="text-6xl font-extrabold tracking-tight">
+    FREE
+  </span>
+</div>
 
 <p className="mt-3 text-lg text-gray-300">
-  Limited-time launch price. One payment. No monthly subscription.
+  Enjoy the free tier with lots of features.
 </p>
 
                   <button
@@ -353,7 +361,7 @@ export default function PricingPage() {
                   </button>
 
                   <p className="mt-4 text-center text-sm text-gray-400">
-                    Build and review your website before activation
+                    Build and review your website in minutes
                   </p>
                 </div>
 
@@ -366,6 +374,9 @@ export default function PricingPage() {
                   <div className="mt-7 space-y-4">
                     {[
                       "Unique public website link",
+					  "100 appointments per month",
+					  "Automatic appointment reminder",
+					  "Automatic review reminder",
                       "Private website editing link",
                       "Built-in or external booking",
 					  "Instant Quote tab",

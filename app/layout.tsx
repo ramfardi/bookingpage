@@ -241,6 +241,7 @@ export default async function RootLayout({
 
                 featureList: [
                   "Professional booking website",
+				  "Free booking website",
                   "Online appointment booking",
                   "Custom business subdomain",
                   "Customer booking confirmation emails",
@@ -263,18 +264,6 @@ export default async function RootLayout({
                   "Mobile-friendly booking pages",
                 ],
 
-                offers: {
-                  "@type": "Offer",
-
-                  price: "19.90",
-
-                  priceCurrency: "USD",
-
-                  category: "One-time activation",
-
-                  availability:
-                    "https://schema.org/InStock",
-                },
 
                 creator: {
                   "@type": "Organization",

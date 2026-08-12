@@ -1970,7 +1970,7 @@ Add optional instant quote button for better communication with the potential cl
                 {[
                   {
                     q: "Is there any recurring monthly fee?",
-                    a: "No, there is only one-time activation fee.",
+                    a: "The current tier is completely free",
                   },
                   {
                     q: "Can I use my existing booking system?",

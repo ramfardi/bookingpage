@@ -43,9 +43,11 @@ export async function POST(req: Request) {
 
     const publicUrl = String(body.publicUrl || "").trim();
     const privateUrl = String(body.privateUrl || "").trim();
-    const activationUrl = String(
-      body.activationUrl || ""
-    ).trim();
+/*
+const activationUrl = String(
+  body.activationUrl || ""
+).trim();
+*/
 
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json(
@@ -69,11 +71,10 @@ export async function POST(req: Request) {
       );
     }
 
-    if (
-      !isValidUrl(publicUrl) ||
-      !isValidUrl(privateUrl) ||
-      !isValidUrl(activationUrl)
-    ) {
+if (
+  !isValidUrl(publicUrl) ||
+  !isValidUrl(privateUrl)
+) {
       return NextResponse.json(
         {
           error: "Invalid website links.",
@@ -87,7 +88,7 @@ export async function POST(req: Request) {
     const safeBusinessName = escapeHtml(businessName);
     const safePublicUrl = escapeHtml(publicUrl);
     const safePrivateUrl = escapeHtml(privateUrl);
-    const safeActivationUrl = escapeHtml(activationUrl);
+    //const safeActivationUrl = escapeHtml(activationUrl);
 
     const { data, error } = await resend.emails.send({
       from:
@@ -144,13 +145,15 @@ export async function POST(req: Request) {
               </a>
             </p>
 
-            <p style="margin-bottom:0;">
-              <strong>Activation link:</strong><br />
+<!--
+<p style="margin-bottom:0;">
+  <strong>Activation link:</strong><br />
 
-              <a href="${safeActivationUrl}">
-                ${safeActivationUrl}
-              </a>
-            </p>
+  <a href="${safeActivationUrl}">
+    ${safeActivationUrl}
+  </a>
+</p>
+-->
           </div>
 
           <div
@@ -224,26 +227,26 @@ export async function POST(req: Request) {
             </li>
           </ol>
 
-          <div
-            style="
-              margin-top:24px;
-              padding:16px;
-              border-radius:12px;
-              background:#fff7ed;
-              color:#9a3412;
-            "
-          >
-            <strong>Your 7-day free trial</strong>
+<div
+  style="
+    margin-top:24px;
+    padding:16px;
+    border-radius:12px;
+    background:#ecfdf5;
+    color:#065f46;
+  "
+>
+  <strong>Your website is free to use</strong>
 
-            <p style="margin-bottom:0;">
-              You can use your website free for 7 days. Before the trial
-              ends, activate it using the activation link above to keep
-              it online.
+  <p style="margin-bottom:0;">
+    Your SimpleBookMe website does not expire after 7 days.
+    You can continue using your public website and private edit
+    link as long as you need them.
 
-              If the website is not activated, it may be removed and you
-              may lose access to the website and its links.
-            </p>
-          </div>
+    Online booking and email notifications are subject to
+    current monthly usage limits.
+  </p>
+</div>
 
           <div
             style="
@@ -280,8 +283,6 @@ ${publicUrl}
 PRIVATE EDIT LINK
 ${privateUrl}
 
-ACTIVATION LINK
-${activationUrl}
 
 IMPORTANT: CHECK SPAM OR JUNK
 
@@ -311,13 +312,11 @@ RECOMMENDED NEXT STEPS
 
 8. Share only your public website link with customers.
 
-YOUR 7-DAY FREE TRIAL
+YOUR WEBSITE IS FREE TO USE
 
-You can use your website free for 7 days.
+You can continue using your public website and private edit link as long as you need them.
 
-Before the trial ends, activate it using the activation link above to keep it online.
-
-If the website is not activated, it may be removed and you may lose access to the website and its links.
+Online booking and email notifications are subject to current monthly usage limits. 
 
 IMPORTANT
 
