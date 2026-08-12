@@ -630,8 +630,7 @@ export default function PricingPage() {
             </h2>
 
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-indigo-100">
-              Create your website, explore the public page and editing tools,
-              and activate it only after you are satisfied.
+              Create your website, explore the public page and editing tools.
             </p>
 
             <button
