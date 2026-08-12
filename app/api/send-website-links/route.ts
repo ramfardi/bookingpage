@@ -145,15 +145,6 @@ if (
               </a>
             </p>
 
-<!--
-<p style="margin-bottom:0;">
-  <strong>Activation link:</strong><br />
-
-  <a href="${safeActivationUrl}">
-    ${safeActivationUrl}
-  </a>
-</p>
--->
           </div>
 
           <div
