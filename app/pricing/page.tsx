@@ -642,9 +642,6 @@ export default function PricingPage() {
               Create My Booking Website
             </button>
 
-            <p className="mt-4 text-sm text-indigo-200">
-              Free
-            </p>
           </div>
         </section>
 
