@@ -94,7 +94,7 @@ const faqs = [
   {
     question: "Is the there any recurring or hidden fees?",
     answer:
-      "No. It is a one-time website activation payment. There is no monthly SimpleBookMe subscription.",
+      "No. It's all free currently and this tier will remain free",
   },
   {
     question: "Can I review my website before paying?",
