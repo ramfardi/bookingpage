@@ -58,6 +58,31 @@ export default function BookingPage() {
     load();
   }, []);
 
+// Preselect service when coming from the pricing page
+useEffect(() => {
+  if (!customer || mode !== "client") {
+    return;
+  }
+
+  const serviceFromUrl =
+    new URLSearchParams(window.location.search).get("service");
+
+  if (!serviceFromUrl) {
+    return;
+  }
+
+  const customerConfig =
+    customer as CustomerConfig;
+
+  const services =
+    customerConfig.services || [];
+
+  // Only preselect a service that actually exists
+  if (services.includes(serviceFromUrl)) {
+    setSelectedService(serviceFromUrl);
+  }
+}, [customer, mode]);
+
   useEffect(() => {
     if (!customer || mode !== "client") {
       return;

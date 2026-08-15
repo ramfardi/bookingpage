@@ -683,6 +683,22 @@ export default function PricingPage() {
   const customerConfig = customer as CustomerConfig;
   const pricing = customerConfig.pricing;
 
+function handleSelectService(serviceName: string) {
+  // If this business uses an external booking system,
+  // use their external booking link instead.
+  if (
+    customerConfig.booking?.is_external &&
+    customerConfig.booking.bookingLink
+  ) {
+    window.location.href = customerConfig.booking.bookingLink;
+    return;
+  }
+
+  router.push(
+    `/booking?service=${encodeURIComponent(serviceName)}`
+  );
+}
+
   if (!pricing?.rows?.length) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 px-6">
@@ -757,6 +773,14 @@ export default function PricingPage() {
                   {row.includes}
                 </p>
               )}
+			  
+			  <button
+  type="button"
+  onClick={() => handleSelectService(row.name)}
+  className="mt-5 w-full rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+>
+  Select
+</button>
             </article>
           ))}
         </div>
@@ -777,6 +801,9 @@ export default function PricingPage() {
                 <th className="px-7 py-5 text-sm font-semibold">
                   Details
                 </th>
+				<th className="w-32 px-7 py-5 text-sm font-semibold text-center">
+  Book
+</th>
               </tr>
             </thead>
 
@@ -799,6 +826,15 @@ export default function PricingPage() {
                   <td className="px-7 py-6 leading-7 text-gray-600">
                     {row.includes || "Contact us for more information."}
                   </td>
+				  <td className="px-7 py-6 text-center">
+  <button
+    type="button"
+    onClick={() => handleSelectService(row.name)}
+    className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
+  >
+    Select
+  </button>
+</td>
                 </tr>
               ))}
             </tbody>
