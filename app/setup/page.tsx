@@ -1025,6 +1025,16 @@ if (createdSiteId && createdSubdomain) {
           />
         </div>
 
+<button
+  type="button"
+  onClick={() => {
+    window.location.href = publicUrl;
+  }}
+  className="mt-6 w-full rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white transition hover:bg-indigo-700"
+>
+  View My Website
+</button>
+
         <p className="mt-6 text-sm text-red-600">
           Do not share the private edit link with customers. Share
           only the public website link.
