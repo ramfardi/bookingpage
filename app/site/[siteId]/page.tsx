@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import HomePage from "@/components/HomePage";
+import { templates } from "@/app/templates";
 import type { CustomerConfig, ScheduleDay } from "@/app/lib/customerConfig";
 import { supabaseBrowser } from "@/app/lib/supabase-browser";
 import imageCompression from "browser-image-compression";
 import { generateSeo } from "@/app/lib/generateSeo";
 import GalleryUploader from "@/components/GalleryUploader";
 import { MAX_GALLERY_FILES } from "@/app/lib/galleryLimits";
+
 
 export default function SitePage({
   params,
@@ -22,6 +24,7 @@ export default function SitePage({
   const [customer, setCustomer] = useState<CustomerConfig | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [heroImageWarning, setHeroImageWarning] = useState("");
   
   const [beforeImage, setBeforeImage] = useState<string | null>(null);
 
@@ -179,6 +182,91 @@ async function uploadLogoImage(file: File) {
         servingCity: prev!.branding?.servingCity || "",
       },
     }));
+  } finally {
+    setUploading(false);
+  }
+}
+
+async function uploadHeroImage(file: File) {
+  try {
+    setUploading(true);
+    setHeroImageWarning("");
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file.");
+      return;
+    }
+
+    // Check original image dimensions
+    const objectUrl = URL.createObjectURL(file);
+    const image = new Image();
+
+    const dimensions = await new Promise<{
+      width: number;
+      height: number;
+    }>((resolve, reject) => {
+      image.onload = () => {
+        resolve({
+          width: image.naturalWidth,
+          height: image.naturalHeight,
+        });
+
+        URL.revokeObjectURL(objectUrl);
+      };
+
+      image.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error("Unable to read image."));
+      };
+
+      image.src = objectUrl;
+    });
+
+    if (dimensions.width < 1200) {
+      setHeroImageWarning(
+        "This photo may look slightly blurry on large screens. For best results, use an image at least 1200px wide."
+      );
+    }
+
+    const ext = file.name.split(".").pop() || "jpg";
+
+    const fileName =
+      `hero/${crypto.randomUUID()}.${ext}`;
+
+    const compressedImage =
+      await imageCompression(file, {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      });
+
+    const { error } =
+      await supabaseBrowser.storage
+        .from("gallery")
+        .upload(fileName, compressedImage);
+
+    if (error) {
+      console.error(error);
+      alert("Hero image upload failed.");
+      return;
+    }
+
+    const { data } =
+      supabaseBrowser.storage
+        .from("gallery")
+        .getPublicUrl(fileName);
+
+    setCustomer((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        heroImage: data.publicUrl,
+      };
+    });
+  } catch (error) {
+    console.error("Hero image upload failed:", error);
+    alert("Unable to upload this image.");
   } finally {
     setUploading(false);
   }
@@ -573,6 +661,90 @@ const galleryImages = (
           {/* -------- HERO -------- */}
           <section className="mb-8">
             <h3 className="font-medium mb-3">Hero</h3>
+
+<p className="text-sm text-gray-500 mb-4">
+  Customize the homepage photo and headline.
+</p>
+
+{/* HERO IMAGE */}
+<div className="mb-6 rounded-2xl border bg-white p-4">
+
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Homepage photo
+  </label>
+
+  {customer.heroImage && (
+    <div className="mb-4 overflow-hidden rounded-xl border bg-gray-100">
+      <img
+        src={customer.heroImage}
+        alt="Homepage hero preview"
+        className="h-52 w-full object-cover"
+      />
+    </div>
+  )}
+
+  <input
+    type="file"
+    accept="image/jpeg,image/png,image/webp"
+    disabled={uploading}
+    onChange={async (e) => {
+      const file = e.target.files?.[0];
+
+      if (file) {
+        await uploadHeroImage(file);
+      }
+
+      e.target.value = "";
+    }}
+    className="
+      block w-full text-sm text-gray-600
+      file:mr-4 file:rounded-xl file:border-0
+      file:bg-indigo-600 file:px-4 file:py-2
+      file:text-white hover:file:bg-indigo-700
+      disabled:opacity-50
+    "
+  />
+
+  <p className="mt-2 text-xs text-gray-500">
+    Recommended: landscape photo at least 1200px wide.
+    Large images are optimized automatically.
+  </p>
+
+  {heroImageWarning && (
+    <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
+      <p className="text-xs text-amber-800">
+        {heroImageWarning}
+      </p>
+    </div>
+  )}
+
+  {customer.heroImage !==
+    templates[
+      customer.templateId as keyof typeof templates
+    ]?.defaultData.heroImage && (
+    <button
+      type="button"
+      className="mt-4 text-sm font-medium text-indigo-600 hover:text-indigo-700"
+      onClick={() => {
+        const defaultImage =
+          templates[
+            customer.templateId as keyof typeof templates
+          ]?.defaultData.heroImage;
+
+        if (!defaultImage) return;
+
+        setCustomer({
+          ...customer,
+          heroImage: defaultImage,
+        });
+
+        setHeroImageWarning("");
+      }}
+    >
+      Use template photo instead
+    </button>
+  )}
+</div>
 
             <input
               className="w-full border rounded-md p-2 mb-2"

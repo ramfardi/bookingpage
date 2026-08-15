@@ -224,6 +224,11 @@ const [branding, setBranding] = useState({
 	const [useDefaultHero, setUseDefaultHero] = useState(true);
 	const [useDefaultAbout, setUseDefaultAbout] = useState(true);
 	
+	const [heroImage, setHeroImage] = useState(
+  template.defaultData.heroImage);
+
+	const [heroImageWarning, setHeroImageWarning] = useState("");
+	
 	const [createdSiteId, setCreatedSiteId] = useState<string | null>(null);
 	const [createdSubdomain, setCreatedSubdomain] = useState<string | null>(null);
 	const [activating, setActivating] = useState(false);
@@ -264,14 +269,18 @@ const [instantQuote, setInstantQuote] = useState({
 
   /* ---------------- RESET ON TEMPLATE CHANGE ---------------- */
 
-  useEffect(() => {
-    setLanding(template.defaultData.landing);
-    setAbout({
-  title: template.defaultData.about.title,
-  description: template.defaultData.about.description,
-  highlights: template.defaultData.about.highlights ?? [],
-  gallery: [],
-});
+useEffect(() => {
+  setLanding(template.defaultData.landing);
+
+  setHeroImage(template.defaultData.heroImage);
+  setHeroImageWarning("");
+
+  setAbout({
+    title: template.defaultData.about.title,
+    description: template.defaultData.about.description,
+    highlights: template.defaultData.about.highlights ?? [],
+    gallery: [],
+  });
 
 
     setServices(
@@ -550,6 +559,84 @@ async function uploadLogoImage(file: File) {
   }
 }
 
+async function uploadHeroImage(file: File) {
+  try {
+    setUploading(true);
+    setHeroImageWarning("");
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file.");
+      return;
+    }
+
+    // Check original image dimensions
+    const imageUrl = URL.createObjectURL(file);
+    const image = new Image();
+
+    const dimensions = await new Promise<{
+      width: number;
+      height: number;
+    }>((resolve, reject) => {
+      image.onload = () => {
+        resolve({
+          width: image.naturalWidth,
+          height: image.naturalHeight,
+        });
+
+        URL.revokeObjectURL(imageUrl);
+      };
+
+      image.onerror = () => {
+        URL.revokeObjectURL(imageUrl);
+        reject(new Error("Unable to read image."));
+      };
+
+      image.src = imageUrl;
+    });
+
+    if (dimensions.width < 1200) {
+      setHeroImageWarning(
+        "This image may look slightly blurry on large screens. For best results, use an image at least 1200px wide."
+      );
+    }
+
+    const ext = file.name.split(".").pop() || "jpg";
+
+    const fileName =
+      `hero/${crypto.randomUUID()}.${ext}`;
+
+    const compressedImage =
+      await imageCompression(file, {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      });
+
+    const { error } =
+      await supabaseBrowser.storage
+        .from("gallery")
+        .upload(fileName, compressedImage);
+
+    if (error) {
+      console.error(error);
+      alert("Hero image upload failed.");
+      return;
+    }
+
+    const { data } =
+      supabaseBrowser.storage
+        .from("gallery")
+        .getPublicUrl(fileName);
+
+    setHeroImage(data.publicUrl);
+  } catch (error) {
+    console.error("Hero image upload failed:", error);
+    alert("Unable to upload this image.");
+  } finally {
+    setUploading(false);
+  }
+}
+
 async function handleCreate() {
   const cleanedSubdomain = sanitizeSubdomain(form.subdomain);
   const cleanedEmail = form.email.trim();
@@ -574,7 +661,7 @@ async function handleCreate() {
     businessName: form.businessName,
     subdomain: cleanedSubdomain,
 
-    heroImage: template.defaultData.heroImage,
+heroImage,
 
     landing,
     about,
@@ -1148,6 +1235,87 @@ if (createdSiteId && createdSubdomain) {
       />
     ))}
   </div>
+
+{/* ---------------- HERO IMAGE ---------------- */}
+<div className="space-y-4 border-t pt-6">
+
+  <div>
+    <h3 className="text-lg font-semibold text-gray-900">
+      Homepage photo
+    </h3>
+
+    <p className="mt-1 text-sm text-gray-500">
+      Use the template photo or upload your own business photo.
+      Landscape photos work best.
+    </p>
+  </div>
+
+  {heroImage && (
+    <div className="overflow-hidden rounded-2xl border bg-gray-100">
+      <img
+        src={heroImage}
+        alt="Homepage preview"
+        className="h-52 w-full object-cover"
+      />
+    </div>
+  )}
+
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Upload your own photo
+    </label>
+
+    <input
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      disabled={uploading}
+      onChange={async (e) => {
+        const file = e.target.files?.[0];
+
+        if (file) {
+          await uploadHeroImage(file);
+        }
+
+        // Allows the same file to be selected again
+        e.target.value = "";
+      }}
+      className="
+        block w-full text-sm text-gray-600
+        file:mr-4 file:rounded-xl file:border-0
+        file:bg-indigo-600 file:px-4 file:py-2
+        file:text-white hover:file:bg-indigo-700
+        disabled:opacity-50
+      "
+    />
+
+    <p className="mt-2 text-xs text-gray-400">
+      Recommended: landscape image at least 1200px wide.
+      Large images are optimized automatically.
+    </p>
+  </div>
+
+  {heroImageWarning && (
+    <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+      <p className="text-sm text-amber-800">
+        {heroImageWarning}
+      </p>
+    </div>
+  )}
+
+  {heroImage !== template.defaultData.heroImage && (
+    <button
+      type="button"
+      onClick={() => {
+        setHeroImage(template.defaultData.heroImage);
+        setHeroImageWarning("");
+      }}
+      className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+    >
+      Use template photo instead
+    </button>
+  )}
+
+</div>
 
   {/* ---------------- ABOUT ---------------- */}
   <div className="space-y-4 pt-6 border-t">
