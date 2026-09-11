@@ -152,6 +152,38 @@ export default function SetupPage() {
     subdomain: "",
   });
   
+  const [timeZone, setTimeZone] = useState("");
+const [timeZoneOptions, setTimeZoneOptions] = useState<string[]>([]);
+
+useEffect(() => {
+  let detected = "";
+
+  try {
+    detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch {
+    // Leave empty so the owner can enter their timezone.
+  }
+
+  // This typing also works with older TypeScript Intl definitions.
+  const intl = Intl as typeof Intl & {
+    supportedValuesOf?: (key: "timeZone") => string[];
+  };
+
+  let available: string[] = [];
+
+  try {
+    available = intl.supportedValuesOf?.("timeZone") ?? [];
+  } catch {
+    // Manual entry remains available.
+  }
+
+  setTimeZoneOptions(
+    Array.from(new Set([...available, detected, "UTC"].filter(Boolean))).sort()
+  );
+
+  setTimeZone((current) => current || detected);
+}, []);
+  
   const [schedule, setSchedule] = useState({
   enabled: true,
   startHour: "08:00",
@@ -638,6 +670,25 @@ async function uploadHeroImage(file: File) {
 }
 
 async function handleCreate() {
+
+  const cleanedTimeZone = timeZone.trim();
+
+  try {
+    if (!cleanedTimeZone) {
+      throw new Error("Missing timezone");
+    }
+
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: cleanedTimeZone,
+    }).format();
+  } catch {
+    setStep("schedule");
+    alert(
+      "Please choose a valid business time zone, such as America/Vancouver."
+    );
+    return;
+  }
+
   const cleanedSubdomain = sanitizeSubdomain(form.subdomain);
   const cleanedEmail = form.email.trim();
 
@@ -660,6 +711,7 @@ async function handleCreate() {
 
     businessName: form.businessName,
     subdomain: cleanedSubdomain,
+	timeZone: cleanedTimeZone,
 
 heroImage,
 
@@ -1719,6 +1771,39 @@ if (createdSiteId && createdSubdomain) {
 {step === "schedule" && (
   <section className="space-y-6">
     <h2 className="text-xl font-semibold">Weekly schedule</h2>
+	
+	<div className="space-y-2">
+  <label
+    htmlFor="business-timezone"
+    className="block text-sm font-medium text-gray-700"
+  >
+    Business time zone
+  </label>
+
+  <input
+    id="business-timezone"
+    type="text"
+    list="business-timezone-options"
+    value={timeZone}
+    onChange={(e) => setTimeZone(e.target.value)}
+    placeholder="Example: America/Vancouver"
+    autoComplete="off"
+    spellCheck={false}
+    aria-describedby="business-timezone-help"
+    className="w-full border p-3 rounded-md"
+  />
+
+  <datalist id="business-timezone-options">
+    {timeZoneOptions.map((zone) => (
+      <option key={zone} value={zone} />
+    ))}
+  </datalist>
+
+  <p id="business-timezone-help" className="text-sm text-gray-500">
+    Prefilled from your device. Check that it matches your business
+    location, especially if you are travelling or setting up for someone else.
+  </p>
+</div>
 
     <p className="text-sm text-gray-500">
       Select the time blocks when you are available. Green means available.

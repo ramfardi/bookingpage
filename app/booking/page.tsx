@@ -145,36 +145,27 @@ const preferredTime =
     formData.get("preferred_time") || ""
   );
 
-/*
- * The browser interprets this as LOCAL time.
- *
- * Example:
- *
- * Vancouver browser:
- * 2026-08-20 14:00 local
- *
- * becomes:
- * 2026-08-20T21:00:00.000Z
- *
- * No timezone setup is needed.
- */
-const appointmentDate =
-  new Date(
+const businessTimeZone = customerConfig.timeZone?.trim() ?? "";
+
+let appointmentAt: string | undefined;
+
+if (!businessTimeZone) {
+  // Compatibility for businesses without a saved timezone.
+  const appointmentDate = new Date(
     `${preferredDate}T${preferredTime}:00`
   );
 
-if (
-  Number.isNaN(
-    appointmentDate.getTime()
-  )
-) {
-  alert(
-    "Please choose a valid appointment date and time."
-  );
+  if (Number.isNaN(appointmentDate.getTime())) {
+    alert("Please choose a valid appointment date and time.");
+    setLoading(false);
+    return;
+  }
 
-  setLoading(false);
-  return;
+  appointmentAt = appointmentDate.toISOString();
 }
+
+// For businesses with a timezone, send the selected local date/time.
+// The API calculates the absolute timestamp using the saved business config.
 
 
 const payload = {
@@ -189,12 +180,8 @@ const payload = {
   preferred_time:
     preferredTime,
 
-  /*
-   * Invisible absolute timestamp used only for
-   * automatic email scheduling.
-   */
-  appointment_at:
-    appointmentDate.toISOString(),
+// Only supplied for businesses without a saved timezone.
+appointment_at: appointmentAt,
 
   customer_email:
     formData.get("email"),
@@ -505,7 +492,13 @@ const payload = {
               </option>
             ))}
           </select>
-
+			{customerConfig.timeZone?.trim() && (
+			  <p className="text-sm text-gray-600">
+				Appointment times are in{" "}
+				<strong>{customerConfig.timeZone.trim()}</strong>
+				{" "}— the business’s local time.
+			  </p>
+			)}
           {/* Date */}
           <input
             type="date"

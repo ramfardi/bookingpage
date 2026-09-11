@@ -35,6 +35,26 @@ export default function SitePage({
 	>("story");
 	
 	const [scheduleOpen, setScheduleOpen] = useState(false);
+	
+	const [timeZoneOptions, setTimeZoneOptions] = useState<string[]>([]);
+
+useEffect(() => {
+  const intl = Intl as typeof Intl & {
+    supportedValuesOf?: (key: "timeZone") => string[];
+  };
+
+  let zones: string[] = [];
+
+  try {
+    zones = intl.supportedValuesOf?.("timeZone") ?? [];
+  } catch {
+    // Manual entry remains available.
+  }
+
+  setTimeZoneOptions(
+    Array.from(new Set([...zones, "UTC"])).sort()
+  );
+}, []);
 
   /* ---------------- RESOLVE PARAMS ---------------- */
   useEffect(() => {
@@ -325,6 +345,23 @@ async function saveChanges() {
   if (!siteId || !customer) {
     return;
   }
+  
+  const cleanedTimeZone = customer.timeZone?.trim() ?? "";
+
+// Allow older sites without a timezone to save unrelated edits.
+// Validate any timezone that has been entered.
+if (cleanedTimeZone) {
+  try {
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: cleanedTimeZone,
+    }).format();
+  } catch {
+    alert(
+      "Please enter a valid business time zone, such as America/Vancouver."
+    );
+    return;
+  }
+}
 
   const gallery = customer.about.gallery || [];
 
@@ -343,6 +380,7 @@ async function saveChanges() {
 
   const updatedCustomer = {
     ...customer,
+	timeZone: cleanedTimeZone || undefined,
 
     services: cleanedItems.map((item: any) => item.label),
 
@@ -1711,6 +1749,76 @@ const galleryImages = (
       />
     </div>
   ))}
+</section>
+
+<section className="mb-8 rounded-2xl border bg-white p-4">
+  <h3 className="font-medium mb-3">Business time zone</h3>
+
+  <label
+    htmlFor="business-timezone"
+    className="block text-sm text-gray-600 mb-2"
+  >
+    Time zone
+  </label>
+
+  <input
+    id="business-timezone"
+    type="text"
+    list="business-timezone-options"
+    value={customer.timeZone ?? ""}
+    onChange={(e) => {
+      const value = e.target.value;
+
+      setCustomer((prev) =>
+        prev ? { ...prev, timeZone: value } : prev
+      );
+    }}
+    placeholder="Example: America/Vancouver"
+    autoComplete="off"
+    spellCheck={false}
+    aria-describedby="business-timezone-help"
+    className="w-full border p-3 rounded-md"
+  />
+
+  <datalist id="business-timezone-options">
+    {Array.from(
+      new Set([
+        ...timeZoneOptions,
+        ...(customer.timeZone ? [customer.timeZone] : []),
+      ])
+    ).map((zone) => (
+      <option key={zone} value={zone} />
+    ))}
+  </datalist>
+
+  <button
+    type="button"
+    className="mt-2 text-sm text-indigo-600 underline"
+    onClick={() => {
+      try {
+        const detected =
+          Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        if (!detected) throw new Error("Timezone unavailable");
+
+        setCustomer((prev) =>
+          prev ? { ...prev, timeZone: detected } : prev
+        );
+      } catch {
+        alert("Could not detect your timezone. Please enter it manually.");
+      }
+    }}
+  >
+    Use my device’s time zone
+  </button>
+
+  <p
+    id="business-timezone-help"
+    className="mt-2 text-sm text-gray-500"
+  >
+    Choose the time zone where your business operates, even if you are
+    currently somewhere else.
+  </p>
 </section>
 
 {/* Schedule */}

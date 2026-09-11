@@ -4,6 +4,7 @@ import { verifyToken, signToken } from "@/app/lib/bookingTokens";
 import { Resend } from "resend";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 import { getSupabase } from "@/app/lib/supabase";
+import { Temporal } from "@js-temporal/polyfill";
 
 const supabase = getSupabase();
 const resend = new Resend(process.env.RESEND_API_KEY!);
@@ -442,15 +443,46 @@ export async function GET(req: Request) {
     return new Response("Invalid link", { status: 400 });
   }
 
+  let data;
   try {
-    verifyToken(token);
+    data = verifyToken(token);
   } catch {
     return new Response("Invalid or expired link", {
       status: 400,
     });
   }
 
+  let businessTimeZone = "";
+  try {
+    const { data: site, error: siteError } = await supabase
+      .from("sites")
+      .select("data")
+      .eq("site_id", String(data.siteId ?? "").trim())
+      .single();
+
+    if (siteError || !site) {
+      return createMessageResponse({
+        title: "Business website not found",
+        message: "The business website associated with this appointment could not be found.",
+        status: 404,
+      });
+    }
+
+    businessTimeZone = (site.data as CustomerConfig).timeZone?.trim() ?? "";
+    if (businessTimeZone) {
+      new Intl.DateTimeFormat("en-US", { timeZone: businessTimeZone }).format();
+    }
+  } catch (error) {
+    console.error("Could not load reschedule business timezone:", error);
+    return createMessageResponse({
+      title: "Rescheduling temporarily unavailable",
+      message: "The business time zone could not be loaded or is invalid. Please contact the business.",
+      status: 503,
+    });
+  }
+
   const safeToken = escapeHtml(token);
+  const safeBusinessTimeZone = escapeHtml(businessTimeZone);
 
   const heading =
     actor === "provider"
@@ -508,7 +540,14 @@ export async function GET(req: Request) {
 <form
   method="POST"
   id="rescheduleForm"
+  data-business-timezone="${safeBusinessTimeZone}"
 >
+              ${businessTimeZone ? `
+                <p style="color:#4b5563;">
+                  All times are in the business time zone:
+                  <strong>${safeBusinessTimeZone}</strong>.
+                </p>
+              ` : ""}
               <label style="display:block;margin-top:20px;">
                 <strong>Date</strong><br />
 
@@ -587,6 +626,12 @@ export async function GET(req: Request) {
   rescheduleForm.addEventListener(
     "submit",
     function (event) {
+      // The server converts business-local time using the saved timezone.
+      // Browser conversion remains only for businesses without that setting.
+      if (rescheduleForm.dataset.businessTimezone) {
+        return;
+      }
+
       const dateInput =
         rescheduleForm.querySelector(
           '[name="date"]'
@@ -689,8 +734,7 @@ const appointmentAtRaw =
 if (
   !token ||
   !date ||
-  !time ||
-  !appointmentAtRaw
+  !time
 ) {
   return createMessageResponse({
     title: "Invalid request",
@@ -714,26 +758,6 @@ if (
       });
     }
 
-const parsedAppointmentAt =
-  new Date(
-    appointmentAtRaw
-  );
-
-if (
-  Number.isNaN(
-    parsedAppointmentAt.getTime()
-  )
-) {
-  return createMessageResponse({
-    title:
-      "Invalid appointment time",
-
-    message:
-      "Please choose a valid appointment date and time.",
-
-    status: 400,
-  });
-}
 
     let data;
 
@@ -827,6 +851,52 @@ if (
 
     const customer =
       site.data as CustomerConfig;
+
+    const businessTimeZone = customer.timeZone?.trim() ?? "";
+    let normalizedAppointmentAt: string;
+    let newTimeLabel = time;
+
+    if (businessTimeZone) {
+      try {
+        new Intl.DateTimeFormat("en-US", { timeZone: businessTimeZone }).format();
+      } catch {
+        return createMessageResponse({
+          title: "Invalid business time zone",
+          message: "Please ask the business to correct its time zone before rescheduling.",
+          status: 400,
+        });
+      }
+
+      try {
+        if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(time)) {
+          throw new Error("Invalid local time");
+        }
+        // Always calculate the NEW instant from the newly selected business
+        // date/time, never from the previous token or the submitter's browser.
+        const local = Temporal.PlainDateTime.from(`${date}T${time}:00`)
+          .toZonedDateTime(businessTimeZone, { disambiguation: "reject" });
+
+        normalizedAppointmentAt = new Date(local.epochMilliseconds).toISOString();
+        newTimeLabel = `${time} (${businessTimeZone}, UTC${local.offset})`;
+      } catch {
+        return createMessageResponse({
+          title: "Invalid appointment time",
+          message: "This date or time is invalid or falls within a clock change. Please choose another time.",
+          status: 400,
+        });
+      }
+    } else {
+      // Preserve browser-local conversion for businesses not yet migrated.
+      const parsedAppointmentAt = new Date(appointmentAtRaw ?? "");
+      if (!appointmentAtRaw || Number.isNaN(parsedAppointmentAt.getTime())) {
+        return createMessageResponse({
+          title: "Invalid appointment time",
+          message: "Please choose a valid appointment date and time.",
+          status: 400,
+        });
+      }
+      normalizedAppointmentAt = parsedAppointmentAt.toISOString();
+    }
 	  
 	  const senderName =
   sanitizeEmailDisplayName(
@@ -891,8 +961,7 @@ const newToken = signToken({
     time,
 
   appointment_at:
-    parsedAppointmentAt
-      .toISOString(),
+    normalizedAppointmentAt,
 });
 
     const baseUrl =
@@ -929,7 +998,7 @@ const newToken = signToken({
       escapeHtml(date);
 
     const safeNewTime =
-      escapeHtml(time);
+      escapeHtml(newTimeLabel);
 
     const safeCustomerName = escapeHtml(
       String(data.customer_name ?? "")
@@ -1163,7 +1232,7 @@ Service: ${cleanService}
 Original date: ${originalDate}
 Original time: ${originalTime}
 Proposed new date: ${date}
-Proposed new time: ${time}
+Proposed new time: ${newTimeLabel}
 
 Review and accept the proposed time:
 ${confirmUrl}
@@ -1336,7 +1405,7 @@ Service: ${cleanService}
 Original date: ${originalDate}
 Original time: ${originalTime}
 Proposed date: ${date}
-Proposed time: ${time}
+Proposed time: ${newTimeLabel}
 
 The client must accept the proposed time before it is confirmed.
           `.trim(),
@@ -1476,7 +1545,7 @@ Service: ${cleanService}
 Current date: ${originalDate}
 Current time: ${originalTime}
 Requested date: ${date}
-Requested time: ${time}
+Requested time: ${newTimeLabel}
 
 Accept the requested time:
 ${confirmUrl}
@@ -1632,7 +1701,7 @@ Service: ${cleanService}
 Current date: ${originalDate}
 Current time: ${originalTime}
 Requested date: ${date}
-Requested time: ${time}
+Requested time: ${newTimeLabel}
 
 You will receive another email if the business accepts the requested time.
         `.trim(),

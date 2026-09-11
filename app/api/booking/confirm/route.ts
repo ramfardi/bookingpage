@@ -3,6 +3,7 @@ export const runtime = "nodejs";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 import { verifyToken } from "@/app/lib/bookingTokens";
 import { createICS } from "@/app/lib/calendar";
+import { Temporal } from "@js-temporal/polyfill";
 import { Resend } from "resend";
 import { getSupabase } from "@/app/lib/supabase";
 import {
@@ -123,6 +124,31 @@ function getErrorMessage(error: unknown) {
   } catch {
     return "Unknown error";
   }
+}
+
+// Preserve the existing calendar helper's metadata and replace only event times.
+function applyUtcCalendarTimes(ics: string, start: string, end: string) {
+  let startCount = 0;
+  let endCount = 0;
+  const result = ics
+    .replace(
+      /^DTSTART(?:;[^:\r\n]*)?:[^\r\n]*(?:\r?\n[ \t][^\r\n]*)*/gm,
+      () => {
+        startCount += 1;
+        return `DTSTART:${start}`;
+      }
+    )
+    .replace(
+      /^DTEND(?:;[^:\r\n]*)?:[^\r\n]*(?:\r?\n[ \t][^\r\n]*)*/gm,
+      () => {
+        endCount += 1;
+        return `DTEND:${end}`;
+      }
+    );
+  if (startCount !== 1 || endCount !== 1) {
+    throw new Error("Calendar helper must produce one DTSTART and one DTEND");
+  }
+  return result;
 }
 
 /* =====================
@@ -401,6 +427,52 @@ export async function GET(req: Request) {
 const customer =
   site.data as CustomerConfig;
 
+// Preserve the signed instant even if the business timezone has since changed.
+const businessTimeZone = customer.timeZone?.trim() ?? "";
+let appointmentDate = cleanDate;
+let appointmentTime = cleanTime;
+let normalizedAppointmentAt = String(data.appointment_at ?? "").trim();
+let calendarInstant: Temporal.Instant | null = null;
+let timeZoneLabel = "";
+
+if (businessTimeZone) {
+  try {
+    if (normalizedAppointmentAt) {
+      calendarInstant = Temporal.Instant.from(normalizedAppointmentAt);
+    } else {
+      // Support older signed links that lack an absolute appointment time.
+      if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(cleanDate) ||
+        !/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(cleanTime)
+      ) {
+        throw new Error("Invalid local appointment date/time");
+      }
+      calendarInstant = Temporal.PlainDateTime.from(
+        `${cleanDate}T${cleanTime}:00`
+      ).toZonedDateTime(businessTimeZone, {
+        disambiguation: "reject",
+      }).toInstant();
+    }
+
+    const local = calendarInstant.toZonedDateTimeISO(businessTimeZone);
+    appointmentDate = local.toPlainDate().toString();
+    appointmentTime = local.toPlainTime().toString({ smallestUnit: "minute" });
+    normalizedAppointmentAt = new Date(
+      calendarInstant.epochMilliseconds
+    ).toISOString();
+    timeZoneLabel = `${businessTimeZone}, UTC${local.offset}`;
+  } catch (error) {
+    console.error("Invalid confirmation appointment timezone/time:", error);
+    return createMessageResponse({
+      title: "Appointment time needs checking",
+      message:
+        "The appointment time or business time zone could not be resolved. Please check the business time zone and request a new confirmation link.",
+      status: 400,
+    });
+  }
+}
+// Sites without a timezone retain the existing floating calendar behavior.
+
 const senderName =
   sanitizeEmailDisplayName(
     customer.businessName || "Booking"
@@ -466,10 +538,12 @@ const providerEmail =
       escapeHtml(cleanService);
 
     const safeDate =
-      escapeHtml(cleanDate);
+      escapeHtml(appointmentDate);
 
     const safeTime =
-      escapeHtml(cleanTime);
+      escapeHtml(appointmentTime);
+
+    const safeTimeZone = escapeHtml(timeZoneLabel);
 	  
 	  /* =====================
    Business contact info
@@ -495,6 +569,22 @@ const safeBusinessContactPhone =
 
     const APPOINTMENT_DURATION_MINUTES =
       60;
+
+    const formatUtcCalendarTime = (milliseconds: number) =>
+      new Date(milliseconds).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+
+    const { start: calendarStart, end: calendarEnd } = calendarInstant
+      ? {
+          start: formatUtcCalendarTime(calendarInstant.epochMilliseconds),
+          end: formatUtcCalendarTime(
+            calendarInstant.epochMilliseconds + APPOINTMENT_DURATION_MINUTES * 60_000
+          ),
+        }
+      : buildCalendarDateTimeRange(
+          cleanDate,
+          cleanTime,
+          APPOINTMENT_DURATION_MINUTES
+        );
 
     /*
      * Calendar title:
@@ -529,6 +619,8 @@ const safeBusinessContactPhone =
       customer.businessName
         ? `Business: ${customer.businessName}`
         : null,
+
+      timeZoneLabel ? `Business time zone: ${timeZoneLabel}` : null,
     ]
       .filter(Boolean)
       .join("\n");
@@ -539,7 +631,7 @@ const safeBusinessContactPhone =
      * Works with Apple Calendar,
      * Outlook and most calendar apps.
      */
-    const ics = createICS({
+    const originalIcs = createICS({
       uid:
         cleanEventUID,
 
@@ -559,9 +651,13 @@ const safeBusinessContactPhone =
         APPOINTMENT_DURATION_MINUTES,
     });
 
+    const ics = calendarInstant
+      ? applyUtcCalendarTimes(originalIcs, calendarStart, calendarEnd)
+      : originalIcs;
+
     const attachment = {
       filename:
-        `appointment-${cleanDate}-${cleanTime.replace(
+        `appointment-${appointmentDate}-${appointmentTime.replace(
           ":",
           "-"
         )}.ics`,
@@ -575,14 +671,6 @@ const safeBusinessContactPhone =
     /*
      * Google Calendar direct-add link.
      */
-    const {
-      start: calendarStart,
-      end: calendarEnd,
-    } = buildCalendarDateTimeRange(
-      cleanDate,
-      cleanTime,
-      APPOINTMENT_DURATION_MINUTES
-    );
 
     const googleCalendarUrl =
       "https://calendar.google.com/calendar/render" +
@@ -593,7 +681,8 @@ const safeBusinessContactPhone =
       `&dates=${calendarStart}/${calendarEnd}` +
       `&details=${encodeURIComponent(
         calendarDescription
-      )}`;
+      )}` +
+      (calendarInstant ? `&ctz=${encodeURIComponent(businessTimeZone)}` : "");
 
     const safeGoogleCalendarUrl =
       escapeHtml(
@@ -841,7 +930,7 @@ from:
 
           <p>
             <strong>Time:</strong>
-            ${safeTime}
+            ${safeTime}${safeTimeZone ? ` (${safeTimeZone})` : ""}
           </p>
 
           ${
@@ -1002,8 +1091,8 @@ from:
 
         subject:
           cleanCustomerName
-            ? `Appointment confirmed – ${cleanService} – ${cleanCustomerName} – ${cleanDate}`
-            : `Appointment confirmed – ${cleanService} – ${cleanDate}`,
+            ? `Appointment confirmed – ${cleanService} – ${cleanCustomerName} – ${appointmentDate}`
+            : `Appointment confirmed – ${cleanService} – ${appointmentDate}`,
 
         html: `
           <h2>Appointment confirmed</h2>
@@ -1036,7 +1125,7 @@ from:
 
           <p>
             <strong>Time:</strong>
-            ${safeTime}
+            ${safeTime}${safeTimeZone ? ` (${safeTimeZone})` : ""}
           </p>
 
           ${
@@ -1235,19 +1324,13 @@ try {
       ).trim(),
 
     appointmentDate:
-      String(
-        data.preferred_date
-      ),
+      appointmentDate,
 
     appointmentTime:
-      String(
-        data.preferred_time
-      ),
+      appointmentTime,
 
     appointmentAt:
-      String(
-        data.appointment_at
-      ),
+      normalizedAppointmentAt,
   });
 } catch (
   automationError

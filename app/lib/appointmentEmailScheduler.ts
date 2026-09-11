@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { Temporal } from "@js-temporal/polyfill";
 
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 
@@ -363,6 +364,24 @@ function buildReminderEmail({
 
   customer: CustomerConfig;
 }) {
+  // appointment_at is already an absolute instant from confirmation.
+  // Convert only for display; never apply the business offset to send times.
+  const businessTimeZone = customer.timeZone?.trim() ?? "";
+  let appointmentDate = row.appointment_date;
+  let appointmentTime = row.appointment_time.slice(0, 5);
+  let timeZoneLabel = "";
+
+  if (businessTimeZone) {
+    const local = Temporal.Instant.from(row.appointment_at)
+      .toZonedDateTimeISO(businessTimeZone);
+
+    appointmentDate = local.toPlainDate().toString();
+    appointmentTime = local.toPlainTime().toString({ smallestUnit: "minute" });
+    timeZoneLabel = `${businessTimeZone}, UTC${local.offset}`;
+  }
+
+  const safeTimeZone = escapeHtml(timeZoneLabel);
+
   const businessName =
     customer.businessName ||
     "the business";
@@ -389,17 +408,13 @@ function buildReminderEmail({
 
   const safeDate =
     escapeHtml(
-      row.appointment_date
+      appointmentDate
     );
 
 
   const safeTime =
     escapeHtml(
-      row.appointment_time
-        .slice(
-          0,
-          5
-        )
+      appointmentTime
     );
 	
 	const contactEmail =
@@ -472,7 +487,7 @@ const contactPhone =
 
           <p>
             <strong>Time:</strong>
-            ${safeTime}
+            ${safeTime}${safeTimeZone ? ` (${safeTimeZone})` : ""}
           </p>
 
         </div>
@@ -946,6 +961,13 @@ async function ensureOneEmail({
   }
 
 
+  // Resolve and validate timezone-dependent content before reserving quota.
+  // Invalid stored time/zone data must not leave a newly reserved unit behind.
+  const email =
+    kind === "reminder"
+      ? buildReminderEmail({ row, customer })
+      : buildReviewEmail({ row, customer });
+
   let counted =
     quotaCounted;
 
@@ -1058,16 +1080,6 @@ const senderName =
   ) ||
   "SimpleBookMe Bookings";
 
-  const email =
-    kind === "reminder"
-      ? buildReminderEmail({
-          row,
-          customer,
-        })
-      : buildReviewEmail({
-          row,
-          customer,
-        });
 
 
   const replyTo =

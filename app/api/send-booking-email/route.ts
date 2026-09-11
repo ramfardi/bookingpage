@@ -5,6 +5,7 @@ import { Resend } from "resend";
 import { signToken } from "@/app/lib/bookingTokens";
 import crypto from "crypto";
 import { getSupabase } from "@/app/lib/supabase";
+import { Temporal } from "@js-temporal/polyfill";
 
 const supabase = getSupabase();
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -243,38 +244,6 @@ const {
       preferred_time ?? ""
     ).trim();
 	
-	const cleanAppointmentAt =
-  String(
-    appointment_at ?? ""
-  ).trim();
-
-
-const parsedAppointmentAt =
-  new Date(
-    cleanAppointmentAt
-  );
-
-
-if (
-  !cleanAppointmentAt ||
-  Number.isNaN(
-    parsedAppointmentAt.getTime()
-  )
-) {
-  return Response.json(
-    {
-      error:
-        "Invalid appointment date/time",
-    },
-    {
-      status: 400,
-    }
-  );
-}
-
-
-const normalizedAppointmentAt =
-  parsedAppointmentAt.toISOString();
 
     const cleanCustomerName = String(
       customer_name ?? ""
@@ -352,6 +321,75 @@ const normalizedAppointmentAt =
 
     const customer =
       site.data as CustomerConfig;
+
+    const businessTimeZone = customer.timeZone?.trim() ?? "";
+    let normalizedAppointmentAt: string;
+
+    if (businessTimeZone) {
+      try {
+        new Intl.DateTimeFormat("en-US", {
+          timeZone: businessTimeZone,
+        }).format();
+      } catch {
+        return Response.json(
+          {
+            error:
+              "The business time zone is invalid. Please contact the business.",
+          },
+          { status: 400 }
+        );
+      }
+
+      try {
+        if (
+          !/^\d{4}-\d{2}-\d{2}$/.test(cleanDate) ||
+          !/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(cleanTime)
+        ) {
+          throw new Error("Invalid local date/time format");
+        }
+
+        const localDateTime = Temporal.PlainDateTime.from(
+          `${cleanDate}T${cleanTime}:00`
+        );
+        const zonedDateTime = localDateTime.toZonedDateTime(
+          businessTimeZone,
+          { disambiguation: "reject" }
+        );
+
+        normalizedAppointmentAt = new Date(
+          zonedDateTime.epochMilliseconds
+        ).toISOString();
+      } catch {
+        return Response.json(
+          {
+            error:
+              "This appointment date or time is invalid or falls within a clock change. Please choose another time.",
+          },
+          { status: 400 }
+        );
+      }
+    } else {
+      // Temporary compatibility for businesses without a saved timezone.
+      const cleanAppointmentAt = String(appointment_at ?? "").trim();
+
+      if (!/(?:Z|[+-]\d{2}:\d{2})$/i.test(cleanAppointmentAt)) {
+        return Response.json(
+          { error: "Invalid appointment date/time" },
+          { status: 400 }
+        );
+      }
+
+      const parsedAppointmentAt = new Date(cleanAppointmentAt);
+
+      if (Number.isNaN(parsedAppointmentAt.getTime())) {
+        return Response.json(
+          { error: "Invalid appointment date/time" },
+          { status: 400 }
+        );
+      }
+
+      normalizedAppointmentAt = parsedAppointmentAt.toISOString();
+    }
 	  
 	  const senderName =
   sanitizeEmailDisplayName(
@@ -489,6 +527,8 @@ const token = signToken({
 
     const safeTime =
       escapeHtml(cleanTime);
+
+    const safeTimeZone = escapeHtml(businessTimeZone);
 
     const safeCustomerName =
       escapeHtml(cleanCustomerName);
@@ -717,7 +757,7 @@ from:
 
           <p>
             <strong>Time:</strong>
-            ${safeTime}
+            ${safeTime}${safeTimeZone ? ` (${safeTimeZone})` : ""}
           </p>
 
           ${
