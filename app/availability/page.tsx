@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 const DAYS = [
@@ -26,6 +27,72 @@ export default function AvailabilityGeneratorPage() {
   });
 
   const [businessName, setBusinessName] = useState("");
+  const [contact, setContact] = useState({ email: "", phone: "", address: "" });
+  const [logoDataUrl, setLogoDataUrl] = useState("");
+  const [logoLoading, setLogoLoading] = useState(false);
+  const [logoError, setLogoError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const logoInput = useRef<HTMLInputElement>(null);
+  const logoRequest = useRef(0);
+  const submitting = useRef(false);
+
+  async function handleLogoChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const request = ++logoRequest.current;
+    setLogoError("");
+    setLogoLoading(true);
+    try {
+      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+        throw new Error("Choose a JPG, PNG, or WebP image.");
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error("Choose an image smaller than 5 MB.");
+      }
+      const url = URL.createObjectURL(file);
+      try {
+        const img = new Image();
+        await new Promise<void>((resolve, reject) => {
+          img.onload = () => resolve();
+          img.onerror = () => reject(new Error("This image could not be opened."));
+          img.src = url;
+        });
+        const scale = Math.min(1, 512 / Math.max(img.naturalWidth, img.naturalHeight));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+        const context = canvas.getContext("2d");
+        if (!context) throw new Error("Image processing is unavailable. Please try another browser.");
+        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+        // A small data URL keeps the existing JSON request format.
+        // The create API must explicitly validate and persist this new field.
+        const result = canvas.toDataURL("image/webp", 0.85);
+        if (result.length > 350_000) {
+          throw new Error("This logo is too large after resizing. Please choose a simpler image.");
+        }
+        if (request === logoRequest.current) setLogoDataUrl(result);
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      if (request === logoRequest.current) {
+        setLogoError(err instanceof Error ? err.message : "Could not load the logo.");
+        if (logoInput.current) logoInput.current.value = "";
+      }
+    } finally {
+      if (request === logoRequest.current) setLogoLoading(false);
+    }
+  }
+
+  function removeLogo() {
+    ++logoRequest.current;
+    setLogoDataUrl("");
+    setLogoError("");
+    setLogoLoading(false);
+    if (logoInput.current) logoInput.current.value = "";
+  }
+
   const [generatedLink, setGeneratedLink] = useState("");
   const [editLink, setEditLink] = useState("");
 
@@ -48,32 +115,52 @@ export default function AvailabilityGeneratorPage() {
     }));
   };
 
-  // 🚀 MAIN FEATURE
-const generateAvailabilityLink = async () => {
-  const siteId = crypto.randomUUID().slice(0, 8);
-  const editToken = crypto.randomUUID().slice(0, 16);
-
-  const payload = {
-    siteId,
-    editToken,
-    businessName,
-    selectedDays,
-    dayTimes,
-  };
-
-  const res = await fetch("/api/availability/create", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
-
-  const data = await res.json();
-
-  const publicUrl = `https://${data.subdomain}.simplebookme.com`;
-  const editUrl = `/availability/${siteId}/edit?token=${editToken}`;
-
-  setGeneratedLink(publicUrl);
-  setEditLink(editUrl);
-};
+  async function generateAvailabilityLink(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (submitting.current || logoLoading) return;
+    setError("");
+    if (!selectedDays.length) {
+      setError("Select at least one available day.");
+      return;
+    }
+    submitting.current = true;
+    setSaving(true);
+    setGeneratedLink("");
+    setEditLink("");
+    try {
+      const siteId = crypto.randomUUID().slice(0, 8);
+      const editToken = crypto.randomUUID().slice(0, 16);
+      const payload = {
+        siteId,
+        editToken,
+        businessName: businessName.trim(),
+        selectedDays,
+        dayTimes,
+        contact: {
+          email: contact.email.trim(),
+          phone: contact.phone.trim(),
+          address: contact.address.trim(),
+        },
+        logoDataUrl,
+      };
+      const res = await fetch("/api/availability/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || typeof data?.subdomain !== "string") {
+        throw new Error(data?.error || "Could not create your availability link. Please try again.");
+      }
+      setGeneratedLink(`https://${data.subdomain}.simplebookme.com`);
+      setEditLink(`${window.location.origin}/availability/${siteId}/edit?token=${editToken}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      submitting.current = false;
+      setSaving(false);
+    }
+  }
 
   return (
     <main className="min-h-screen bg-white px-6 py-24 flex justify-center">
@@ -89,7 +176,8 @@ Let clients see when you're available and contact or book instantly.
         </p>
 
         {/* INPUT */}
-        <div className="mt-10 bg-gray-50 p-8 rounded-2xl border space-y-6">
+        <form onSubmit={generateAvailabilityLink} className="mt-10 bg-gray-50 p-8 rounded-2xl border">
+          <fieldset disabled={saving} className="space-y-6 disabled:opacity-70">
 
           {/* Days */}
           <div>
@@ -101,6 +189,8 @@ Let clients see when you're available and contact or book instantly.
               {DAYS.map((day) => (
                 <button
                   key={day}
+                  type="button"
+                  aria-pressed={selectedDays.includes(day)}
                   onClick={() => toggleDay(day)}
                   className={`px-4 py-2 rounded-lg border ${
                     selectedDays.includes(day)
@@ -130,6 +220,8 @@ Let clients see when you're available and contact or book instantly.
 
                   <input
                     type="time"
+                    required
+                    aria-label={`${day} start time`}
                     value={dayTimes[day].start}
                     onChange={(e) =>
                       updateDayTime(day, "start", e.target.value)
@@ -139,6 +231,8 @@ Let clients see when you're available and contact or book instantly.
 
                   <input
                     type="time"
+                    required
+                    aria-label={`${day} end time`}
                     value={dayTimes[day].end}
                     onChange={(e) =>
                       updateDayTime(day, "end", e.target.value)
@@ -150,24 +244,68 @@ Let clients see when you're available and contact or book instantly.
             </div>
           </div>
 
-          {/* Business */}
-          <input
-            type="text"
-            placeholder="Business Name"
-            value={businessName}
-            onChange={(e) => setBusinessName(e.target.value)}
-            className="w-full border rounded-lg px-4 py-3"
-          />
+          {/* Business details */}
+          <div className="space-y-4 border-t pt-6">
+            <h2 className="text-xl font-semibold text-gray-900">Business details</h2>
+            <p className="text-sm text-gray-600">
+              Contact details and your logo are optional. Information entered here is intended for your public availability page.
+            </p>
+            <label className="block font-medium">
+              Business name
+              <input type="text" autoComplete="organization" maxLength={100}
+                value={businessName} onChange={(e) => setBusinessName(e.target.value)}
+                className="mt-2 w-full border rounded-lg px-4 py-3 font-normal" />
+            </label>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block font-medium">
+                Email (optional)
+                <input type="email" autoComplete="email" maxLength={254}
+                  placeholder="hello@yourbusiness.com" value={contact.email}
+                  onChange={(e) => setContact((prev) => ({ ...prev, email: e.target.value }))}
+                  className="mt-2 w-full border rounded-lg px-4 py-3 font-normal" />
+              </label>
+              <label className="block font-medium">
+                Phone number (optional)
+                <input type="tel" autoComplete="tel" maxLength={50}
+                  placeholder="Include your country code" value={contact.phone}
+                  onChange={(e) => setContact((prev) => ({ ...prev, phone: e.target.value }))}
+                  className="mt-2 w-full border rounded-lg px-4 py-3 font-normal" />
+              </label>
+            </div>
+            <label className="block font-medium">
+              Address (optional)
+              <textarea autoComplete="street-address" rows={2} maxLength={500}
+                placeholder="Your business address" value={contact.address}
+                onChange={(e) => setContact((prev) => ({ ...prev, address: e.target.value }))}
+                className="mt-2 w-full border rounded-lg px-4 py-3 font-normal" />
+            </label>
+            <div>
+              <label htmlFor="business-logo" className="block font-medium">Business logo (optional)</label>
+              <p id="logo-help" className="mt-1 text-sm text-gray-600">JPG, PNG, or WebP, up to 5 MB.</p>
+              <input ref={logoInput} id="business-logo" type="file"
+                accept="image/jpeg,image/png,image/webp" aria-describedby="logo-help"
+                onChange={handleLogoChange} className="mt-3 block w-full text-sm" />
+              {logoLoading && <p role="status" className="mt-2 text-sm">Preparing logo…</p>}
+              {logoError && <p role="alert" className="mt-2 text-sm text-red-600">{logoError}</p>}
+              {logoDataUrl && (
+                <div className="mt-4 flex items-center gap-4">
+                  {/* A native image supports the locally processed data URL. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={logoDataUrl} alt="Business logo preview" width={96} height={96}
+                    className="h-24 w-24 rounded-xl border bg-white p-2 object-contain" />
+                  <button type="button" onClick={removeLogo} className="text-sm text-red-600 hover:underline">Remove logo</button>
+                </div>
+              )}
+            </div>
+          </div>
 
-          <button
-            onClick={generateAvailabilityLink}
-            className="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700"
-          >
-            Generate Live Availability Link
+          {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+          <button type="submit" disabled={saving || logoLoading}
+            className="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">
+            {saving ? "Creating your link…" : logoLoading ? "Preparing logo…" : "Generate Live Availability Link"}
           </button>
-        </div>
-		
-		
+          </fieldset>
+        </form>
 
 {/* RESULT */}
 {generatedLink && (
@@ -181,6 +319,7 @@ Let clients see when you're available and contact or book instantly.
         <a
           href={generatedLink}
           target="_blank"
+          rel="noopener noreferrer"
           className="text-indigo-600 break-all text-sm flex-1"
         >
           {generatedLink}
@@ -207,6 +346,7 @@ Let clients see when you're available and contact or book instantly.
         <a
           href={editLink}
           target="_blank"
+          rel="noopener noreferrer"
           className="text-indigo-600 break-all text-sm flex-1"
         >
           {editLink}
