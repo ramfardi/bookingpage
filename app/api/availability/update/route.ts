@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { updateAvailability } from "../../../lib/availabilityStore";
 import { createClient } from "@supabase/supabase-js";
+import { normalizeBookingUrl } from "@/app/lib/bookingUrl";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL1!,
