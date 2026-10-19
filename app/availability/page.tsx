@@ -33,9 +33,12 @@ export default function AvailabilityGeneratorPage() {
   const [logoError, setLogoError] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [bookingUrl, setBookingUrl] = useState("");
   const logoInput = useRef<HTMLInputElement>(null);
   const logoRequest = useRef(0);
   const submitting = useRef(false);
+  
+  
 
   async function handleLogoChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -142,6 +145,7 @@ export default function AvailabilityGeneratorPage() {
           address: contact.address.trim(),
         },
         logoDataUrl,
+		bookingUrl: bookingUrl.trim(),
       };
       const res = await fetch("/api/availability/create", {
         method: "POST",
@@ -272,6 +276,27 @@ Let clients see when you're available and contact or book instantly.
                   className="mt-2 w-full border rounded-lg px-4 py-3 font-normal" />
               </label>
             </div>
+			<label className="block font-medium">
+			  Booking link (optional)
+
+			  <input
+				type="url"
+				maxLength={2048}
+				placeholder="https://your-booking-website.com"
+				value={bookingUrl}
+				onChange={(e) => setBookingUrl(e.target.value)}
+				aria-describedby="booking-link-help"
+				className="mt-2 w-full border rounded-lg px-4 py-3 font-normal"
+			  />
+
+			  <span
+				id="booking-link-help"
+				className="mt-2 block text-sm font-normal text-gray-500"
+			  >
+				Visitors can click an available hour to open this booking page.
+				Include https:// at the beginning.
+			  </span>
+			</label>
             <label className="block font-medium">
               Address (optional)
               <textarea autoComplete="street-address" rows={2} maxLength={500}

@@ -28,6 +28,7 @@ type AvailabilityData = {
   dayTimes: Record<string, { start: string; end: string }>;
   contact: Contact;
   logoDataUrl: string;
+  bookingUrl: string;
 };
 
 export default function EditPage() {
@@ -123,6 +124,7 @@ export default function EditPage() {
             address: result.contact?.address || "",
           },
           logoDataUrl: result.logoDataUrl || "",
+		  bookingUrl: result.bookingUrl ?? "",
         });
       } catch (err) {
         if (!controller.signal.aborted) {
@@ -414,6 +416,29 @@ export default function EditPage() {
                   className="mt-2 w-full rounded-lg border bg-white px-3 py-2"
                 />
               </label>
+			  <label className="block text-sm font-medium">
+			  Booking link (optional)
+
+			  <input
+				type="url"
+				maxLength={2048}
+				placeholder="https://your-booking-website.com"
+				value={data.bookingUrl}
+				onChange={(e) => {
+				  const bookingUrl = e.target.value;
+				  setMessage("");
+
+				  setData((prev) =>
+					prev ? { ...prev, bookingUrl } : prev
+				  );
+				}}
+				className="mt-2 w-full rounded-lg border bg-white px-3 py-2"
+			  />
+
+			  <span className="mt-2 block text-xs font-normal text-gray-500">
+				Available hours link to this page. Leave empty to disable booking links.
+			  </span>
+			</label>
             </div>
 
             <label className="block text-sm font-medium">

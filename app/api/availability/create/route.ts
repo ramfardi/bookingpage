@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { saveAvailability } from "../../../lib/availabilityStore";
 import { createClient } from "@supabase/supabase-js";
+import { normalizeBookingUrl } from "@/app/lib/bookingUrl";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL1!,
@@ -112,6 +113,15 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+	
+	const bookingUrl = normalizeBookingUrl(body.bookingUrl ?? "");
+
+	if (bookingUrl === null) {
+	  return NextResponse.json(
+		{ error: "Please enter a valid booking URL beginning with https:// or http://" },
+		{ status: 400 }
+	  );
+	}
 
     const availabilityData = {
       businessName: businessName.trim(),
@@ -119,6 +129,7 @@ export async function POST(req: Request) {
       dayTimes,
       contact,
       logoDataUrl,
+	  bookingUrl,
     };
 
     // Keep your existing in-memory system.

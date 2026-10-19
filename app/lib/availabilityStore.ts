@@ -12,6 +12,7 @@ type AvailabilityData = {
   };
 
   logoDataUrl?: string;
+  bookingUrl?: string;
 };
 
 const store = new Map<string, AvailabilityData>();

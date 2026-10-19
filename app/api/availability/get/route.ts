@@ -68,6 +68,7 @@ export async function GET(req: Request) {
           address: saved.contact?.address ?? "",
         },
         logoDataUrl: saved.logoDataUrl ?? "",
+		bookingUrl: saved.bookingUrl ?? "",
       });
     }
 
@@ -93,6 +94,7 @@ export async function GET(req: Request) {
         address: memoryData.contact?.address ?? "",
       },
       logoDataUrl: memoryData.logoDataUrl ?? "",
+	  bookingUrl: memoryData.bookingUrl ?? "",
     });
   } catch (err) {
     console.error("GET availability error:", err);

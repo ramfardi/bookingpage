@@ -117,6 +117,19 @@ export async function POST(req: Request) {
       );
     }
 
+	const bookingUrl = normalizeBookingUrl(
+	  body.bookingUrl === undefined
+		? currentData.bookingUrl ?? ""
+		: body.bookingUrl
+	);
+
+	if (bookingUrl === null) {
+	  return NextResponse.json(
+		{ error: "Please enter a valid booking URL beginning with https:// or http://" },
+		{ status: 400 }
+	  );
+	}
+
     // Preserve all existing saved fields.
     // Omitted logo = keep it; empty string = explicitly remove it.
     const updatedData = {
@@ -132,6 +145,7 @@ export async function POST(req: Request) {
         body.logoDataUrl === undefined
           ? currentData.logoDataUrl ?? ""
           : body.logoDataUrl,
+	  bookingUrl,
     };
 
     // Persist first so a failed database save isn't reported as success.

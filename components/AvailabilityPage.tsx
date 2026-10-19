@@ -1,6 +1,13 @@
+import { normalizeBookingUrl } from "@/app/lib/bookingUrl";
+
 type DayHours = {
   start: string;
   end: string;
+};
+
+type Interval = {
+  start: number;
+  end: number;
 };
 
 type Props = {
@@ -14,6 +21,7 @@ type Props = {
       address?: string;
     };
     logoDataUrl?: string;
+    bookingUrl?: string;
   };
 };
 
@@ -26,6 +34,8 @@ const DAYS = [
   "Saturday",
   "Sunday",
 ];
+
+const ALL_HOURS = Array.from({ length: 24 }, (_, hour) => hour);
 
 // Supports "09:30", "9 AM", and "9:30 PM".
 function toMinutes(value?: string): number | null {
@@ -53,10 +63,11 @@ function toMinutes(value?: string): number | null {
   return hour * 60 + minute;
 }
 
-function formatTime(minutes: number) {
-  const normalized = minutes % 1440;
-  const hour = Math.floor(normalized / 60);
-  const minute = normalized % 60;
+function formatTime(minutes: number): string {
+  if (minutes === 1440) return "24:00";
+
+  const hour = Math.floor(minutes / 60);
+  const minute = minutes % 60;
 
   return `${String(hour).padStart(2, "0")}:${String(minute).padStart(
     2,
@@ -72,6 +83,9 @@ export default function AvailabilityPage({ data }: Props) {
   const phone = data.contact?.phone?.trim() || "";
   const address = data.contact?.address?.trim() || "";
   const phoneHref = phone.replace(/[^\d+]/g, "");
+
+  const bookingUrl =
+    normalizeBookingUrl(data.bookingUrl ?? "") || "";
 
   const logo =
     data.logoDataUrl &&
@@ -89,7 +103,7 @@ export default function AvailabilityPage({ data }: Props) {
     .toUpperCase();
 
   // Overnight hours continue into the following calendar day.
-  const schedules = DAYS.map((day) => {
+  const schedules = DAYS.map((day): Interval | null => {
     if (!selectedDays.includes(day)) return null;
 
     const start = toMinutes(data.dayTimes?.[day]?.start);
@@ -110,8 +124,8 @@ export default function AvailabilityPage({ data }: Props) {
     };
   });
 
-  const intervals = DAYS.map((_, index) => {
-    const result: Array<{ start: number; end: number }> = [];
+  const intervals = DAYS.map((_, index): Interval[] => {
+    const result: Interval[] = [];
     const current = schedules[index];
     const previous = schedules[(index + 6) % 7];
 
@@ -129,10 +143,10 @@ export default function AvailabilityPage({ data }: Props) {
       });
     }
 
-    // Merge overlaps so the weekly total doesn't count minutes twice.
+    // Merge overlapping or adjacent periods.
     return result
       .sort((a, b) => a.start - b.start)
-      .reduce<Array<{ start: number; end: number }>>((merged, item) => {
+      .reduce<Interval[]>((merged, item) => {
         const last = merged[merged.length - 1];
 
         if (last && item.start <= last.end) {
@@ -145,36 +159,35 @@ export default function AvailabilityPage({ data }: Props) {
       }, []);
   });
 
-  const allIntervals = intervals.flat();
-  const activeDays = intervals.filter((items) => items.length > 0).length;
+  // A slot is available only when its entire hour is covered.
+  const availableHoursByDay = intervals.map((dayIntervals) =>
+    ALL_HOURS.filter((hour) =>
+      dayIntervals.some(
+        (interval) =>
+          interval.start <= hour * 60 &&
+          interval.end >= (hour + 1) * 60
+      )
+    )
+  );
 
-  const totalMinutes = allIntervals.reduce(
-    (sum, item) => sum + item.end - item.start,
+  const activeDays = availableHoursByDay.filter(
+    (dayHours) => dayHours.length > 0
+  ).length;
+
+  const totalSlots = availableHoursByDay.reduce(
+    (total, dayHours) => total + dayHours.length,
     0
   );
 
-  const totalHours = Math.floor(totalMinutes / 60);
-  const remainingMinutes = totalMinutes % 60;
+  const allAvailableHours = availableHoursByDay.flat();
 
-  const weeklyDuration = remainingMinutes
-    ? `${totalHours}h ${remainingMinutes}m`
-    : `${totalHours}h`;
-
-  // Adapt the grid to the schedule, including one hour of context.
-  const firstHour = allIntervals.length
-    ? Math.max(
-        0,
-        Math.floor(Math.min(...allIntervals.map((item) => item.start)) / 60) -
-          1
-      )
+  // Include one unavailable hour around the schedule for context.
+  const firstHour = allAvailableHours.length
+    ? Math.max(0, Math.min(...allAvailableHours) - 1)
     : 8;
 
-  const lastHour = allIntervals.length
-    ? Math.min(
-        24,
-        Math.ceil(Math.max(...allIntervals.map((item) => item.end)) / 60) +
-          1
-      )
+  const lastHour = allAvailableHours.length
+    ? Math.min(24, Math.max(...allAvailableHours) + 2)
     : 18;
 
   const hours = Array.from(
@@ -228,48 +241,52 @@ export default function AvailabilityPage({ data }: Props) {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2">
+              <div className="flex shrink-0 flex-wrap gap-2">
                 <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600">
                   {activeDays} {activeDays === 1 ? "day" : "days"} a week
                 </span>
 
                 <span className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
-                  {weeklyDuration} available
+                  {totalSlots}h available
                 </span>
               </div>
             </div>
 
             {hasContact && (
               <div className="mt-6 flex flex-col gap-5 border-t border-slate-100 pt-6 lg:flex-row lg:items-center lg:justify-between">
-                <div className="flex flex-wrap gap-3">
-                  {phone && (
-                    <a
-                      href={`tel:${phoneHref}`}
-                      className="inline-flex flex-col rounded-xl bg-indigo-600 px-5 py-3 text-white transition hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                    >
-                      <span className="text-sm font-semibold">
-                        Call to book
-                      </span>
-                      <span className="mt-0.5 break-all text-xs text-indigo-100">
-                        {phone}
-                      </span>
-                    </a>
-                  )}
+                {(phone || email) && (
+                  <div className="flex flex-wrap gap-3">
+                    {phone && (
+                      <a
+                        href={`tel:${phoneHref}`}
+                        className="inline-flex flex-col rounded-xl bg-indigo-600 px-5 py-3 text-white transition hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                      >
+                        <span className="text-sm font-semibold">
+                          Call to book
+                        </span>
 
-                  {email && (
-                    <a
-                      href={`mailto:${encodeURIComponent(email)}`}
-                      className="inline-flex min-w-0 flex-col rounded-xl border border-slate-200 bg-white px-5 py-3 transition hover:border-indigo-200 hover:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                    >
-                      <span className="text-sm font-semibold">
-                        Send an email
-                      </span>
-                      <span className="mt-0.5 break-all text-xs text-slate-500">
-                        {email}
-                      </span>
-                    </a>
-                  )}
-                </div>
+                        <span className="mt-0.5 break-all text-xs text-indigo-100">
+                          {phone}
+                        </span>
+                      </a>
+                    )}
+
+                    {email && (
+                      <a
+                        href={`mailto:${encodeURIComponent(email)}`}
+                        className="inline-flex min-w-0 flex-col rounded-xl border border-slate-200 bg-white px-5 py-3 transition hover:border-indigo-200 hover:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                      >
+                        <span className="text-sm font-semibold">
+                          Send an email
+                        </span>
+
+                        <span className="mt-0.5 break-all text-xs text-slate-500">
+                          {email}
+                        </span>
+                      </a>
+                    )}
+                  </div>
+                )}
 
                 {address && (
                   <div className="max-w-md">
@@ -309,11 +326,13 @@ export default function AvailabilityPage({ data }: Props) {
               </h2>
 
               <p className="mt-1 text-sm text-slate-500">
-                Green blocks show scheduled availability.
+                {bookingUrl
+                  ? "Choose an available one-hour block to open our booking page."
+                  : "Green blocks show available one-hour slots."}
               </p>
             </div>
 
-            <div className="flex items-center gap-4 text-xs text-slate-500">
+            <div className="flex shrink-0 items-center gap-4 text-xs text-slate-500">
               <span className="inline-flex items-center gap-2">
                 <span
                   aria-hidden="true"
@@ -332,19 +351,20 @@ export default function AvailabilityPage({ data }: Props) {
             </div>
           </div>
 
-          {allIntervals.length === 0 ? (
+          {totalSlots === 0 ? (
             <div className="px-6 py-16 text-center">
               <h3 className="font-semibold text-slate-700">
-                No hours posted yet
+                No one-hour slots available
               </h3>
+
               <p className="mt-2 text-sm text-slate-500">
                 Check back for an updated schedule.
               </p>
             </div>
           ) : (
             <>
-              <p className="px-6 pt-4 text-xs text-slate-400 md:hidden">
-                Swipe sideways to see the full week.
+              <p className="px-6 pt-4 text-xs text-slate-400 lg:hidden">
+                Scroll sideways to see the full week.
               </p>
 
               <div
@@ -355,15 +375,15 @@ export default function AvailabilityPage({ data }: Props) {
               >
                 <table className="w-full min-w-[820px] table-fixed border-separate border-spacing-0 text-sm">
                   <caption className="sr-only">
-                    Weekly availability for {businessName}. Times use a
-                    24-hour clock.
+                    Weekly availability for {businessName}. Each block
+                    represents one hour. Times use a 24-hour clock.
                   </caption>
 
                   <thead>
                     <tr>
                       <th
                         scope="col"
-                        className="w-20 px-2 pb-5 text-left align-top text-xs font-medium text-slate-400"
+                        className="w-20 px-2 pb-4 text-left align-top text-xs font-medium text-slate-400"
                       >
                         <span className="block pt-3">Time</span>
                         <span className="mt-1 block font-normal">
@@ -372,24 +392,25 @@ export default function AvailabilityPage({ data }: Props) {
                       </th>
 
                       {DAYS.map((day, index) => {
-                        const available = intervals[index].length > 0;
+                        const count = availableHoursByDay[index].length;
+                        const hasSlots = count > 0;
 
                         return (
                           <th
                             key={day}
                             scope="col"
-                            className="px-1 pb-5 align-top font-normal"
+                            className="px-1 pb-4 align-top font-normal"
                           >
                             <div
-                              className={`min-h-[88px] rounded-xl px-2 py-3 ${
-                                available
+                              className={`rounded-xl px-2 py-3 ${
+                                hasSlots
                                   ? "bg-indigo-50"
                                   : "bg-slate-50"
                               }`}
                             >
                               <span
                                 className={`block text-sm font-semibold ${
-                                  available
+                                  hasSlots
                                     ? "text-indigo-700"
                                     : "text-slate-400"
                                 }`}
@@ -400,23 +421,13 @@ export default function AvailabilityPage({ data }: Props) {
                                 </span>
                               </span>
 
-                              <div className="mt-2 space-y-1 text-[11px] text-slate-500">
-                                {available ? (
-                                  intervals[index].map((item) => (
-                                    <span
-                                      key={`${item.start}-${item.end}`}
-                                      className="block"
-                                    >
-                                      {formatTime(item.start)}–
-                                      {item.end === 1440
-                                        ? "24:00"
-                                        : formatTime(item.end)}
-                                    </span>
-                                  ))
-                                ) : (
-                                  <span>Closed</span>
-                                )}
-                              </div>
+                              <span className="mt-2 block text-[11px] text-slate-500">
+                                {hasSlots
+                                  ? `${count} ${
+                                      count === 1 ? "slot" : "slots"
+                                    }`
+                                  : "No slots"}
+                              </span>
                             </div>
                           </th>
                         );
@@ -426,72 +437,72 @@ export default function AvailabilityPage({ data }: Props) {
 
                   <tbody>
                     {hours.map((hour) => {
-                      const slotStart = hour * 60;
-                      const slotEnd = slotStart + 60;
+                      const startLabel = formatTime(hour * 60);
+                      const endLabel = formatTime((hour + 1) * 60);
 
                       return (
                         <tr key={hour}>
                           <th
                             scope="row"
-                            className="px-2 py-0 text-left align-top text-xs font-normal tabular-nums text-slate-400"
+                            className="px-2 py-2 text-left align-middle text-xs font-medium tabular-nums text-slate-400"
                           >
-                            {formatTime(slotStart)}
+                            {startLabel}
                           </th>
 
                           {DAYS.map((day, dayIndex) => {
-                            const segments = intervals[dayIndex]
-                              .map((item) => ({
-                                start: Math.max(slotStart, item.start),
-                                end: Math.min(slotEnd, item.end),
-                              }))
-                              .filter((item) => item.end > item.start);
+                            const available =
+                              availableHoursByDay[dayIndex].includes(
+                                hour
+                              );
 
-                            const description = segments.length
-                              ? segments
-                                  .map(
-                                    (item) =>
-                                      `${formatTime(item.start)}–${
-                                        item.end === 1440
-                                          ? "24:00"
-                                          : formatTime(item.end)
-                                      }`
-                                  )
-                                  .join(", ")
-                              : "Unavailable";
+                            const label =
+                              `${day}, ${startLabel}–${endLabel}`;
 
                             return (
-                              <td
-                                key={day}
-                                className="px-1 py-0 align-top"
-                              >
-                                <div
-                                  title={`${day}: ${description}`}
-                                  className="relative h-12 overflow-hidden border-t border-white bg-slate-50"
-                                >
-                                  <span className="sr-only">
-                                    {description}
-                                  </span>
+                              <td key={day} className="p-1">
+                                {available && bookingUrl ? (
+                                  <a
+                                    href={bookingUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label={`${label}: open booking page in a new tab`}
+                                    title={`${label} — open booking page`}
+                                    className="flex h-16 flex-col items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 px-1 text-center transition hover:border-emerald-400 hover:bg-emerald-100 hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+                                  >
+                                    <span className="text-[11px] font-semibold tabular-nums text-emerald-800">
+                                      {startLabel}–{endLabel}
+                                    </span>
 
-                                  {segments.map((segment) => (
-                                    <div
-                                      key={segment.start}
+                                    <span className="mt-1 text-[10px] font-medium text-emerald-700">
+                                      Book ↗
+                                    </span>
+                                  </a>
+                                ) : available ? (
+                                  <div
+                                    className="flex h-16 flex-col items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 px-1 text-center"
+                                  >
+                                    <span className="text-[11px] font-semibold tabular-nums text-emerald-800">
+                                      {startLabel}–{endLabel}
+                                    </span>
+
+                                    <span className="mt-1 text-[10px] text-emerald-700">
+                                      Available
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <div className="flex h-16 items-center justify-center rounded-xl border border-slate-100 bg-slate-50">
+                                    <span className="sr-only">
+                                      {label}: unavailable
+                                    </span>
+
+                                    <span
                                       aria-hidden="true"
-                                      className="absolute inset-x-0 border-l-2 border-emerald-500 bg-emerald-100"
-                                      style={{
-                                        top: `${
-                                          ((segment.start - slotStart) /
-                                            60) *
-                                          100
-                                        }%`,
-                                        height: `${
-                                          ((segment.end - segment.start) /
-                                            60) *
-                                          100
-                                        }%`,
-                                      }}
-                                    />
-                                  ))}
-                                </div>
+                                      className="text-slate-300"
+                                    >
+                                      —
+                                    </span>
+                                  </div>
+                                )}
                               </td>
                             );
                           })}
@@ -506,9 +517,11 @@ export default function AvailabilityPage({ data }: Props) {
 
           <div className="border-t border-slate-100 bg-slate-50/60 px-6 py-4 sm:px-8">
             <p className="text-sm leading-6 text-slate-500">
-              {phone || email
-                ? "Have a time in mind? Contact us above to confirm your appointment."
-                : "This schedule shows regular weekly availability. Appointments require confirmation."}
+              {bookingUrl
+                ? "Booking opens in a new tab. Select and confirm your appointment on the booking website."
+                : phone || email
+                  ? "Contact us using the details above to confirm your appointment."
+                  : "This schedule shows regular weekly availability. Appointments require confirmation."}
             </p>
           </div>
         </section>
