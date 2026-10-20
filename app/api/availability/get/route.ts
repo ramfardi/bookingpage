@@ -26,11 +26,11 @@ export async function GET(req: Request) {
     const siteId = searchParams.get("siteId");
     const token = searchParams.get("token");
 
-    if (!siteId) {
+    if (!siteId?.trim()) {
       return json({ error: "Missing siteId" }, 400);
     }
 
-    if (!token) {
+    if (!token?.trim()) {
       return json({ error: "Missing edit token" }, 401);
     }
 
@@ -51,6 +51,7 @@ export async function GET(req: Request) {
     }
 
     if (dbData) {
+      // Validate authorization before returning saved details.
       if (dbData.edit_token !== token) {
         return json({ error: "Invalid edit link" }, 403);
       }
@@ -62,17 +63,23 @@ export async function GET(req: Request) {
         businessName: saved.businessName ?? "",
         selectedDays: saved.selectedDays ?? [],
         dayTimes: saved.dayTimes ?? {},
+
         contact: {
           email: saved.contact?.email ?? "",
           phone: saved.contact?.phone ?? "",
           address: saved.contact?.address ?? "",
         },
+
         logoDataUrl: saved.logoDataUrl ?? "",
-		bookingUrl: saved.bookingUrl ?? "",
+        bookingUrl: saved.bookingUrl ?? "",
+
+        // Individual one-hour block changes.
+        // Preserve false values because they mark removed blocks.
+        slotOverrides: saved.slotOverrides ?? {},
       });
     }
 
-    // Preserve support for records that exist only in memory.
+    // Support records that exist only in memory.
     const memoryData = getAvailability(siteId);
 
     if (!memoryData) {
@@ -88,13 +95,16 @@ export async function GET(req: Request) {
       businessName: memoryData.businessName ?? "",
       selectedDays: memoryData.selectedDays ?? [],
       dayTimes: memoryData.dayTimes ?? {},
+
       contact: {
         email: memoryData.contact?.email ?? "",
         phone: memoryData.contact?.phone ?? "",
         address: memoryData.contact?.address ?? "",
       },
+
       logoDataUrl: memoryData.logoDataUrl ?? "",
-	  bookingUrl: memoryData.bookingUrl ?? "",
+      bookingUrl: memoryData.bookingUrl ?? "",
+      slotOverrides: memoryData.slotOverrides ?? {},
     });
   } catch (err) {
     console.error("GET availability error:", err);

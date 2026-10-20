@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { updateAvailability } from "../../../lib/availabilityStore";
 import { createClient } from "@supabase/supabase-js";
 import { normalizeBookingUrl } from "@/app/lib/bookingUrl";
+import { isSlotOverrides } from "@/app/lib/availabilitySlots";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL1!,
@@ -10,14 +11,14 @@ const supabase = createClient(
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const body = await req.json().catch(() => null);
 
     if (
       !body ||
       typeof body !== "object" ||
       Array.isArray(body) ||
       typeof body.siteId !== "string" ||
-      !body.siteId
+      !body.siteId.trim()
     ) {
       return NextResponse.json(
         { error: "Missing or invalid siteId" },
@@ -25,14 +26,17 @@ export async function POST(req: Request) {
       );
     }
 
-    if (typeof body.editToken !== "string" || !body.editToken) {
+    if (
+      typeof body.editToken !== "string" ||
+      !body.editToken.trim()
+    ) {
       return NextResponse.json(
         { error: "Missing edit token" },
         { status: 401 }
       );
     }
 
-    // Load the existing record and check authorization on the server.
+    // Verify the edit token before reading or updating saved data.
     const { data: existing, error: loadError } = await supabase
       .from("availability_sites")
       .select("data")
@@ -58,6 +62,19 @@ export async function POST(req: Request) {
 
     const currentData = existing.data ?? {};
 
+    // Validate business name when supplied.
+    if (
+      body.businessName !== undefined &&
+      (typeof body.businessName !== "string" ||
+        body.businessName.length > 100)
+    ) {
+      return NextResponse.json(
+        { error: "Business name must be 100 characters or fewer" },
+        { status: 400 }
+      );
+    }
+
+    // Validate contact details when supplied.
     if (
       body.contact !== undefined &&
       (!body.contact ||
@@ -103,6 +120,7 @@ export async function POST(req: Request) {
       );
     }
 
+    // An omitted logo is preserved; an empty string removes it.
     if (
       body.logoDataUrl !== undefined &&
       (typeof body.logoDataUrl !== "string" ||
@@ -118,41 +136,71 @@ export async function POST(req: Request) {
       );
     }
 
-	const bookingUrl = normalizeBookingUrl(
-	  body.bookingUrl === undefined
-		? currentData.bookingUrl ?? ""
-		: body.bookingUrl
-	);
+    const bookingUrl = normalizeBookingUrl(
+      body.bookingUrl === undefined
+        ? currentData.bookingUrl ?? ""
+        : body.bookingUrl
+    );
 
-	if (bookingUrl === null) {
-	  return NextResponse.json(
-		{ error: "Please enter a valid booking URL beginning with https:// or http://" },
-		{ status: 400 }
-	  );
-	}
+    if (bookingUrl === null) {
+      return NextResponse.json(
+        {
+          error:
+            "Please enter a valid booking URL beginning with https:// or http://",
+        },
+        { status: 400 }
+      );
+    }
 
-    // Preserve all existing saved fields.
-    // Omitted logo = keep it; empty string = explicitly remove it.
+    // Validate individual one-hour block changes.
+    // Explicit false values must be retained: they remove blocks.
+    if (
+      body.slotOverrides !== undefined &&
+      !isSlotOverrides(body.slotOverrides)
+    ) {
+      return NextResponse.json(
+        { error: "Invalid availability blocks" },
+        { status: 400 }
+      );
+    }
+
     const updatedData = {
       ...currentData,
+
       businessName:
-        body.businessName ?? currentData.businessName,
+        body.businessName === undefined
+          ? currentData.businessName ?? ""
+          : body.businessName.trim(),
+
       selectedDays:
-        body.selectedDays ?? currentData.selectedDays,
+        body.selectedDays ?? currentData.selectedDays ?? [],
+
       dayTimes:
-        body.dayTimes ?? currentData.dayTimes,
+        body.dayTimes ?? currentData.dayTimes ?? {},
+
       contact,
+
       logoDataUrl:
         body.logoDataUrl === undefined
           ? currentData.logoDataUrl ?? ""
           : body.logoDataUrl,
-	  bookingUrl,
+
+      bookingUrl,
+
+      // Preserve existing overrides if an older editor omits them.
+      // Otherwise save the complete override map from the editor.
+      slotOverrides:
+        body.slotOverrides === undefined
+          ? currentData.slotOverrides ?? {}
+          : body.slotOverrides,
     };
 
-    // Persist first so a failed database save isn't reported as success.
+    // Persist to Supabase before reporting success.
     const { data: saved, error: saveError } = await supabase
       .from("availability_sites")
-      .update({ data: updatedData })
+      .update({
+        data: updatedData,
+      })
       .eq("site_id", body.siteId)
       .eq("edit_token", body.editToken)
       .select("site_id")
@@ -167,7 +215,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Keep your in-memory store synchronized.
+    // Keep the existing in-memory store synchronized.
     updateAvailability(body.siteId, {
       ...updatedData,
       siteId: body.siteId,

@@ -13,6 +13,7 @@ type AvailabilityData = {
 
   logoDataUrl?: string;
   bookingUrl?: string;
+  slotOverrides?: Record<string, Record<string, boolean>>;
 };
 
 const store = new Map<string, AvailabilityData>();
