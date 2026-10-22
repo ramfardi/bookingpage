@@ -5,6 +5,8 @@ import { headers } from "next/headers";
 import { getSiteFromHost } from "./lib/getSiteFromHost";
 import { getSiteCleaningQuote } from "./lib/getSiteCleaningQuote";
 
+import PricingPage from "@/components/PricingPage";
+import { getSitePricing } from "./lib/getSitePricing";
 import { getCustomerServer } from "./lib/getCustomerServer";
 import { generateSeo } from "./lib/generateSeo";
 import { notFound } from "next/navigation";
@@ -13,6 +15,80 @@ import type { Metadata } from "next";
 export async function generateMetadata() {
   const host =
     (await headers()).get("host") || "";
+	
+	const sitePricing = await getSitePricing(host);
+
+if (sitePricing) {
+  const businessName =
+    sitePricing.data.businessName || "Our services";
+
+  const title = `${businessName} | Services & Pricing`;
+  const description = `View services and pricing for ${businessName}.`;
+
+  // Keep the existing dedicated link as the canonical URL.
+  const canonical =
+    `https://simplebookme.com/pricing_page/${sitePricing.siteId}`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      siteName: businessName,
+      type: "website",
+    },
+  } satisfies Metadata;
+}
+
+const siteAvailability = await getSiteFromHost(host);
+
+if (siteAvailability) {
+  const businessName =
+    siteAvailability.data.businessName?.trim() || "Availability";
+
+  const title = `${businessName} | Weekly Availability`;
+
+  const description =
+    `View weekly availability for ${businessName} and contact the business to arrange an appointment.`;
+
+  const hostname = host
+    .trim()
+    .toLowerCase()
+    .replace(/:\d+$/, "");
+
+  const canonical = `https://${hostname}/`;
+
+  return {
+    title,
+    description,
+
+    alternates: {
+      canonical,
+    },
+
+    robots: {
+      index: true,
+      follow: true,
+    },
+
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      siteName: businessName,
+      type: "website",
+    },
+  } satisfies Metadata;
+}
 
   const customer =
     await getCustomerServer(host);
@@ -133,6 +209,7 @@ export default async function Page() {
   // 🔥 try both
   const site = await getSiteFromHost(host);
   const siteCleaning = await getSiteCleaningQuote(host);
+  const sitePricing = await getSitePricing(host);
 
   // 🔥 PRIORITY 1: cleaning quote
   if (siteCleaning) {
@@ -142,6 +219,10 @@ export default async function Page() {
   // 🔥 PRIORITY 2: availability
   if (site) {
     return <AvailabilityPage data={site.data} />;
+  }
+  
+    if (sitePricing) {
+    return <PricingPage data={sitePricing.data} />;
   }
 
   // 🔥 fallback: homepage
