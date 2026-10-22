@@ -194,8 +194,18 @@ export default function PricingPage() {
           typeof payload.editToken !== "string" || !payload.editToken) {
         throw new Error("The server did not return the page ID and edit token. Please retry to recover your links.");
       }
-      const publicUrl = `${window.location.origin}/pricing_page/${encodeURIComponent(payload.siteId)}`;
-      setCreated({ publicUrl, editUrl: `${publicUrl}/edit?token=${encodeURIComponent(payload.editToken)}` });
+	const siteId = encodeURIComponent(payload.siteId);
+	const editToken = encodeURIComponent(payload.editToken);
+
+	const publicUrl = `https://${payload.siteId}.simplebookme.com`;
+
+	setCreated({
+	  publicUrl,
+
+	  // Keep editing on the main site's existing edit route.
+	  editUrl:
+		`${window.location.origin}/pricing_page/${siteId}/edit?token=${editToken}`,
+	});
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : "Unable to create your pricing page. Please try again.");
     } finally {
