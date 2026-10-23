@@ -356,12 +356,13 @@ export async function POST(req: Request) {
     // return the same links instead of creating duplicate pages.
     const result = await createPricing(data, requestId);
 
-    return json({
-      success: true,
-      persisted: true,
-      siteId: result.siteId,
-      editToken: result.editToken,
-    });
+	return json({
+	  success: true,
+	  persisted: true,
+	  siteId: result.siteId,
+	  editToken: result.editToken,
+	  subdomain: result.subdomain,
+	});
   } catch (error) {
     if (error instanceof ValidationError) {
       return json({ error: error.message }, 400);

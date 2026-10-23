@@ -3,6 +3,10 @@ import "server-only";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 
+import { getSiteFromHost } from "./getSiteFromHost";
+import { getSiteCleaningQuote } from "./getSiteCleaningQuote";
+import { getCustomerServer } from "./getCustomerServer";
+
 /* ---------------- TYPES ---------------- */
 
 export type PricingTemplateId =
@@ -51,6 +55,7 @@ export type PricingData = {
 export type CreatePricingResult = {
   siteId: string;
   editToken: string;
+  subdomain: string;
 };
 
 export class PricingStoreError extends Error {
@@ -137,6 +142,83 @@ function hashData(data: PricingData): string {
 
 /* ---------------- CREATE ---------------- */
 
+
+const RESERVED_SUBDOMAINS = new Set([
+  "www",
+  "app",
+  "api",
+  "admin",
+  "support",
+  "mail",
+  "email",
+  "smtp",
+  "help",
+  "docs",
+  "status",
+  "blog",
+  "dashboard",
+  "pricing",
+  "availability",
+]);
+
+function sanitizePricingSubdomain(value: string): string {
+  const cleaned = value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40)
+    .replace(/-+$/g, "");
+
+  const base = cleaned || "business";
+
+  return RESERVED_SUBDOMAINS.has(base)
+    ? `${base}-pricing`
+    : base;
+}
+
+async function isPricingSubdomainTaken(
+  subdomain: string
+): Promise<boolean> {
+  if (RESERVED_SUBDOMAINS.has(subdomain)) {
+    return true;
+  }
+
+  const supabase = getPricingSupabase();
+
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select("site_id")
+    .eq("subdomain", subdomain)
+    .maybeSingle();
+
+  if (error) {
+    throw new PricingStoreError(
+      "Could not check the pricing page address. Please try again."
+    );
+  }
+
+  if (data) {
+    return true;
+  }
+
+  // Check the other page types that share the same domain.
+  const host = `${subdomain}.simplebookme.com`;
+
+  const [availability, cleaningQuote, bookingWebsite] =
+    await Promise.all([
+      getSiteFromHost(host),
+      getSiteCleaningQuote(host),
+      getCustomerServer(host),
+    ]);
+
+  return Boolean(
+    availability || cleaningQuote || bookingWebsite
+  );
+}
+
 /**
  * Creates a pricing page.
  *
@@ -161,55 +243,107 @@ export async function createPricing(
   const savedData = copyPricingData(data);
   const requestHash = hashData(savedData);
 
+  async function getExistingRequest():
+    Promise<CreatePricingResult | null> {
+    const { data: existing, error } = await supabase
+      .from(TABLE)
+      .select(
+        "site_id, edit_token, subdomain, request_hash"
+      )
+      .eq("request_id", requestId)
+      .maybeSingle();
+
+    if (error) {
+      throw new PricingStoreError(
+        "Could not check your creation request. Please retry."
+      );
+    }
+
+    if (!existing) {
+      return null;
+    }
+
+    if (existing.request_hash !== requestHash) {
+      throw new PricingStoreError(
+        "This request ID was already used with different pricing data.",
+        409
+      );
+    }
+
+    return {
+      siteId: existing.site_id,
+      editToken: existing.edit_token,
+      subdomain: existing.subdomain,
+    };
+  }
+
+  // Recover the same links if a previous response was lost.
+  const existing = await getExistingRequest();
+
+  if (existing) {
+    return existing;
+  }
+
+  const base = sanitizePricingSubdomain(
+    savedData.businessName
+  );
+
   const siteId = randomUUID();
   const editToken = randomBytes(32).toString("hex");
 
-  // Ignore an existing request ID instead of overwriting its page.
-  const { error: insertError } = await supabase
-    .from(TABLE)
-    .upsert(
-      {
+  for (let attempt = 0; attempt < 10; attempt++) {
+    // First try the business name.
+    // If taken, add a short random suffix.
+    const subdomain =
+      attempt === 0
+        ? base
+        : `${base}-${randomBytes(3).toString("hex")}`;
+
+    if (await isPricingSubdomainTaken(subdomain)) {
+      continue;
+    }
+
+    const { error } = await supabase
+      .from(TABLE)
+      .insert({
         site_id: siteId,
         edit_token: editToken,
+        subdomain,
         request_id: requestId,
         request_hash: requestHash,
         data: savedData,
-      },
-      {
-        onConflict: "request_id",
-        ignoreDuplicates: true,
-      }
-    );
+      });
 
-  if (insertError) {
+    if (!error) {
+      return {
+        siteId,
+        editToken,
+        subdomain,
+      };
+    }
+
+    if (error.code === "23505") {
+      // Another identical request may have completed meanwhile.
+      const recovered = await getExistingRequest();
+
+      if (recovered) {
+        return recovered;
+      }
+
+      // Otherwise another pricing page may have claimed this name.
+      // Retry with a different suffix.
+      continue;
+    }
+
     throw new PricingStoreError(
       "Could not create your pricing page."
     );
   }
 
-  const { data: record, error: readError } = await supabase
-    .from(TABLE)
-    .select("site_id, edit_token, request_hash")
-    .eq("request_id", requestId)
-    .maybeSingle();
-
-  if (readError || !record) {
-    throw new PricingStoreError(
-      "Could not retrieve your pricing page links. Please retry."
-    );
-  }
-
-  if (record.request_hash !== requestHash) {
-    throw new PricingStoreError(
-      "This request ID was already used with different pricing data.",
-      409
-    );
-  }
-
-  return {
-    siteId: record.site_id,
-    editToken: record.edit_token,
-  };
+  throw new PricingStoreError(
+    "Could not assign an available page address. Please try again.",
+    409
+  );
 }
 
 /* ---------------- PUBLIC READ ---------------- */
@@ -334,4 +468,44 @@ export async function updatePricing(
   }
 
   return Boolean(record);
+}
+
+export async function getPricingBySubdomain(
+  subdomain: string
+): Promise<{
+  siteId: string;
+  subdomain: string;
+  data: PricingData;
+} | null> {
+  const cleaned = subdomain.trim().toLowerCase();
+
+  if (
+    !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(cleaned)
+  ) {
+    return null;
+  }
+
+  const supabase = getPricingSupabase();
+
+  const { data: record, error } = await supabase
+    .from(TABLE)
+    .select("site_id, subdomain, data")
+    .eq("subdomain", cleaned)
+    .maybeSingle();
+
+  if (error) {
+    throw new PricingStoreError(
+      "Could not load the pricing page."
+    );
+  }
+
+  if (!record) {
+    return null;
+  }
+
+  return {
+    siteId: record.site_id,
+    subdomain: record.subdomain,
+    data: record.data as PricingData,
+  };
 }

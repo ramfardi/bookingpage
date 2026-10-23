@@ -190,22 +190,31 @@ export default function PricingPage() {
         }
         throw new Error(typeof payload?.error === "string" ? payload.error : "Unable to create your pricing page. Please try again.");
       }
-      if (typeof payload?.siteId !== "string" || !payload.siteId ||
-          typeof payload.editToken !== "string" || !payload.editToken) {
-        throw new Error("The server did not return the page ID and edit token. Please retry to recover your links.");
-      }
-	const siteId = encodeURIComponent(payload.siteId);
-	const editToken = encodeURIComponent(payload.editToken);
+		if (
+		  typeof payload?.siteId !== "string" ||
+		  !payload.siteId ||
+		  typeof payload.editToken !== "string" ||
+		  !payload.editToken ||
+		  typeof payload.subdomain !== "string" ||
+		  !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(
+			payload.subdomain
+		  )
+		) {
+		  throw new Error(
+			"The server did not return your page address and edit token. Please retry."
+		  );
+		}
 
-	const publicUrl = `https://${payload.siteId}.simplebookme.com`;
+		const siteId = encodeURIComponent(payload.siteId);
+		const editToken = encodeURIComponent(payload.editToken);
 
-	setCreated({
-	  publicUrl,
+		setCreated({
+		  publicUrl:
+			`https://${payload.subdomain}.simplebookme.com`,
 
-	  // Keep editing on the main site's existing edit route.
-	  editUrl:
-		`${window.location.origin}/pricing_page/${siteId}/edit?token=${editToken}`,
-	});
+		  editUrl:
+			`${window.location.origin}/pricing_page/${siteId}/edit?token=${editToken}`,
+		});
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : "Unable to create your pricing page. Please try again.");
     } finally {
