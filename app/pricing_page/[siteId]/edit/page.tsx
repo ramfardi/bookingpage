@@ -28,6 +28,7 @@ type PricingRow = {
   id: string;
   name: string;
   price: string;
+  description?: string;
 };
 
 type PricingData = {
@@ -165,6 +166,7 @@ function parsePricingData(value: unknown): PricingData {
       id,
       name: row.name,
       price: row.price,
+	  description: text(row.description),
     };
   });
 
@@ -345,7 +347,7 @@ function PricingEditor({
 
   function updateService(
     id: string,
-    field: "name" | "price",
+    field: "name" | "price"| "description",
     value: string
   ) {
     clearFeedback();
@@ -636,6 +638,7 @@ function PricingEditor({
           id: row.id,
           name: row.name.trim(),
           price: row.price.trim(),
+		  description: row.description?.trim() || "",
         })),
       },
       contact: {
@@ -1019,6 +1022,25 @@ function PricingEditor({
                           }
                         />
                       </label>
+					  
+					  <label className="mt-3 block text-sm font-medium">
+					  Service notes (optional)
+
+					  <textarea
+						className={inputClass}
+						rows={2}
+						maxLength={500}
+						value={row.description ?? ""}
+						placeholder="Additional details about this service"
+						onChange={(event) =>
+						  updateService(
+							row.id,
+							"description",
+							event.target.value
+						  )
+						}
+					  />
+					</label>
 
                       <label className="block text-sm font-medium">
                         Price ({data.currency}) *

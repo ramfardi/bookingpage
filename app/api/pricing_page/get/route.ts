@@ -61,6 +61,7 @@ export async function GET(req: Request) {
           id: row.id,
           name: row.name,
           price: row.price,
+		  description: row.description ?? "",
         })),
       },
 

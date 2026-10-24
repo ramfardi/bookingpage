@@ -245,21 +245,30 @@ function buildUpdatedData(
 
     usedIds.add(id);
 
-    return {
-      id,
-      name: readString(
-        row.name,
-        `Service ${index + 1} name`,
-        160,
-        true
-      ),
-      price: readString(
-        row.price,
-        `Service ${index + 1} price`,
-        100,
-        true
-      ),
-    };
+return {
+  id,
+  name: readString(
+    row.name,
+    `Service ${index + 1} name`,
+    160,
+    true
+  ),
+  price: readString(
+    row.price,
+    `Service ${index + 1} price`,
+    100,
+    true
+  ),
+  description: readString(
+    row.description === undefined
+      ? current.pricing.rows.find(
+          (existing) => existing.id === id
+        )?.description ?? ""
+      : row.description,
+    `Service ${index + 1} notes`,
+    500
+  ),
+};
   });
 
   /* ---------------- CONTACT ---------------- */

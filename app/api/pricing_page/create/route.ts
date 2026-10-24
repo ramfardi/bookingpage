@@ -221,23 +221,26 @@ function validatePricingData(value: unknown): PricingData {
 
     usedIds.add(id);
 
-    return {
-      id,
-      name: readString(
-        row.name,
-        `Service ${index + 1} name`,
-        160,
-        true
-      ),
-      // Prices remain text to support "From 80", "40 / hour",
-      // or "Contact for quote", matching the creation form.
-      price: readString(
-        row.price,
-        `Service ${index + 1} price`,
-        100,
-        true
-      ),
-    };
+return {
+  id,
+  name: readString(
+    row.name,
+    `Service ${index + 1} name`,
+    160,
+    true
+  ),
+  price: readString(
+    row.price,
+    `Service ${index + 1} price`,
+    100,
+    true
+  ),
+  description: readString(
+    row.description,
+    `Service ${index + 1} notes`,
+    500
+  ),
+};
   });
 
   /* ---------------- CONTACT ---------------- */

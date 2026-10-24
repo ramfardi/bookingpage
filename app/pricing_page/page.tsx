@@ -23,6 +23,7 @@ type ServiceItem = {
   id: string;
   name: string;
   price: string;
+  description?: string;
   enabled: boolean;
 };
 
@@ -36,6 +37,7 @@ type PricingData = {
       id: string;
       name: string;
       price: string;
+	  description?: string;
     }[];
   };
   contact: {
@@ -202,10 +204,12 @@ export default function PricingPage() {
   function changePreset(next: PresetId) {
     if (next === preset) return;
 
-    const hasChanges = services.some(
-      (service) =>
-        service.enabled || service.price.trim()
-    );
+const hasChanges = services.some(
+  (service) =>
+    service.enabled ||
+    service.price.trim() ||
+    service.description?.trim()
+);
 
     if (
       hasChanges &&
@@ -358,11 +362,12 @@ export default function PricingPage() {
       currency,
       pricing: {
         title: title.trim(),
-        rows: enabled.map(({ id, name, price }) => ({
-          id,
-          name: name.trim(),
-          price: price.trim(),
-        })),
+		rows: enabled.map(({ id, name, price, description }) => ({
+		  id,
+		  name: name.trim(),
+		  price: price.trim(),
+		  description: description?.trim() || "",
+		})),
       },
       contact: {
         email: contact.email.trim(),
@@ -729,6 +734,27 @@ export default function PricingPage() {
                           />
                         </label>
                       )}
+					  
+					  {service.enabled && (
+  <label className="mt-3 block space-y-1">
+    <span className="text-xs font-medium text-gray-600">
+      Service notes (optional)
+    </span>
+
+    <textarea
+      className={inputClass}
+      rows={2}
+      maxLength={500}
+      value={service.description ?? ""}
+      placeholder="e.g. Includes consultation. Price varies by hair length."
+      onChange={(event) =>
+        updateService(service.id, {
+          description: event.target.value,
+        })
+      }
+    />
+  </label>
+)}
                     </div>
                   ))}
                 </div>
@@ -1063,10 +1089,17 @@ export default function PricingPage() {
                         key={service.id}
                         className="flex items-start justify-between gap-4 py-4"
                       >
-                        <span className="min-w-0 flex-1 break-words font-medium">
-                          {service.name.trim() ||
-                            "Service name"}
-                        </span>
+<div className="min-w-0 flex-1">
+  <p className="break-words font-medium">
+    {service.name.trim() || "Service name"}
+  </p>
+
+  {service.description?.trim() && (
+    <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-5 text-gray-500">
+      {service.description}
+    </p>
+  )}
+</div>
 
                         <span className="max-w-[50%] break-words text-right text-indigo-700">
                           {service.price.trim() ||

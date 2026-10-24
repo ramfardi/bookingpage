@@ -25,6 +25,7 @@ export type PricingRow = {
   id: string;
   name: string;
   price: string;
+  description?: string;
 };
 
 export type PricingContact = {
@@ -117,6 +118,7 @@ function copyPricingData(data: PricingData): PricingData {
         id: row.id,
         name: row.name,
         price: row.price,
+		description: row.description ?? "",
       })),
     },
 

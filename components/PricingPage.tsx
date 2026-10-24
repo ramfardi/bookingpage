@@ -8,6 +8,7 @@ type Props = {
         id?: string;
         name: string;
         price: string;
+		description?: string;
       }[];
     };
     contact?: {
@@ -280,9 +281,17 @@ export default function PricingPage({ data }: Props) {
                     key={`${row.id || "service"}-${index}`}
                     className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-start gap-4 py-5 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] sm:gap-6"
                   >
-                    <dt className="break-words text-sm font-medium leading-6 text-slate-800 sm:text-base">
-                      {row.name.trim()}
-                    </dt>
+				<dt className="min-w-0">
+				  <span className="block break-words text-sm font-medium leading-6 text-slate-800 sm:text-base">
+					{row.name.trim()}
+				  </span>
+
+				  {row.description?.trim() && (
+					<span className="mt-1 block whitespace-pre-wrap break-words text-sm font-normal leading-5 text-slate-500">
+					  {row.description}
+					</span>
+				  )}
+				</dt>
 
                     <dd className="break-words text-right text-sm font-semibold leading-6 text-indigo-700 sm:text-base">
                       {row.price?.trim() || "Contact for quote"}
