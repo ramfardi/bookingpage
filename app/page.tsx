@@ -16,6 +16,63 @@ export async function generateMetadata() {
   const host =
     (await headers()).get("host") || "";
 	
+	
+  // CLEANING QUOTE WEBSITE SEO
+  const siteCleaning = await getSiteCleaningQuote(host);
+
+  if (siteCleaning) {
+    const cleaningData = siteCleaning.data;
+
+    const businessName =
+      cleaningData.businessName?.trim() ||
+      "Cleaning Services";
+
+    const serviceArea =
+      cleaningData.serviceArea?.trim() || "";
+
+    const locationText = serviceArea
+      ? ` in ${serviceArea}`
+      : "";
+
+    const title =
+      `${businessName} | Instant Cleaning Quote`;
+
+    const description =
+      `Get an instant cleaning estimate from ${businessName}${locationText}. ` +
+      `Explore house, apartment, townhouse, and commercial cleaning options ` +
+      `and request your preferred appointment.`;
+
+    const hostname = host
+      .trim()
+      .toLowerCase()
+      .replace(/:\d+$/, "");
+
+    const canonical = `https://${hostname}/`;
+
+    return {
+      title,
+      description,
+
+      alternates: {
+        canonical,
+      },
+
+      robots: {
+        index: true,
+        follow: true,
+      },
+
+      openGraph: {
+        title,
+        description,
+        url: canonical,
+        siteName: businessName,
+        type: "website",
+      },
+    } satisfies Metadata;
+  }
+
+	
 	const sitePricing = await getSitePricing(host);
 
 if (sitePricing) {
