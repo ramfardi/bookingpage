@@ -23,12 +23,15 @@ export async function generateMetadata() {
   if (siteCleaning) {
     const cleaningData = siteCleaning.data;
 
-    const businessName =
-      cleaningData.businessName?.trim() ||
-      "Cleaning Services";
+const businessName =
+  typeof cleaningData.businessName === "string"
+    ? cleaningData.businessName.trim() || "Cleaning Services"
+    : "Cleaning Services";
 
-    const serviceArea =
-      cleaningData.serviceArea?.trim() || "";
+const serviceArea =
+  typeof cleaningData.serviceArea === "string"
+    ? cleaningData.serviceArea.trim()
+    : "";
 
     const locationText = serviceArea
       ? ` in ${serviceArea}`
