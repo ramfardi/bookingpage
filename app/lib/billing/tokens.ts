@@ -103,8 +103,8 @@ export function getActivationUrl(
     );
   }
 
-  return new URL(
-    `/activate/${token}`,
-    appUrl
-  ).toString();
+return new URL(
+  `/product-activation/${token}`,
+  appUrl
+).toString();
 }
