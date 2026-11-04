@@ -109,6 +109,10 @@ export default function CleaningQuoteGeneratorPage() {
 
   const [generatedLink, setGeneratedLink] = useState("");
   const [editLink, setEditLink] = useState("");
+  const [activationUrl, setActivationUrl] = useState("");
+	const [trialEndsAt, setTrialEndsAt] = useState("");
+	const [emailSent, setEmailSent] = useState<boolean | null>(null);
+	const [emailWarning, setEmailWarning] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState<"public" | "private" | "">("");
@@ -132,9 +136,14 @@ export default function CleaningQuoteGeneratorPage() {
   async function generateQuoteLink() {
     setError("");
     if (!businessName.trim()) { setError("Please enter your business name."); return; }
-    if (businessEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(businessEmail.trim())) {
-      setError("Please enter a valid business email address, or leave it blank."); return;
-    }
+if (
+  !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+    businessEmail.trim()
+  )
+) {
+  setError("Please enter a valid business email address.");
+  return;
+}
     if (availabilityUrl.trim() && !normalizedUrl(availabilityUrl)) { setError("Please enter a valid availability link."); return; }
     if (bookingUrl.trim() && !normalizedUrl(bookingUrl)) { setError("Please enter a valid booking link."); return; }
 
@@ -165,9 +174,35 @@ export default function CleaningQuoteGeneratorPage() {
       if (!res.ok || !json.subdomain) {
         throw new Error(typeof json.error === "string" ? json.error : "Unable to create your link. Please try again.");
       }
-      setGeneratedLink(`https://${json.subdomain}.simplebookme.com`);
-      setEditLink(`/cleaning/quote-gen/${siteId}/edit?token=${encodeURIComponent(editToken)}`);
-      setCopied("");
+setGeneratedLink(
+  `https://${json.subdomain}.simplebookme.com`
+);
+
+setEditLink(
+  `/cleaning/quote-gen/${siteId}/edit?token=${encodeURIComponent(editToken)}`
+);
+
+setActivationUrl(
+  typeof json.activationUrl === "string"
+    ? json.activationUrl
+    : ""
+);
+
+setTrialEndsAt(
+  typeof json.trialEndsAt === "string"
+    ? json.trialEndsAt
+    : ""
+);
+
+setEmailSent(json.emailSent === true);
+
+setEmailWarning(
+  typeof json.emailWarning === "string"
+    ? json.emailWarning
+    : ""
+);
+
+setCopied("");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Unable to create the link.");
     } finally {
@@ -205,7 +240,16 @@ export default function CleaningQuoteGeneratorPage() {
               <div className="space-y-4">
                 <div><label htmlFor="owner-name" className={labelClass}>Business name *</label><input id="owner-name" value={businessName} onChange={(e) => setBusinessName(e.target.value)} className={inputClass} maxLength={100} placeholder="e.g. Bright Home Cleaning" /></div>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <div><label htmlFor="owner-email" className={labelClass}>Contact email</label><input id="owner-email" type="email" value={businessEmail} onChange={(e) => setBusinessEmail(e.target.value)} className={inputClass} placeholder="hello@yourbusiness.com" maxLength={160} /></div>
+                  <div><label htmlFor="owner-email" className={labelClass}>Contact email *</label><input
+  id="owner-email"
+  type="email"
+  required
+  value={businessEmail}
+  onChange={(e) => setBusinessEmail(e.target.value)}
+  className={inputClass}
+  placeholder="hello@yourbusiness.com"
+  maxLength={160}
+/></div>
                   <div><label htmlFor="owner-phone" className={labelClass}>Phone (optional)</label><input id="owner-phone" type="tel" value={businessPhone} onChange={(e) => setBusinessPhone(e.target.value)} className={inputClass} placeholder="Your business number" maxLength={40} /></div>
                 </div>
                 <p className="text-xs leading-5 text-slate-500">Add an email to let customers open a prefilled quote request in their email app. Automated lead emails are not connected yet.</p>
@@ -298,7 +342,7 @@ export default function CleaningQuoteGeneratorPage() {
               <h2 className="text-lg font-bold">Your shareable quote page is almost ready</h2>
               <p className="mt-2 text-sm leading-6 text-slate-300">Review the preview, then generate your public link and private edit link.</p>
               {error && <p role="alert" className="mt-4 rounded-xl bg-rose-900/40 p-3 text-sm text-rose-100">{error}</p>}
-              <button type="button" disabled={saving} onClick={generateQuoteLink} className="mt-5 w-full rounded-xl bg-indigo-500 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60">
+              <button type="button" disabled={saving || !!generatedLink} onClick={generateQuoteLink} className="mt-5 w-full rounded-xl bg-indigo-500 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60">
                 {saving ? "Creating your link..." : "Generate Instant Quote Link →"}
               </button>
               <p className="mt-3 text-center text-xs text-slate-400">Your pricing rules stay editable through your private link, once the edit page supports the new settings.</p>
@@ -313,24 +357,208 @@ export default function CleaningQuoteGeneratorPage() {
           </aside>
         </div>
 
-        {generatedLink && (
-          <section className="mt-10 rounded-3xl border border-emerald-200 bg-emerald-50/60 p-5 shadow-sm sm:p-7">
-            <div className="mb-5"><h2 className="text-xl font-bold text-slate-900">Your links are ready</h2><p className="mt-1 text-sm text-slate-600">Save your private edit link somewhere safe. Anyone with that link may be able to change your settings.</p></div>
-            <div className="grid gap-4 lg:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-sm font-semibold text-slate-900">Public quote link</p>
-                <a href={generatedLink} target="_blank" rel="noopener noreferrer" className="mt-2 block break-all text-sm text-indigo-700 underline underline-offset-2">{generatedLink}</a>
-                <button type="button" onClick={() => copyText(generatedLink, "public")} className="mt-3 rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200">{copied === "public" ? "Copied ✓" : "Copy public link"}</button>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-sm font-semibold text-slate-900">Private edit link</p><p className="mt-1 text-xs text-rose-600">Do not share this link publicly.</p>
-                <a href={editLink} target="_blank" rel="noopener noreferrer" className="mt-2 block break-all text-sm text-indigo-700 underline underline-offset-2">{absoluteEditLink}</a>
-                <button type="button" onClick={() => copyText(absoluteEditLink, "private")} className="mt-3 rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200">{copied === "private" ? "Copied ✓" : "Copy private link"}</button>
-              </div>
-            </div>
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-emerald-200 pt-5"><p className="text-sm text-slate-600">Want a QR code for your new link?</p>
-              <a href={`/qr-code-generator?url=${encodeURIComponent(generatedLink)}`} className="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700">Generate QR Code</a>
-            </div>
-          </section>
-        )}
+
+{generatedLink && (
+  <section className="mt-10 rounded-3xl border border-emerald-200 bg-emerald-50/60 p-5 shadow-sm sm:p-7">
+
+    {/* HEADER */}
+    <div className="mb-5">
+      <h2 className="text-xl font-bold text-slate-900">
+        Your links are ready!
+      </h2>
+
+      <p className="mt-1 text-sm text-slate-600">
+        Your Cleaning Quote Page has been created successfully.
+        Save your private edit link somewhere safe.
+      </p>
+    </div>
+
+    {/* PUBLIC AND PRIVATE LINKS */}
+    <div className="grid gap-4 lg:grid-cols-2">
+
+      {/* PUBLIC LINK */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+        <p className="text-sm font-semibold text-slate-900">
+          Public quote link
+        </p>
+
+        <p className="mt-1 text-xs text-slate-500">
+          Share this link with your customers.
+        </p>
+
+        <a
+          href={generatedLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 block break-all text-sm text-indigo-700 underline underline-offset-2"
+        >
+          {generatedLink}
+        </a>
+
+        <button
+          type="button"
+          onClick={() => copyText(generatedLink, "public")}
+          className="mt-3 rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+        >
+          {copied === "public"
+            ? "Copied ✓"
+            : "Copy public link"}
+        </button>
+      </div>
+
+      {/* PRIVATE EDIT LINK */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+        <p className="text-sm font-semibold text-slate-900">
+          Private edit link
+        </p>
+
+        <p className="mt-1 text-xs text-rose-600">
+          Keep this link private. Anyone with access may
+          be able to modify your settings.
+        </p>
+
+        <a
+          href={editLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 block break-all text-sm text-indigo-700 underline underline-offset-2"
+        >
+          {absoluteEditLink}
+        </a>
+
+        <button
+          type="button"
+          onClick={() => copyText(absoluteEditLink, "private")}
+          className="mt-3 rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+        >
+          {copied === "private"
+            ? "Copied ✓"
+            : "Copy private link"}
+        </button>
+      </div>
+    </div>
+
+    {/* 14-DAY FREE TRIAL */}
+    {trialEndsAt && (
+      <div className="mt-5 rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+        <div className="flex items-start gap-3">
+          <span className="text-xl">🎉</span>
+
+          <div>
+            <h3 className="font-bold text-indigo-950">
+              Your 14-day free trial has started!
+            </h3>
+
+            <p className="mt-1 text-sm text-indigo-800">
+              Your quote page is ready to share.
+              No credit card is required during the trial.
+            </p>
+
+            <p className="mt-2 text-sm font-semibold text-indigo-900">
+              Trial expires:{" "}
+              {new Date(trialEndsAt).toLocaleDateString(
+                undefined,
+                {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                }
+              )}
+            </p>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* RESEND EMAIL STATUS */}
+    {emailSent === true && (
+      <div
+        role="status"
+        className="mt-5 rounded-xl border border-emerald-200 bg-white p-4"
+      >
+        <p className="text-sm font-semibold text-emerald-800">
+          ✓ Your links have been emailed!
+        </p>
+
+        <p className="mt-1 text-sm text-slate-600">
+          We've submitted your public, private, and
+          activation links for delivery to{" "}
+          <span className="font-semibold">
+            {businessEmail}
+          </span>.
+          Please check your inbox and spam folder.
+        </p>
+      </div>
+    )}
+
+    {emailSent === false && (
+      <div
+        role="alert"
+        className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4"
+      >
+        <p className="text-sm font-semibold text-amber-900">
+          Your page was created, but the email could
+          not be sent.
+        </p>
+
+        <p className="mt-1 text-sm text-amber-800">
+          {emailWarning ||
+            "Please save your public, private, and activation links manually."}
+        </p>
+      </div>
+    )}
+
+    {/* STRIPE ACTIVATION */}
+    {activationUrl && (
+      <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+          <div className="max-w-xl">
+            <h3 className="text-lg font-bold text-slate-900">
+              Keep your Cleaning Quote Page active
+            </h3>
+
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Enjoy your 14-day free trial.
+              Activate your page anytime with a
+              one-time payment and keep using your
+              existing public and private links.
+            </p>
+
+            <p className="mt-2 text-xs font-medium text-slate-500">
+              No monthly subscription.
+            </p>
+          </div>
+
+          <a
+            href={activationUrl}
+            className="inline-flex shrink-0 items-center justify-center rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-indigo-700"
+          >
+            Activate Your Page →
+          </a>
+        </div>
+      </div>
+    )}
+
+    {/* QR CODE GENERATOR */}
+    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-emerald-200 pt-5">
+      <p className="text-sm text-slate-600">
+        Want a QR code for your new quote link?
+      </p>
+
+      <a
+        href={`/qr-code-generator?url=${encodeURIComponent(
+          generatedLink
+        )}`}
+        className="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
+      >
+        Generate QR Code
+      </a>
+    </div>
+
+  </section>
+)}
+
 
         <div className="mx-auto mt-20 max-w-4xl space-y-9 text-slate-700">
           {seoSections.map((section) => (

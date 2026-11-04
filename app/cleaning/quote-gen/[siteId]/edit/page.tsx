@@ -164,13 +164,13 @@ function EditCleaningQuoteContent() {
       }
 
       try {
-		const res = await fetch(
-		  `/api/cleaning/quote-gen/get?siteId=${encodeURIComponent(siteId)}&token=${encodeURIComponent(token)}`,
-		  {
-			cache: "no-store",
-			signal: controller.signal,
-		  }
-		);
+const res = await fetch(
+  `/api/cleaning/quote-gen/get?siteId=${encodeURIComponent(siteId)}&token=${encodeURIComponent(token)}`,
+  {
+    cache: "no-store",
+    signal: controller.signal,
+  }
+);
         if (!res.ok) throw new Error(res.status === 404 ? "This quote page was not found." : "Unable to load this quote page.");
 
         const data: unknown = await res.json();

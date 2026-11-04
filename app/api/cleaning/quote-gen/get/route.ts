@@ -2,6 +2,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+// Reusable SimpleBookMe billing system
+import { getProductAccess } from "@/app/lib/billing/getAccess";
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -34,12 +37,22 @@ export async function GET(req: Request) {
     const token = searchParams.get("token");
 
     if (!siteId) {
-      return json({ error: "Missing siteId." }, 400);
+      return json(
+        { error: "Missing siteId." },
+        400
+      );
     }
 
     if (siteId.length > 128) {
-      return json({ error: "Invalid siteId." }, 400);
+      return json(
+        { error: "Invalid siteId." },
+        400
+      );
     }
+
+    /* ===========================================
+       1. CONNECT TO SUPABASE
+    =========================================== */
 
     const supabaseUrl =
       process.env.NEXT_PUBLIC_SUPABASE_URL1;
@@ -69,7 +82,10 @@ export async function GET(req: Request) {
       }
     );
 
-    // 1. Original lookup by site ID
+    /* ===========================================
+       2. ORIGINAL LOOKUP BY SITE ID
+    =========================================== */
+
     const first = await supabase
       .from("cleaning_quote_sites")
       .select("site_id, subdomain, edit_token, data")
@@ -90,7 +106,10 @@ export async function GET(req: Request) {
 
     let quote = first.data as CleaningQuoteRow | null;
 
-    // 2. Also support business subdomain
+    /* ===========================================
+       3. FALLBACK LOOKUP BY SUBDOMAIN
+    =========================================== */
+
     if (!quote) {
       const second = await supabase
         .from("cleaning_quote_sites")
@@ -120,9 +139,18 @@ export async function GET(req: Request) {
       );
     }
 
-    // 3. Verify private edit token when supplied
+    /* ===========================================
+       4. VERIFY PRIVATE EDIT TOKEN
+
+       A valid edit token allows the owner
+       to retrieve their configuration even
+       when the 14-day trial has expired.
+    =========================================== */
+
+    const isPrivateRequest = token !== null;
+
     if (
-      token !== null &&
+      isPrivateRequest &&
       token !== quote.edit_token
     ) {
       return json(
@@ -131,7 +159,69 @@ export async function GET(req: Request) {
       );
     }
 
-    // 4. Retrieve ALL saved configuration fields
+    /* ===========================================
+       5. CHECK PUBLIC BILLING ACCESS
+
+       Only public requests need an active
+       trial or a completed payment.
+
+       Authorized private editing remains
+       available after trial expiration.
+    =========================================== */
+
+    if (!isPrivateRequest) {
+      try {
+        const access = await getProductAccess({
+          productKey: "cleaning_quote",
+          resourceId: quote.site_id,
+        });
+
+        // Existing Cleaning Quote pages may have
+        // been created before the billing system.
+        // Keep these pages working for now.
+        //
+        // This is the same legacy policy used
+        // by getSiteCleaningQuote.ts.
+        if (access.status === "unregistered") {
+          console.log(
+            "Allowing legacy Cleaning Quote:",
+            quote.site_id
+          );
+        } else if (!access.allowed) {
+          // Trial expired and no Stripe payment.
+          return json(
+            {
+              error:
+                "This Cleaning Quote Page is inactive because its free trial has ended.",
+              status: "expired",
+              trialEndsAt: access.trialEndsAt,
+            },
+            403
+          );
+        }
+      } catch (billingError) {
+        console.error(
+          "Cleaning quote GET billing error:",
+          billingError
+        );
+
+        // Do not expose the quote configuration
+        // when the payment status cannot be checked.
+        return json(
+          {
+            error:
+              "This quote page is temporarily unavailable.",
+            status: "unavailable",
+          },
+          503
+        );
+      }
+    }
+
+    /* ===========================================
+       6. PREPARE EXISTING QUOTE DATA
+    =========================================== */
+
     const savedData: SavedQuoteData =
       quote.data &&
       typeof quote.data === "object" &&
@@ -139,20 +229,26 @@ export async function GET(req: Request) {
         ? { ...quote.data }
         : {};
 
-    // Do not expose edit tokens stored in JSON
+    // Never expose private tokens stored in JSON.
     delete savedData.editToken;
     delete savedData.edit_token;
 
-    // 5. Return configuration to the customer page
-    // or authenticated editor
+    /* ===========================================
+       7. RETURN QUOTE CONFIGURATION
+
+       Preserve existing response format.
+
+       Only include editToken for a validated
+       private editing request.
+    =========================================== */
+
     return json({
       ...savedData,
 
       siteId: quote.site_id,
       subdomain: quote.subdomain,
 
-      // Only return token after validating it
-      ...(token !== null
+      ...(isPrivateRequest
         ? { editToken: quote.edit_token }
         : {}),
     });
