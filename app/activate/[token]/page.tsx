@@ -273,14 +273,13 @@ export default async function ActivationPage({
       }
     );
 
-    const decimals =
-      formatter.resolvedOptions()
-        .maximumFractionDigits;
+const decimals =
+  formatter.resolvedOptions().maximumFractionDigits ?? 2;
 
-    formattedPrice =
-      formatter.format(
-        price.unit_amount / Math.pow(10, decimals)
-      ) + ` ${currency}`;
+formattedPrice =
+  formatter.format(
+    price.unit_amount / Math.pow(10, decimals)
+  ) + ` ${currency}`;
 
   } catch (stripeError) {
     console.error(
