@@ -227,11 +227,25 @@ setCopied("");
         <div className="mx-auto mb-10 max-w-3xl text-center">
           <span className="inline-flex items-center rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">A smarter way to answer "How much?"</span>
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-950 sm:text-5xl">Your cleaning quote link, made simple.</h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-600">Create a beautiful instant estimate for your customers. Customize your prices, share one link, and make it easier for people to request cleaning.</p>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-600">Enter your business details and cleaning prices on the left, see exactly how customers will use your quote page on the right, then generate a link to share.</p>
         </div>
 
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)]">
           <div className="space-y-5">
+            {/* OWNER SETUP: clear distinction from the customer preview */}
+            <div className="rounded-2xl border border-indigo-200 bg-indigo-50 px-5 py-5 sm:px-6">
+              <p className="text-xs font-bold uppercase tracking-widest text-indigo-700">
+                Step 1 · Your business setup
+              </p>
+              <h2 className="mt-2 text-xl font-extrabold tracking-tight text-slate-950 sm:text-2xl">
+                Enter your business details and prices here
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate-700">
+                Fill in your contact information, cleaning rates, and service options below.
+                This is the section you edit.
+              </p>
+            </div>
+
             <section className={sectionClass}>
               <div className="mb-5 flex items-center gap-3">
                 <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100 text-sm font-bold text-indigo-700">01</span>
@@ -350,7 +364,26 @@ setCopied("");
           </div>
 
           <aside className="lg:sticky lg:top-5">
-            <div className="mb-3 flex items-center justify-between"><div><h2 className="text-lg font-bold text-slate-900">Customer preview</h2><p className="text-xs text-slate-500">Try all four steps before publishing. Form edits do not update an already-created link.</p></div><span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Live preview</span></div>
+            {/* CUSTOMER PREVIEW: interactive, but not the owner's settings form */}
+            <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-5 sm:px-6">
+              <p className="text-xs font-bold uppercase tracking-widest text-emerald-700">
+                Step 2 · Customer view
+              </p>
+              <h2 className="mt-2 text-xl font-extrabold tracking-tight text-slate-950 sm:text-2xl">
+                This is how your customers will see it
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate-700">
+                The preview updates as you change the settings on the left.
+                Try the steps below to experience the page like a customer.
+              </p>
+              <div className="mt-3 inline-flex items-center rounded-full border border-emerald-200 bg-white px-3 py-1 text-xs font-semibold text-emerald-800">
+                Preview updates as you type
+              </div>
+              <p className="mt-3 text-xs leading-5 text-slate-600">
+                Preview only — your page is not public until you generate a link.
+                After creation, use your private edit link to change the published page.
+              </p>
+            </div>
             <div className="max-h-[85vh] overflow-y-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
               <CleaningGetQuotePage compact data={previewData} />
             </div>
