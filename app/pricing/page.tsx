@@ -109,20 +109,6 @@ export default function PricingPage() {
   if (mode === "sales") {
     return (
       <main className="min-h-screen bg-white text-slate-900">
-        <header className="border-b border-slate-100">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8">
-            <Link href="/" className="text-xl font-bold tracking-tight text-slate-950">
-              SimpleBookMe
-            </Link>
-            <Link
-              href="/setup"
-              className="rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
-            >
-              Create free website
-            </Link>
-          </div>
-        </header>
-
         <section className="px-5 pb-10 pt-14 text-center sm:px-8 sm:pt-20">
           <div className="mx-auto max-w-3xl">
             <p className="text-sm font-semibold text-indigo-700">
