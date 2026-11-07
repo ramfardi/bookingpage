@@ -1,6 +1,51 @@
-import { getAvailability } from "../../lib/availabilityStore";
+import "server-only";
+
+import { createClient } from "@supabase/supabase-js";
+import { notFound } from "next/navigation";
+import { getProductAccess } from "../../lib/billing/getAccess";
 
 export const dynamic = "force-dynamic";
+
+type AvailabilityPageData = {
+  businessName?: string;
+  selectedDays?: string[];
+  dayTimes?: Record<string, { start?: string; end?: string }>;
+  contact?: {
+    email?: string;
+    phone?: string;
+    address?: string;
+  };
+  logoDataUrl?: string;
+};
+
+function InactiveAvailabilityPage({
+  expired = false,
+}: {
+  expired?: boolean;
+}) {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
+      <div className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+        <h1 className="text-2xl font-bold text-gray-900">
+          {expired
+            ? "This availability page is temporarily inactive"
+            : "Availability page temporarily unavailable"}
+        </h1>
+        <p className="mt-4 text-sm leading-7 text-gray-600">
+          {expired
+            ? "The free trial has ended. The business owner can reactivate this availability page using their private activation link."
+            : "This availability page is not currently available. Please try again later or contact the business directly."}
+        </p>
+        <a
+          href="https://simplebookme.com"
+          className="mt-6 inline-block rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-700"
+        >
+          Visit SimpleBookMe
+        </a>
+      </div>
+    </main>
+  );
+}
 
 export default async function AvailabilityPage({
   params,
@@ -8,19 +53,101 @@ export default async function AvailabilityPage({
   params: Promise<{ siteId: string }>;
 }) {
   const { siteId } = await params;
-  const data = getAvailability(siteId);
 
-  if (!data) {
-    return <div className="p-10 text-center">Not found</div>;
+  if (!siteId?.trim()) {
+    notFound();
+  }
+
+  // Supabase is the authoritative store for pages across Vercel instances.
+  // Never fetch the private edit_token on a public route.
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL1;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    console.error("Missing Supabase environment variables for Availability Page.");
+    return <InactiveAvailabilityPage />;
+  }
+
+  let savedData: unknown = null;
+  let found = false;
+
+  try {
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const { data: record, error } = await supabase
+      .from("availability_sites")
+      .select("site_id, data")
+      .eq("site_id", siteId)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Failed to load Availability Page:", error.code);
+      return <InactiveAvailabilityPage />;
+    }
+
+    if (record) {
+      found = true;
+      savedData = record.data;
+    }
+  } catch {
+    console.error("Unexpected error loading Availability Page.");
+    return <InactiveAvailabilityPage />;
+  }
+
+  if (!found) {
+    notFound();
+  }
+
+  if (
+    !savedData ||
+    typeof savedData !== "object" ||
+    Array.isArray(savedData)
+  ) {
+    console.error("Availability Page has invalid saved data.");
+    return <InactiveAvailabilityPage />;
+  }
+
+  const data = savedData as AvailabilityPageData;
+
+  // Enforce the same billing rule used by Availability Page subdomains.
+  try {
+    const access = await getProductAccess({
+      productKey: "availability",
+      resourceId: siteId,
+    });
+
+    if (access.status === "unregistered") {
+      // Grandfather only existing pages explicitly listed by their ID.
+      // Do not allow all unregistered pages: registration can fail after save.
+      const legacyIds = new Set(
+        (process.env.AVAILABILITY_LEGACY_SITE_IDS || "")
+          .split(",")
+          .map((id) => id.trim())
+          .filter(Boolean)
+      );
+
+      if (!legacyIds.has(siteId)) {
+        return <InactiveAvailabilityPage />;
+      }
+    } else if (!access.allowed) {
+      return (
+        <InactiveAvailabilityPage expired={access.status === "expired"} />
+      );
+    }
+  } catch {
+    console.error("Unable to verify Availability Page billing status.");
+    return <InactiveAvailabilityPage />;
   }
 
   const businessName = data.businessName || "Availability";
   const email = data.contact?.email?.trim() || "";
   const phone = data.contact?.phone?.trim() || "";
   const address = data.contact?.address?.trim() || "";
-
   const phoneHref = phone.replace(/[^\d+]/g, "");
   const hasContact = Boolean(email || phone || address);
+  const selectedDays = Array.isArray(data.selectedDays)
+    ? data.selectedDays.filter((day): day is string => typeof day === "string")
+    : [];
+  const dayTimes = data.dayTimes ?? {};
 
   // Only display supported image data URLs.
   const logo =
@@ -80,9 +207,7 @@ export default async function AvailabilityPage({
                     className="flex min-w-0 flex-col items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-center text-white transition hover:bg-indigo-700"
                   >
                     <span className="font-semibold">Call</span>
-                    <span className="mt-1 text-sm break-all">
-                      {phone}
-                    </span>
+                    <span className="mt-1 text-sm break-all">{phone}</span>
                   </a>
                 )}
 
@@ -92,9 +217,7 @@ export default async function AvailabilityPage({
                     className="flex min-w-0 flex-col items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-center text-indigo-700 transition hover:bg-indigo-100"
                   >
                     <span className="font-semibold">Email</span>
-                    <span className="mt-1 text-sm break-all">
-                      {email}
-                    </span>
+                    <span className="mt-1 text-sm break-all">{email}</span>
                   </a>
                 )}
               </div>
@@ -136,9 +259,9 @@ export default async function AvailabilityPage({
           </h2>
 
           <div className="space-y-3">
-            {data.selectedDays.map((day: string) => {
+            {selectedDays.map((day) => {
               const isToday = day === today;
-              const hours = data.dayTimes[day];
+              const hours = dayTimes[day];
 
               return (
                 <div
@@ -171,7 +294,7 @@ export default async function AvailabilityPage({
               );
             })}
 
-            {data.selectedDays.length === 0 && (
+            {selectedDays.length === 0 && (
               <p className="py-4 text-center text-sm text-gray-500">
                 No availability has been posted yet.
               </p>

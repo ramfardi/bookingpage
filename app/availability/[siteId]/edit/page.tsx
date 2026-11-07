@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { useSearchParams, useParams } from "next/navigation";
 
@@ -32,6 +32,20 @@ type AvailabilityData = {
 };
 
 export default function EditPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="p-10 text-center text-slate-500">
+          Loading availability editor…
+        </div>
+      }
+    >
+      <EditPageContent />
+    </Suspense>
+  );
+}
+
+function EditPageContent() {
   const params = useParams();
   const searchParams = useSearchParams();
 

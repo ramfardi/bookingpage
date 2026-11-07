@@ -14,11 +14,11 @@ export const BILLING_PRODUCTS = {
   },
 
   // Future products
-  // availability: {
-  //   name: "Availability Page",
-  //   trialDays: 14,
-  //   stripePriceEnv: "STRIPE_PRICE_AVAILABILITY",
-  // },
+   availability: {
+     name: "Availability Page",
+     trialDays: 14,
+     stripePriceEnv: "STRIPE_PRICE_AVAILABILITY",
+   },
 
 } as const;
 

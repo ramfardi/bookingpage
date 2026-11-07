@@ -98,6 +98,28 @@ export default function AvailabilityGeneratorPage() {
 
   const [generatedLink, setGeneratedLink] = useState("");
   const [editLink, setEditLink] = useState("");
+  const [activationUrl, setActivationUrl] = useState("");
+  const [trialEndsAt, setTrialEndsAt] = useState("");
+  const [emailSent, setEmailSent] = useState<boolean | null>(null);
+  const [emailWarning, setEmailWarning] = useState("");
+  const [copyMessage, setCopyMessage] = useState("");
+
+  // Keep the same credentials and request details on retry. The API may
+  // already have saved the page if billing temporarily failed.
+  const creationAttempt = useRef<{
+    siteId: string;
+    editToken: string;
+    serializedForm: string;
+  } | null>(null);
+
+  async function copyLink(value: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopyMessage("Link copied.");
+    } catch {
+      setCopyMessage("Couldn't copy automatically. Please select and copy the link.");
+    }
+  }
 
   const toggleDay = (day: string) => {
     setSelectedDays((prev) =>
@@ -120,46 +142,128 @@ export default function AvailabilityGeneratorPage() {
 
   async function generateAvailabilityLink(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (submitting.current || logoLoading) return;
+    if (submitting.current || logoLoading || generatedLink) return;
+
     setError("");
+    setCopyMessage("");
+
     if (!selectedDays.length) {
       setError("Select at least one available day.");
       return;
     }
+
+    const ownerEmail = contact.email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ownerEmail)) {
+      setError("Enter a valid email address to receive your page links.");
+      return;
+    }
+
+    // The API uses the same availability data as before.
+    const formData = {
+      businessName: businessName.trim(),
+      selectedDays,
+      dayTimes,
+      contact: {
+        email: ownerEmail,
+        phone: contact.phone.trim(),
+        address: contact.address.trim(),
+      },
+      logoDataUrl,
+      bookingUrl: bookingUrl.trim(),
+    };
+
+    const serializedForm = JSON.stringify(formData);
+    let attempt = creationAttempt.current;
+
+    if (attempt && attempt.serializedForm !== serializedForm) {
+      setError(
+        "A previous attempt may already have saved your page. " +
+        "Please restore the same details and retry first. " +
+        "You can change them later using your private edit link."
+      );
+      return;
+    }
+
+    if (!attempt) {
+      attempt = {
+        siteId: crypto.randomUUID().slice(0, 8),
+        editToken: crypto.randomUUID().slice(0, 16),
+        serializedForm,
+      };
+      creationAttempt.current = attempt;
+    }
+
     submitting.current = true;
     setSaving(true);
-    setGeneratedLink("");
-    setEditLink("");
+
     try {
-      const siteId = crypto.randomUUID().slice(0, 8);
-      const editToken = crypto.randomUUID().slice(0, 16);
       const payload = {
-        siteId,
-        editToken,
-        businessName: businessName.trim(),
-        selectedDays,
-        dayTimes,
-        contact: {
-          email: contact.email.trim(),
-          phone: contact.phone.trim(),
-          address: contact.address.trim(),
-        },
-        logoDataUrl,
-		bookingUrl: bookingUrl.trim(),
+        siteId: attempt.siteId,
+        editToken: attempt.editToken,
+        ...formData,
       };
+
       const res = await fetch("/api/availability/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await res.json().catch(() => null);
-      if (!res.ok || typeof data?.subdomain !== "string") {
-        throw new Error(data?.error || "Could not create your availability link. Please try again.");
+
+      const data: unknown = await res.json().catch(() => null);
+      const response = data && typeof data === "object" && !Array.isArray(data)
+        ? (data as Record<string, unknown>)
+        : null;
+
+      if (!res.ok) {
+        // Validation or duplicate-subdomain failures mean the page was not
+        // created by this request. Allow corrected details on the next try.
+        if (res.status === 400 || res.status === 409) {
+          creationAttempt.current = null;
+        }
+        throw new Error(
+          typeof response?.error === "string"
+            ? response.error
+            : "Could not create your availability link. Please try again."
+        );
       }
-      setGeneratedLink(`https://${data.subdomain}.simplebookme.com`);
-      setEditLink(`${window.location.origin}/availability/${siteId}/edit?token=${editToken}`);
+
+      if (
+        response?.success !== true ||
+        response.persisted !== true ||
+        typeof response.subdomain !== "string" ||
+        !/^[a-z0-9-]+$/.test(response.subdomain) ||
+        typeof response.activationUrl !== "string" ||
+        !/^https?:\/\//i.test(response.activationUrl) ||
+        typeof response.trialEndsAt !== "string" ||
+        Number.isNaN(Date.parse(response.trialEndsAt))
+      ) {
+        // A partial rollout or incomplete response must not hide the
+        // activation link. Retry using the same ID and token.
+        throw new Error(
+          "Your page may have been saved, but trial setup is not confirmed. " +
+          "Please try again with the same details."
+        );
+      }
+
+      const publicUrl = `https://${response.subdomain}.simplebookme.com`;
+      const privateUrl = `${window.location.origin}/availability/${encodeURIComponent(
+        attempt.siteId
+      )}/edit?token=${encodeURIComponent(attempt.editToken)}`;
+
+      setGeneratedLink(publicUrl);
+      setEditLink(privateUrl);
+      setActivationUrl(response.activationUrl);
+      setTrialEndsAt(response.trialEndsAt);
+      setEmailSent(response.emailSent === true);
+      setEmailWarning(
+        typeof response.emailWarning === "string" ? response.emailWarning : ""
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again."
+      );
     } finally {
       submitting.current = false;
       setSaving(false);
@@ -171,17 +275,18 @@ export default function AvailabilityGeneratorPage() {
       <div className="w-full max-w-4xl">
 
         <h1 className="text-4xl font-bold text-gray-900">
-          Free Weekly Availability Link Generator
+          Weekly Availability Link Generator
         </h1>
 
         <p className="mt-4 text-gray-600">
           Create a shareable weekly availability page for your business. 
 Let clients see when you're available and contact or book instantly.
+          Create your page with a 14-day free trial, then keep it active with a one-time payment.
         </p>
 
         {/* INPUT */}
         <form onSubmit={generateAvailabilityLink} className="mt-10 bg-gray-50 p-8 rounded-2xl border">
-          <fieldset disabled={saving} className="space-y-6 disabled:opacity-70">
+          <fieldset disabled={saving || Boolean(generatedLink)} className="space-y-6 disabled:opacity-70">
 
           {/* Days */}
           <div>
@@ -252,7 +357,8 @@ Let clients see when you're available and contact or book instantly.
           <div className="space-y-4 border-t pt-6">
             <h2 className="text-xl font-semibold text-gray-900">Business details</h2>
             <p className="text-sm text-gray-600">
-              Contact details and your logo are optional. Information entered here is intended for your public availability page.
+              Your email is required to receive your public, private edit, and activation links.
+              The contact information you enter here will also appear on your public availability page. Phone, address, and logo are optional.
             </p>
             <label className="block font-medium">
               Business name
@@ -262,8 +368,8 @@ Let clients see when you're available and contact or book instantly.
             </label>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block font-medium">
-                Email (optional)
-                <input type="email" autoComplete="email" maxLength={254}
+                Email * (required)
+                <input type="email" required autoComplete="email" maxLength={254}
                   placeholder="hello@yourbusiness.com" value={contact.email}
                   onChange={(e) => setContact((prev) => ({ ...prev, email: e.target.value }))}
                   className="mt-2 w-full border rounded-lg px-4 py-3 font-normal" />
@@ -325,16 +431,29 @@ Let clients see when you're available and contact or book instantly.
           </div>
 
           {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-          <button type="submit" disabled={saving || logoLoading}
+          <button type="submit" disabled={saving || logoLoading || Boolean(generatedLink)}
             className="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">
-            {saving ? "Creating your link…" : logoLoading ? "Preparing logo…" : "Generate Live Availability Link"}
+            {saving
+              ? "Creating your link…"
+              : generatedLink
+                ? "Availability Link Created"
+                : logoLoading
+                  ? "Preparing logo…"
+                  : "Generate Live Availability Link"}
           </button>
           </fieldset>
         </form>
 
 {/* RESULT */}
 {generatedLink && (
-  <div className="mt-10 p-6 border rounded-2xl bg-white shadow-sm space-y-6">
+  <div className="mt-10 p-6 border rounded-2xl bg-white shadow-sm space-y-6" aria-live="polite">
+
+    <div>
+      <h2 className="text-2xl font-bold text-gray-900">Your availability page is ready!</h2>
+      <p className="mt-2 text-sm text-gray-600">
+        Save your private edit link and share the public link with customers.
+      </p>
+    </div>
 
     {/* PUBLIC LINK */}
     <div className="space-y-2">
@@ -351,7 +470,8 @@ Let clients see when you're available and contact or book instantly.
         </a>
 
         <button
-          onClick={() => navigator.clipboard.writeText(generatedLink)}
+          type="button"
+          onClick={() => void copyLink(generatedLink)}
           className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-md"
         >
           Copy
@@ -378,13 +498,97 @@ Let clients see when you're available and contact or book instantly.
         </a>
 
         <button
-          onClick={() => navigator.clipboard.writeText(editLink)}
+          type="button"
+          onClick={() => void copyLink(editLink)}
           className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-md"
         >
           Copy
         </button>
       </div>
     </div>
+
+    {/* 14-DAY TRIAL */}
+    {trialEndsAt && (
+      <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+        <h3 className="text-lg font-bold text-indigo-950">
+          Your 14-day free trial has started!
+        </h3>
+        <p className="mt-2 text-sm leading-6 text-indigo-800">
+          Your availability page is ready to share. No credit card is required
+          during your trial.
+        </p>
+        <p className="mt-3 text-sm font-semibold text-indigo-900">
+          Trial ends: {new Date(trialEndsAt).toLocaleDateString(undefined, {
+            year: "numeric", month: "long", day: "numeric",
+          })}
+        </p>
+      </div>
+    )}
+
+    {/* EMAIL DELIVERY STATUS */}
+    {emailSent === true && (
+      <div role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+        <p className="text-sm font-semibold text-emerald-800">
+          Your links have been submitted for email delivery.
+        </p>
+        <p className="mt-1 text-sm text-emerald-800">
+          We sent your public, private edit, and activation links to {contact.email.trim()}.
+          Please check your inbox and spam folder.
+        </p>
+      </div>
+    )}
+    {emailSent === false && (
+      <div role="alert" className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+        <p className="text-sm font-semibold text-amber-900">
+          Your page was created, but the email could not be sent.
+        </p>
+        <p className="mt-1 text-sm text-amber-800">
+          {emailWarning || "Save all three links below for future access."}
+        </p>
+      </div>
+    )}
+
+    {/* STRIPE ACTIVATION */}
+    {activationUrl && (
+      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5">
+        <h3 className="text-lg font-bold text-gray-900">
+          Keep your availability page active
+        </h3>
+        <p className="mt-2 text-sm leading-6 text-gray-600">
+          Activate your page with a one-time payment before or after your trial ends.
+          No monthly subscription is required, and your page links stay the same.
+        </p>
+        <a
+          href={activationUrl}
+          className="mt-4 inline-flex rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white hover:bg-indigo-700"
+        >
+          Activate Your Availability Page
+        </a>
+        <div className="mt-4 space-y-2">
+          <p className="text-xs font-medium text-gray-500">
+            Private activation link — save this as well
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <a href={activationUrl} className="min-w-0 flex-1 break-all text-xs text-indigo-700 underline">
+              {activationUrl}
+            </a>
+            <button
+              type="button"
+              onClick={() => void copyLink(activationUrl)}
+              className="rounded-md bg-white px-3 py-2 text-xs font-medium text-gray-700 ring-1 ring-gray-200 hover:bg-gray-100"
+            >
+              Copy activation link
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {copyMessage && (
+      <p role="status" className="text-sm font-medium text-gray-700">
+        {copyMessage}
+      </p>
+    )}
 
     {/* SHARE IDEAS */}
     <div className="pt-4 border-t">
