@@ -1,5 +1,7 @@
+
 import { notFound } from "next/navigation";
 import { getPricing } from "../../lib/pricingStore";
+import { getProductAccess } from "../../lib/billing/getAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +35,6 @@ function safeWebUrl(value?: string): string {
 
   if (!trimmed) return "";
 
-  // Reject unsupported schemes.
   if (
     /^[a-z][a-z0-9+.-]*:/i.test(trimmed) &&
     !/^https?:\/\//i.test(trimmed)
@@ -64,12 +65,10 @@ function safeWebUrl(value?: string): string {
 }
 
 function getLogo(data: PricingData): string {
-  // The pricing creation form uploads to Supabase and saves logoUrl.
   const uploadedLogo = safeWebUrl(data.logoUrl);
 
   if (uploadedLogo) return uploadedLogo;
 
-  // Also support the image format used by your availability page.
   const dataUrl = data.logoDataUrl?.trim() || "";
 
   return /^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(
@@ -79,6 +78,50 @@ function getLogo(data: PricingData): string {
     : "";
 }
 
+/* ---------------- INACTIVE PAGE ---------------- */
+
+function PricingUnavailable({
+  expired,
+}: {
+  expired: boolean;
+}) {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
+      <div className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+        <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-50 text-2xl">
+          {expired ? "⏳" : "⚠️"}
+        </div>
+
+        <h1 className="text-2xl font-bold text-gray-900">
+          {expired
+            ? "This pricing page is temporarily inactive"
+            : "Pricing page temporarily unavailable"}
+        </h1>
+
+        <p className="mt-4 text-sm leading-7 text-gray-600">
+          {expired
+            ? "The free trial for this pricing page has ended. The business owner can reactivate the page using their private activation link."
+            : "We couldn't verify the availability of this pricing page right now. Please try again later."}
+        </p>
+
+        <p className="mt-4 text-xs text-gray-500">
+          The business owner can still access their private
+          editing page and saved pricing information.
+        </p>
+
+        <a
+          href="https://simplebookme.com"
+          className="mt-6 inline-flex rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+        >
+          Visit SimpleBookMe
+        </a>
+      </div>
+    </main>
+  );
+}
+
+/* ---------------- PUBLIC PRICING PAGE ---------------- */
+
 export default async function PublicPricingPage({
   params,
 }: {
@@ -86,16 +129,58 @@ export default async function PublicPricingPage({
 }) {
   const { siteId } = await params;
 
-  // getPricing should return the saved data object, or null if not found.
-  // Await supports either a synchronous store or an async Supabase store.
+  // STEP 1: Load saved pricing information.
   const data: PricingData | null = await getPricing(siteId);
 
   if (!data) {
     notFound();
   }
 
-  const businessName = data.businessName?.trim() || "Our services";
-  const title = data.pricing?.title?.trim() || "Services & Pricing";
+  // STEP 2: Verify trial or payment status.
+  // Direct URLs must use the same billing rules as
+  // business subdomains.
+
+  let billingBlocked = false;
+  let billingExpired = false;
+
+  try {
+    const access = await getProductAccess({
+      productKey: "pricing_page",
+      resourceId: siteId,
+    });
+
+    // Compatibility with Pricing Pages created before
+    // the billing system was introduced.
+    if (access.status === "unregistered") {
+      billingBlocked = false;
+    } else if (!access.allowed) {
+      billingBlocked = true;
+      billingExpired = access.status === "expired";
+    }
+  } catch {
+    console.error(
+      "Unable to verify Pricing Page billing access."
+    );
+
+    // Fail closed if billing verification is unavailable.
+    billingBlocked = true;
+    billingExpired = false;
+  }
+
+  // STEP 3: Block public access when necessary.
+  if (billingBlocked) {
+    return <PricingUnavailable expired={billingExpired} />;
+  }
+
+  // STEP 4: Existing Pricing Page display.
+  // Everything below retains the original functionality.
+
+  const businessName =
+    data.businessName?.trim() || "Our services";
+
+  const title =
+    data.pricing?.title?.trim() || "Services & Pricing";
+
   const currency = data.currency?.trim() || "";
 
   const rows = (data.pricing?.rows ?? []).filter(
@@ -116,6 +201,7 @@ export default async function PublicPricingPage({
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white px-4 py-10 sm:px-6">
       <div className="mx-auto w-full max-w-2xl space-y-6">
+
         {/* BUSINESS HEADER */}
         <header className="space-y-3 text-center">
           {logo && (
@@ -231,7 +317,10 @@ export default async function PublicPricingPage({
                     href={`tel:${phoneHref}`}
                     className="flex min-w-0 flex-col items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-center text-white transition hover:bg-indigo-700"
                   >
-                    <span className="font-semibold">Call</span>
+                    <span className="font-semibold">
+                      Call
+                    </span>
+
                     <span className="mt-1 break-all text-sm">
                       {phone}
                     </span>
@@ -243,7 +332,10 @@ export default async function PublicPricingPage({
                     href={`mailto:${encodeURIComponent(email)}`}
                     className="flex min-w-0 flex-col items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-center text-indigo-700 transition hover:bg-indigo-100"
                   >
-                    <span className="font-semibold">Email</span>
+                    <span className="font-semibold">
+                      Email
+                    </span>
+
                     <span className="mt-1 break-all text-sm">
                       {email}
                     </span>
@@ -253,7 +345,11 @@ export default async function PublicPricingPage({
             )}
 
             {address && (
-              <div className={phone || email ? "border-t pt-4" : ""}>
+              <div
+                className={
+                  phone || email ? "border-t pt-4" : ""
+                }
+              >
                 <p className="text-sm font-medium text-gray-900">
                   Address
                 </p>
@@ -275,8 +371,8 @@ export default async function PublicPricingPage({
 
             {!bookingUrl && (
               <p className="border-t pt-4 text-center text-sm text-gray-500">
-                Contact us to ask about our services or arrange an
-                appointment.
+                Contact us to ask about our services or
+                arrange an appointment.
               </p>
             )}
           </section>

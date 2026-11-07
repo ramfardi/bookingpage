@@ -6,18 +6,18 @@ export const BILLING_PRODUCTS = {
     stripePriceEnv: "STRIPE_PRICE_CLEANING_QUOTE",
   },
 
-  // Add future products here:
-  //
+  // NEW: Pricing Page Generator
+  pricing_page: {
+    name: "Pricing Page Generator",
+    trialDays: 14,
+    stripePriceEnv: "STRIPE_PRICE_PRICING_PAGE",
+  },
+
+  // Future products
   // availability: {
   //   name: "Availability Page",
   //   trialDays: 14,
   //   stripePriceEnv: "STRIPE_PRICE_AVAILABILITY",
-  // },
-  //
-  // pricing_page: {
-  //   name: "Pricing Page",
-  //   trialDays: 14,
-  //   stripePriceEnv: "STRIPE_PRICE_PRICING",
   // },
 
 } as const;

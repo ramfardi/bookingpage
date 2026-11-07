@@ -53,6 +53,10 @@ type PricingData = {
 type CreatedLinks = {
   publicUrl: string;
   editUrl: string;
+  activationUrl: string;
+  trialEndsAt: string;
+  emailSent: boolean;
+  emailWarning: string;
 };
 
 const PRESETS: { value: PresetId; label: string }[] = [
@@ -336,12 +340,13 @@ const hasChanges = services.some(
     }
 
     if (
-      contact.email.trim() &&
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
         contact.email.trim()
       )
     ) {
-      setError("Enter a valid contact email address.");
+      setError(
+        "Enter a valid contact email address to receive your page links."
+      );
       return;
     }
 
@@ -449,6 +454,20 @@ const hasChanges = services.some(
         );
       }
 
+      // The new API returns these only after billing registration.
+      // If a deployment is partially updated, let the user retry using
+      // the same requestId rather than silently omit the activation link.
+      if (
+        typeof payload.activationUrl !== "string" ||
+        !/^https?:\/\//i.test(payload.activationUrl) ||
+        typeof payload.trialEndsAt !== "string" ||
+        Number.isNaN(Date.parse(payload.trialEndsAt))
+      ) {
+        throw new Error(
+          "Your page may have been saved, but trial setup is not available yet. Please retry without changing the form."
+        );
+      }
+
       const siteId = encodeURIComponent(payload.siteId);
       const editToken = encodeURIComponent(
         payload.editToken
@@ -459,6 +478,13 @@ const hasChanges = services.some(
           `https://${payload.subdomain}.simplebookme.com`,
         editUrl:
           `${window.location.origin}/pricing_page/${siteId}/edit?token=${editToken}`,
+        activationUrl: payload.activationUrl,
+        trialEndsAt: payload.trialEndsAt,
+        emailSent: payload.emailSent === true,
+        emailWarning:
+          typeof payload.emailWarning === "string"
+            ? payload.emailWarning
+            : "",
       });
     } catch (failure) {
       setError(
@@ -802,19 +828,23 @@ const hasChanges = services.some(
                 </h2>
 
                 <p className="text-sm text-gray-500">
-                  Optional. These details will be visible
-                  on your public pricing page.
+                  Your email is required so we can send your public,
+                  private edit, and activation links. It will also be
+                  displayed on your public pricing page. Phone,
+                  address, and booking link are optional.
                 </p>
 
                 <label className="block space-y-1">
                   <span className="text-sm font-medium">
-                    Email
+                    Contact email *
                   </span>
 
                   <input
                     type="email"
                     className={inputClass}
                     autoComplete="email"
+                    placeholder="you@yourbusiness.com"
+                    required
                     maxLength={254}
                     value={contact.email}
                     onChange={(event) =>
@@ -1026,6 +1056,75 @@ const hasChanges = services.some(
                   change your page. Share only the public
                   link with clients.
                 </p>
+
+                {/* TRIAL DETAILS */}
+                <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+                  <h3 className="text-base font-bold text-indigo-950">
+                    Your 14-day free trial has started!
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-indigo-900">
+                    Your pricing page is ready to share. No credit card
+                    is required during your trial.
+                  </p>
+                  <p className="mt-2 text-sm font-semibold text-indigo-950">
+                    Trial ends: {new Date(created.trialEndsAt).toLocaleDateString(
+                      undefined,
+                      { year: "numeric", month: "long", day: "numeric" }
+                    )}
+                  </p>
+                </div>
+
+                {/* EMAIL DELIVERY STATUS */}
+                {created.emailSent ? (
+                  <p
+                    className="rounded-lg border border-green-200 bg-white p-3 text-sm text-green-800"
+                    role="status"
+                  >
+                    Your public, private edit, and activation links have
+                    been submitted for email delivery to {contact.email.trim()}.
+                    Please check your inbox and spam folder.
+                  </p>
+                ) : (
+                  <p
+                    className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900"
+                    role="alert"
+                  >
+                    {created.emailWarning ||
+                      "Your page was created, but the email could not be sent. Please save all your links now."}
+                  </p>
+                )}
+
+                {/* STRIPE ACTIVATION: SHARED BILLING FLOW */}
+                <div className="rounded-xl border border-gray-200 bg-white p-4">
+                  <h3 className="text-lg font-bold text-gray-900">
+                    Keep your pricing page active
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-gray-600">
+                    Activate your page with a one-time payment before
+                    the trial ends to keep your public link working.
+                    No monthly subscription. Your page and edit links
+                    will stay the same.
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <a
+                      href={created.activationUrl}
+                      className="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+                    >
+                      Activate my pricing page
+                    </a>
+                    <button
+                      type="button"
+                      className={secondaryClass}
+                      onClick={() => copyLink(created.activationUrl)}
+                    >
+                      Copy activation link
+                    </button>
+                  </div>
+                  <p className="mt-3 text-xs text-gray-500">
+                    The payment amount is shown on the activation page.
+                    Save the activation link with your private edit link.
+                  </p>
+                </div>
 
                 {copyMessage && (
                   <p

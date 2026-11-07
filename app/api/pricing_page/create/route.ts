@@ -1,3 +1,4 @@
+
 import { NextResponse } from "next/server";
 import {
   createPricing,
@@ -7,6 +8,11 @@ import type {
   PricingData,
   PricingTemplateId,
 } from "@/app/lib/pricingStore";
+
+// Billing system shared with Cleaning Quote
+import { registerProduct } from "@/app/lib/billing/registerProduct";
+import { sendProductLinks } from "@/app/lib/billing/sendLinks";
+import { getBillingDb } from "@/app/lib/billing/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -140,9 +146,18 @@ const CURRENCIES = new Set([
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-function validatePricingData(value: unknown): PricingData {
+const EMAIL_PATTERN =
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/* ---------------- VALIDATION ---------------- */
+
+function validatePricingData(
+  value: unknown
+): PricingData {
   if (!isRecord(value)) {
-    throw new ValidationError("Missing or invalid pricing data.");
+    throw new ValidationError(
+      "Missing or invalid pricing data."
+    );
   }
 
   const businessName = readString(
@@ -157,7 +172,9 @@ function validatePricingData(value: unknown): PricingData {
   );
 
   if (!templateId) {
-    throw new ValidationError("Please select a valid service preset.");
+    throw new ValidationError(
+      "Please select a valid service preset."
+    );
   }
 
   const currency = readString(
@@ -168,13 +185,17 @@ function validatePricingData(value: unknown): PricingData {
   ).toUpperCase();
 
   if (!CURRENCIES.has(currency)) {
-    throw new ValidationError("Please select a supported currency.");
+    throw new ValidationError(
+      "Please select a supported currency."
+    );
   }
 
   /* ---------------- SERVICES AND PRICES ---------------- */
 
   if (!isRecord(value.pricing)) {
-    throw new ValidationError("Missing pricing information.");
+    throw new ValidationError(
+      "Missing pricing information."
+    );
   }
 
   const title = readString(
@@ -205,7 +226,6 @@ function validatePricingData(value: unknown): PricingData {
       );
     }
 
-    // Preset IDs such as "hairsalon-0" and custom UUIDs are supported.
     const id = readString(
       row.id,
       `Service ${index + 1} ID`,
@@ -221,61 +241,80 @@ function validatePricingData(value: unknown): PricingData {
 
     usedIds.add(id);
 
-return {
-  id,
-  name: readString(
-    row.name,
-    `Service ${index + 1} name`,
-    160,
-    true
-  ),
-  price: readString(
-    row.price,
-    `Service ${index + 1} price`,
-    100,
-    true
-  ),
-  description: readString(
-    row.description,
-    `Service ${index + 1} notes`,
-    500
-  ),
-};
+    return {
+      id,
+      name: readString(
+        row.name,
+        `Service ${index + 1} name`,
+        160,
+        true
+      ),
+      price: readString(
+        row.price,
+        `Service ${index + 1} price`,
+        100,
+        true
+      ),
+      description: readString(
+        row.description,
+        `Service ${index + 1} notes`,
+        500
+      ),
+    };
   });
 
   /* ---------------- CONTACT ---------------- */
 
   const rawContact =
-    value.contact === undefined ? {} : value.contact;
+    value.contact === undefined
+      ? {}
+      : value.contact;
 
   if (!isRecord(rawContact)) {
-    throw new ValidationError("Invalid contact information.");
+    throw new ValidationError(
+      "Invalid contact information."
+    );
   }
 
+  // NEW: Email is required for trial registration.
   const contact = {
-    email: readString(rawContact.email, "Email", 254),
-    phone: readString(rawContact.phone, "Phone number", 50),
-    address: readString(rawContact.address, "Address", 500),
+    email: readString(
+      rawContact.email,
+      "Email",
+      254,
+      true
+    ).toLowerCase(),
+
+    phone: readString(
+      rawContact.phone,
+      "Phone number",
+      50
+    ),
+
+    address: readString(
+      rawContact.address,
+      "Address",
+      500
+    ),
   };
 
-  if (
-    contact.email &&
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email)
-  ) {
+  if (!EMAIL_PATTERN.test(contact.email)) {
     throw new ValidationError(
-      "Please enter a valid email address."
+      "Please enter a valid email address to receive your pricing page links."
     );
   }
 
   /* ---------------- LOGO ---------------- */
 
-  // The creation form uploads to Supabase and sends logoUrl.
   const logoUrl = normalizeWebUrl(
-    readString(value.logoUrl, "Logo URL", 2048),
+    readString(
+      value.logoUrl,
+      "Logo URL",
+      2048
+    ),
     "Logo URL"
   );
 
-  // Also support the resized embedded logo used by the edit form.
   const logoDataUrl = readString(
     value.logoDataUrl,
     "Logo image",
@@ -296,7 +335,11 @@ return {
   /* ---------------- BOOKING AND NOTES ---------------- */
 
   const bookingUrl = normalizeWebUrl(
-    readString(value.bookingUrl, "Booking link", 2048),
+    readString(
+      value.bookingUrl,
+      "Booking link",
+      2048
+    ),
     "Booking link"
   );
 
@@ -331,11 +374,17 @@ export async function POST(req: Request) {
     try {
       body = await req.json();
     } catch {
-      return json({ error: "Invalid JSON request." }, 400);
+      return json(
+        { error: "Invalid JSON request." },
+        400
+      );
     }
 
     if (!isRecord(body)) {
-      return json({ error: "Invalid request." }, 400);
+      return json(
+        { error: "Invalid request." },
+        400
+      );
     }
 
     const requestId = readString(
@@ -347,28 +396,177 @@ export async function POST(req: Request) {
 
     if (!UUID_PATTERN.test(requestId)) {
       return json(
-        { error: "Invalid creation request ID." },
+        {
+          error: "Invalid creation request ID.",
+        },
         400
       );
     }
 
     const data = validatePricingData(body.data);
 
-    // The store generates the page ID and private edit token.
-    // Repeated requests with the same requestId and data
-    // return the same links instead of creating duplicate pages.
-    const result = await createPricing(data, requestId);
+    const ownerEmail = data.contact.email;
 
-	return json({
-	  success: true,
-	  persisted: true,
-	  siteId: result.siteId,
-	  editToken: result.editToken,
-	  subdomain: result.subdomain,
-	});
+    /* -------- STEP 1: SAVE PRICING PAGE -------- */
+
+    // Keep existing storage and retry protection.
+    // The store generates siteId, editToken and subdomain.
+    const result = await createPricing(
+      data,
+      requestId
+    );
+
+    /* -------- STEP 2: REGISTER FREE TRIAL -------- */
+
+    let billing: Awaited<
+      ReturnType<typeof registerProduct>
+    >;
+
+    try {
+      billing = await registerProduct({
+        productKey: "pricing_page",
+        resourceId: result.siteId,
+        email: ownerEmail,
+      });
+    } catch {
+      console.error(
+        "Pricing page saved, but billing registration failed."
+      );
+
+      // Do not create a second pricing page.
+      // A retry with the same requestId should recover it.
+      return json(
+        {
+          error:
+            "Your pricing page was saved, but trial setup could not be completed. Please retry without changing your form.",
+          retryable: true,
+        },
+        503
+      );
+    }
+
+    /* -------- STEP 3: CREATE LINKS -------- */
+
+    const appOrigin =
+      process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+      new URL(req.url).origin;
+
+    const publicUrl =
+      `https://${result.subdomain}.simplebookme.com`;
+
+    const editUrl = new URL(
+      `/pricing_page/${encodeURIComponent(result.siteId)}/edit`,
+      appOrigin
+    );
+
+    editUrl.searchParams.set(
+      "token",
+      result.editToken
+    );
+
+    const privateUrl = editUrl.toString();
+
+    const activationUrl = billing.activationUrl;
+
+    /* -------- STEP 4: WELCOME EMAIL -------- */
+
+    let emailSent = false;
+    let emailWarning = "";
+
+    try {
+      const db = getBillingDb();
+
+      // Look up whether we already emailed the owner.
+      // This avoids resending on normal creation retries.
+      const {
+        data: activationRow,
+        error: lookupError,
+      } = await db
+        .from("product_activations")
+        .select("id, welcome_email_sent_at")
+        .eq("product_key", "pricing_page")
+        .eq("resource_id", result.siteId)
+        .maybeSingle();
+
+      if (lookupError || !activationRow) {
+        throw new Error(
+          "Could not verify welcome email status."
+        );
+      }
+
+      if (activationRow.welcome_email_sent_at) {
+        // The email was already accepted previously.
+        emailSent = true;
+      } else {
+        await sendProductLinks({
+          productKey: "pricing_page",
+          email: ownerEmail,
+          businessName: data.businessName,
+          publicUrl,
+          privateUrl,
+          activationUrl,
+          trialEndsAt: billing.trialEndsAt,
+        });
+
+        // Resend accepted the email.
+        emailSent = true;
+
+        const { error: updateError } = await db
+          .from("product_activations")
+          .update({
+            welcome_email_sent_at:
+              new Date().toISOString(),
+          })
+          .eq("id", activationRow.id)
+          .is("welcome_email_sent_at", null);
+
+        if (updateError) {
+          // The page and email still succeeded.
+          // Log without printing any private tokens.
+          console.error(
+            "Pricing welcome email sent, but status update failed."
+          );
+        }
+      }
+    } catch {
+      console.error(
+        "Pricing page created, but welcome email failed."
+      );
+
+      emailWarning =
+        "Your pricing page was created, but the email could not be sent. Please save your links.";
+    }
+
+    /* -------- STEP 5: RETURN RESULT -------- */
+
+    return json({
+      success: true,
+      persisted: true,
+
+      // Existing fields: retained for frontend compatibility
+      siteId: result.siteId,
+      editToken: result.editToken,
+      subdomain: result.subdomain,
+
+      // New URLs
+      publicUrl,
+      editUrl: privateUrl,
+      activationUrl,
+
+      // New billing information
+      trialStartedAt: billing.trialStartedAt,
+      trialEndsAt: billing.trialEndsAt,
+
+      // Welcome email status
+      emailSent,
+      emailWarning,
+    });
   } catch (error) {
     if (error instanceof ValidationError) {
-      return json({ error: error.message }, 400);
+      return json(
+        { error: error.message },
+        400
+      );
     }
 
     if (error instanceof PricingStoreError) {
@@ -378,11 +576,16 @@ export async function POST(req: Request) {
       );
     }
 
-    // Do not log request bodies or private edit tokens.
-    console.error("Unexpected pricing page creation failure.");
+    // Never log request bodies or private edit tokens.
+    console.error(
+      "Unexpected pricing page creation failure."
+    );
 
     return json(
-      { error: "Could not create your pricing page. Please try again." },
+      {
+        error:
+          "Could not create your pricing page. Please try again.",
+      },
       500
     );
   }
