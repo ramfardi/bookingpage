@@ -41,6 +41,19 @@ function isRecord(
 const EMAIL_PATTERN =
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Valid weekdays for the Availability Page calendar.
+const VALID_DAYS = new Set([
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+]);
+
+const TIME_PATTERN = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+
 /* ---------------- CREATE AVAILABILITY PAGE ---------------- */
 
 export async function POST(req: Request) {
@@ -203,14 +216,88 @@ export async function POST(req: Request) {
       );
     }
 
+    /* ---------------- VALIDATE WEEKLY SCHEDULE ---------------- */
+
+    // JSON fields are unknown until they have been validated.
+    // saveAvailability expects string[] and a typed dayTimes object.
+    if (
+      !Array.isArray(selectedDays) ||
+      selectedDays.length === 0 ||
+      selectedDays.length > 7
+    ) {
+      return json(
+        { error: "Select at least one available day." },
+        400
+      );
+    }
+
+    const validatedDays: string[] = [];
+
+    for (const day of selectedDays) {
+      if (
+        typeof day !== "string" ||
+        !VALID_DAYS.has(day) ||
+        validatedDays.includes(day)
+      ) {
+        return json(
+          { error: "Invalid or duplicate availability day." },
+          400
+        );
+      }
+      validatedDays.push(day);
+    }
+
+    if (!isRecord(dayTimes)) {
+      return json(
+        { error: "Invalid working hours." },
+        400
+      );
+    }
+
+    const validatedDayTimes: Record<
+      string,
+      { start: string; end: string }
+    > = {};
+
+    for (const [day, rawTimes] of Object.entries(dayTimes)) {
+      if (!VALID_DAYS.has(day)) continue;
+
+      if (
+        !isRecord(rawTimes) ||
+        typeof rawTimes.start !== "string" ||
+        typeof rawTimes.end !== "string" ||
+        !TIME_PATTERN.test(rawTimes.start) ||
+        !TIME_PATTERN.test(rawTimes.end)
+      ) {
+        return json(
+          { error: `Invalid working hours for ${day}.` },
+          400
+        );
+      }
+
+      validatedDayTimes[day] = {
+        start: rawTimes.start,
+        end: rawTimes.end,
+      };
+    }
+
+    for (const day of validatedDays) {
+      const hours = validatedDayTimes[day];
+      if (!hours || hours.start >= hours.end) {
+        return json(
+          { error: `Choose valid start and end times for ${day}.` },
+          400
+        );
+      }
+    }
+
     /* ---------------- AVAILABILITY DATA ---------------- */
 
-    // Preserve the same data shape used by your
-    // existing public page and edit page.
+    // Preserve the data shape used by the public page and editor.
     const availabilityData = {
       businessName: businessName.trim(),
-      selectedDays,
-      dayTimes,
+      selectedDays: validatedDays,
+      dayTimes: validatedDayTimes,
       contact,
       logoDataUrl,
       bookingUrl,
