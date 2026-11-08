@@ -1,52 +1,88 @@
+
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Cleaning Business Website, Quote Generator & Booking System | SimpleBookMe",
+  title:
+    "Cleaning Quote Generator for Cleaning Businesses | SimpleBookMe",
+
   description:
-    "Create a complete online system for your cleaning business. Generate instant cleaning quotes, share a live weekly availability calendar, and accept bookings with built-in email notifications. Includes free tools like QR codes to help grow your business.",
+    "Create your own online cleaning quote calculator in minutes. Customize cleaning rates, property types, services, and extras. Share one link so customers can get instant cleaning estimates. Just $9.99 USD, one-time payment.",
 
   keywords: [
-    "cleaning business website",
     "cleaning quote generator",
-    "cleaning availability calendar",
-    "cleaning booking system",
-    "house cleaning booking website",
-    "maid service scheduling",
-    "cleaning service pricing tool",
-    "cleaning appointment booking",
+    "cleaning quote calculator",
+    "online cleaning estimate calculator",
+    "cleaning business quote generator",
+    "house cleaning estimate calculator",
+    "cleaning service pricing calculator",
+    "cleaning business pricing tool",
+    "instant cleaning quotes",
+    "cleaning quote website",
     "cleaning quote link",
-    "availability calendar for cleaning business",
-    "online booking for cleaning services",
-    "cleaning website builder",
+    "maid service quote calculator",
+    "cleaning business software",
+    "custom cleaning quote form",
+    "cleaning estimate tool",
     "cleaning business tools",
-    "QR code for cleaning business",
-    "cleaning service website no monthly fee",
+    "cleaning quote calculator no monthly fee",
   ],
+
+  applicationName: "SimpleBookMe",
 
   alternates: {
     canonical: "https://simplebookme.com/cleaning",
   },
 
   openGraph: {
-    title: "Cleaning Business Tools: Quotes, Availability & Booking | SimpleBookMe",
+    title:
+      "Cleaning Quote Generator — Create & Share Your Own Quote Page",
+
     description:
-      "All-in-one platform for cleaning businesses. Let customers generate quotes, check your availability, and book appointments online. Includes free tools like QR codes to attract more clients.",
+      "Stop calculating every cleaning estimate manually. Build a customizable cleaning quote page, set your rates, and let customers calculate estimated prices instantly. Only $9.99 USD, one-time.",
+
     url: "https://simplebookme.com/cleaning",
+
     siteName: "SimpleBookMe",
+
     type: "website",
+
+    locale: "en_US",
+
+    images: [
+      {
+        url: "https://simplebookme.com/images/cleaning.jpg",
+        alt: "SimpleBookMe Cleaning Quote Generator",
+      },
+    ],
   },
 
   twitter: {
-    card: "summary",
-    title: "Cleaning Business Tools & Booking System",
+    card: "summary_large_image",
+
+    title:
+      "Cleaning Quote Generator for Your Business | SimpleBookMe",
+
     description:
-      "Quote generator, availability calendar, and booking website for cleaning services.",
+      "Create a customizable cleaning quote calculator, set your prices, and share your own quote link. $9.99 USD one-time.",
+
+    images: [
+      "https://simplebookme.com/images/cleaning.jpg",
+    ],
   },
 
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
+
+  category: "business",
 };
 
 export default function CleaningLayout({
