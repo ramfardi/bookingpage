@@ -2,7 +2,10 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
+import {
+  getCustomerConfigFromHost,
+  SALES_CONFIG,
+} from "@/app/lib/getCustomer";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 import type { LandingConfig } from "@/app/lib/landingConfig";
 import { useRouter } from "next/navigation";
@@ -38,12 +41,26 @@ export default function HomePage({
 }) {
   const router = useRouter();
 
+  /*
+   * SEO: start with real content so the server-rendered HTML
+   * contains the full page. Previously this started as null and
+   * was only filled in by a client-side fetch, so the server
+   * sent an empty <main>.
+   * - activeCustomer is resolved on the server (subdomain sites)
+   *   or passed live by the /site/[siteId] editor preview.
+   * - Otherwise this is the main SimpleBookMe sales page.
+   */
+  const initialCustomer: CustomerConfig | LandingConfig =
+    activeCustomer ?? SALES_CONFIG;
+
   const [customer, setCustomer] = useState<
-    CustomerConfig | LandingConfig | null
-  >(null);
+    CustomerConfig | LandingConfig
+  >(initialCustomer);
 
   const [customerKey, setCustomerKey] = useState<string | null>(null);
-  const [mode, setMode] = useState<"sales" | "client">("sales");
+  const [mode, setMode] = useState<"sales" | "client">(
+    activeCustomer ? "client" : "sales"
+  );
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [quoteOpen, setQuoteOpen] = useState(false);
 
@@ -83,11 +100,26 @@ export default function HomePage({
     message: "",
   });
   
-  const [typedSubheader1, setTypedSubheader1] = useState("");
-  const [typedSubheader2, setTypedSubheader2] = useState("");
-  
-  const [typedHeader1, setTypedHeader1] = useState("");
-  const [typedHeader2, setTypedHeader2] = useState("");
+  /*
+   * SEO: the typewriter text starts as the FULL text so the
+   * server HTML has a complete <h1> and subheaders. The effects
+   * below reset it and type it out after mount. The hero starts
+   * at opacity 0 (framer-motion) until hydration, so visitors
+   * don't see the full text flash before the typing begins.
+   */
+  const [typedSubheader1, setTypedSubheader1] = useState(
+    initialCustomer.landing?.subheader1 || ""
+  );
+  const [typedSubheader2, setTypedSubheader2] = useState(
+    initialCustomer.landing?.subheader2 || ""
+  );
+
+  const [typedHeader1, setTypedHeader1] = useState(
+    initialCustomer.landing?.header1 || ""
+  );
+  const [typedHeader2, setTypedHeader2] = useState(
+    initialCustomer.landing?.header2 || ""
+  );
   
 useEffect(() => {
   if (!customer) return;
@@ -130,16 +162,29 @@ useEffect(() => {
   }, [activeCustomer]);
 
   useEffect(() => {
+    // The server (or the editor) already supplied the customer.
+    // Re-fetching would overwrite live editor changes with the
+    // saved version, so only look up the host when nothing was passed.
+    if (activeCustomer) return;
+
     async function load() {
       const hostname = window.location.hostname;
       const result = await getCustomerConfigFromHost(hostname);
 
-      setCustomer(result.config);
-      setMode(result.mode);
       setCustomerKey(result.key);
+
+      // On the main domain this resolves to the sales config that
+      // is already shown; replacing it with an identical new object
+      // would only restart the typing animation. Switch only when the
+      // host turns out to be a client site (e.g. qq.localhost in dev).
+      if (result.mode === "client") {
+        setCustomer(result.config);
+        setMode("client");
+      }
     }
 
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
 
@@ -181,8 +226,6 @@ useEffect(() => {
     clearInterval(interval1);
   };
 }, [customer, mode]);
-
-  if (!customer) return null;
 
 const landing = customer.landing;
 
