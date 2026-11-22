@@ -264,11 +264,6 @@ export default function HomePage({
               </div>
             </div>
           </section>
-
-          {/* -------- FOOTER -------- */}
-          <footer className="bg-white border-t py-12 text-center text-sm text-gray-500">
-            © {new Date().getFullYear()} SimpleBookMe — All rights reserved.
-          </footer>
         </>
       )}
     </main>

@@ -6,10 +6,23 @@ import ClientNavbar from "./ClientNavbar";
 import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 
-export default function Navbar() {
-  const [mode, setMode] = useState<"sales" | "client" | null>(null);
+/*
+ * The server (app/layout.tsx) decides the first mode from the host,
+ * so the navbar is in the HTML that crawlers see. The browser lookup
+ * still runs, to switch to client mode on /site/{id} preview pages.
+ */
+export default function Navbar({
+  initialCustomer = null,
+  isSubdomain = false,
+}: {
+  initialCustomer?: CustomerConfig | null;
+  isSubdomain?: boolean;
+}) {
+  const [mode, setMode] = useState<"sales" | "client">(
+    initialCustomer ? "client" : "sales"
+  );
   // const [isPaid, setIsPaid] = useState<boolean | undefined>(undefined);
-  
+
   const [isPaid, setIsPaid] = useState<boolean>(true);
 
   useEffect(() => {
@@ -17,26 +30,27 @@ export default function Navbar() {
       const hostname = window.location.hostname;
       const result = await getCustomerConfigFromHost(hostname);
 
-      setMode(result.mode);
-
       if (result.mode === "client") {
-        const customer = result.config as CustomerConfig;
-        //setIsPaid(customer.isPaid);
-		setIsPaid(true);
+        setMode("client");
+        // const customer = result.config as CustomerConfig;
+        // setIsPaid(customer.isPaid);
+        setIsPaid(true);
       }
     }
 
     load();
   }, []);
 
-
-  if (mode === null) {
-    return null;
-  }
-
   // 🔒 SINGLE DECISION POINT
   if (mode === "client") {
-    return <ClientNavbar isPaid={isPaid} />;
+    return (
+      <ClientNavbar isPaid={isPaid} initialCustomer={initialCustomer} />
+    );
+  }
+
+  // Never show the SimpleBookMe menu on a customer subdomain.
+  if (isSubdomain) {
+    return null;
   }
 
   return <SalesNavbar />;

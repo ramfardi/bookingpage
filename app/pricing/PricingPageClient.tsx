@@ -184,16 +184,6 @@ export default function PricingPage(props: HostConfigProps) {
           </div>
         </section>
 
-        <footer className="border-t border-slate-100 px-5 py-7 sm:px-8">
-          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-sm text-slate-500 sm:flex-row">
-            <p>© {new Date().getFullYear()} SimpleBookMe</p>
-            <nav aria-label="Footer" className="flex flex-wrap justify-center gap-5">
-              <Link href="/" className="hover:text-slate-900">Home</Link>
-              <Link href="/support" className="hover:text-slate-900">Support</Link>
-              <Link href="/qr-code-generator" className="hover:text-slate-900">Free QR code tool</Link>
-            </nav>
-          </div>
-        </footer>
       </main>
     );
   }

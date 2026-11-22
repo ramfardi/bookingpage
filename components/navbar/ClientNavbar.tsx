@@ -2,21 +2,26 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import { getCustomerConfigFromHost } from "@/app/lib/getCustomer";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 
 export default function ClientNavbar({
   isPaid,
+  initialCustomer = null,
 }: {
   isPaid?: boolean;
+  // From the server (app/layout.tsx), so the logo, name and links are
+  // in the first HTML. The browser lookup below still runs, for
+  // /site/{id} previews.
+  initialCustomer?: CustomerConfig | null;
 }) {
   const [open, setOpen] = useState(false);
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const router = useRouter();
+
 
   // 🔑 Explicit mode handling
   const mode = searchParams.get("mode");
@@ -37,11 +42,19 @@ export default function ClientNavbar({
 
   // Booking logic
   const [customerKey, setCustomerKey] = useState<string | null>(null);
-  const [bookingLink, setBookingLink] = useState<string | null>(null);
-  const [isExternalBooking, setIsExternalBooking] = useState(false);
-  
-  const [clientLogoUrl, setClientLogoUrl] = useState<string | null>(null);
-const [clientBusinessName, setClientBusinessName] = useState("");
+  const [bookingLink, setBookingLink] = useState<string | null>(
+    initialCustomer?.booking?.bookingLink || null
+  );
+  const [isExternalBooking, setIsExternalBooking] = useState(
+    !!initialCustomer?.booking?.is_external
+  );
+
+  const [clientLogoUrl, setClientLogoUrl] = useState<string | null>(
+    initialCustomer?.branding?.logoUrl || null
+  );
+  const [clientBusinessName, setClientBusinessName] = useState(
+    initialCustomer?.businessName || ""
+  );
 
   useEffect(() => {
     async function load() {
@@ -65,19 +78,10 @@ const [clientBusinessName, setClientBusinessName] = useState("");
     load();
   }, []);
 
-  function handleBookAppointment() {
-    if (isExternalBooking && bookingLink) {
-      window.location.href = bookingLink;
-      return;
-    }
-
-	if (base) {
-	  router.push(`${base}/booking`);
-	  return;
-	}
-
-	router.push("/booking");
-  }
+  // A real link (crawlable, opens in a new tab on middle-click):
+  // the business's external booking page, or this site's /booking.
+  const bookingHref =
+    isExternalBooking && bookingLink ? bookingLink : `${base}/booking`;
 
   return (
     <>
@@ -147,12 +151,12 @@ const [clientBusinessName, setClientBusinessName] = useState("");
 
           {/* Desktop menu */}
           <div className="hidden md:flex items-center gap-8">
-            <button
-              onClick={handleBookAppointment}
+            <Link
+              href={bookingHref}
               className="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
             >
               Book appointment
-            </button>
+            </Link>
 
             <Link
               href={`${base}/pricing`}
@@ -228,15 +232,13 @@ const [clientBusinessName, setClientBusinessName] = useState("");
               Pricing
             </Link>
 
-            <button
-              onClick={() => {
-                setOpen(false);
-                handleBookAppointment();
-              }}
+            <Link
+              href={bookingHref}
+              onClick={() => setOpen(false)}
               className="py-3 text-base font-medium text-center bg-indigo-600 text-white rounded-lg"
             >
               Book appointment
-            </button>
+            </Link>
 
             {/* Upsell only in PREVIEW */}
             {isPreview && isPaid === false && (

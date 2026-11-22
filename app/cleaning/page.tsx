@@ -502,14 +502,6 @@ export default function CleaningLandingPage() {
         </div>
       </section>
 
-      <footer className="border-t border-slate-100 py-7">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <span>© {new Date().getFullYear()} SimpleBookMe</span>
-          <Link href="/" className="font-medium text-slate-600 hover:text-indigo-600">
-            SimpleBookMe.com
-          </Link>
-        </div>
-      </footer>
     </main>
   );
 }

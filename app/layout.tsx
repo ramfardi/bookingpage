@@ -6,6 +6,8 @@ import { headers } from "next/headers";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import GoogleAdsTag from "@/components/GoogleAdsTag";
+import MarketingFooter from "@/components/MarketingFooter";
+import { getHostCustomer } from "./lib/getHostCustomer";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://simplebookme.com"),
@@ -184,6 +186,10 @@ export default async function RootLayout({
     cleanHost !== "simplebookme.com" &&
     cleanHost !== "www.simplebookme.com";
 
+  // Customer sites: load the business once (shared with the page via
+  // React cache) so the navbar shows its logo and links in the HTML.
+  const hostCustomer = isSubdomain ? await getHostCustomer() : null;
+
   return (
     <html lang="en">
       <head>
@@ -269,13 +275,19 @@ export default async function RootLayout({
 
       <body className="bg-gradient-to-br from-indigo-50 via-white to-purple-50">
         <Providers>
-          {/* Navbar is client-side and resolves mode async */}
-          <Navbar />
+          {/* Server picks the navbar from the host, so it is in the HTML */}
+          <Navbar
+            initialCustomer={hostCustomer}
+            isSubdomain={isSubdomain}
+          />
 
           {/* Offset for fixed navbar height */}
           <main className="pt-16 min-h-screen">
             {children}
           </main>
+
+          {/* Links to every public marketing page (main domain only) */}
+          {!isSubdomain && <MarketingFooter />}
         </Providers>
 
         <GoogleAdsTag />
