@@ -9,7 +9,6 @@ import {
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 import type { LandingConfig } from "@/app/lib/landingConfig";
 import { useRouter } from "next/navigation";
-import SeoSchema from "@/components/SeoSchema";
 import {
   ArrowRight,
   Instagram,
@@ -421,33 +420,8 @@ function handleBookAppointment() {
 
 return (
   <>
-{mode === "sales" ? (
-  <script
-    type="application/ld+json"
-    dangerouslySetInnerHTML={{
-      __html: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-
-        name: "SimpleBookMe",
-
-        applicationCategory:
-          "BusinessApplication",
-
-        operatingSystem: "Web",
-
-        description:
-          "Booking website builder for service businesses.",
-
-        url: "https://simplebookme.com",
-      }),
-    }}
-  />
-) : (
-  <SeoSchema
-    customer={customer as CustomerConfig}
-  />
-)}
+{/* Structured data is rendered on the server: SimpleBookMe's in
+    app/layout.tsx, a customer's LocalBusiness in app/page.tsx. */}
 
     <main className="min-h-screen w-full flex flex-col">
       {/* ================= HERO ================= */}

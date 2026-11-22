@@ -11,6 +11,9 @@ import { getCustomerServer } from "./lib/getCustomerServer";
 import { generateSeo } from "./lib/generateSeo";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import JsonLd from "@/components/JsonLd";
+import { buildLocalBusinessSchema } from "./lib/localBusinessSchema";
+import { getRequestHostname } from "./lib/getHostCustomer";
 
 export async function generateMetadata() {
   const host =
@@ -290,10 +293,19 @@ export default async function Page() {
   await getCustomerServer(host);
 
 if (customer) {
+  // LocalBusiness structured data, built on the server (M2).
+  const businessSchema = buildLocalBusinessSchema(
+    customer,
+    await getRequestHostname()
+  );
+
   return (
-    <HomePage
-      activeCustomer={customer}
-    />
+    <>
+      {businessSchema && <JsonLd data={businessSchema} />}
+      <HomePage
+        activeCustomer={customer}
+      />
+    </>
   );
 }
 

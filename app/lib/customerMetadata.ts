@@ -38,7 +38,7 @@ function locationOf(customer: CustomerConfig): string {
 }
 
 /* Only absolute http(s) or site-relative images work as link previews. */
-function previewImage(
+export function previewImage(
   url: string | undefined,
   origin: string
 ): string | undefined {
@@ -51,7 +51,7 @@ function previewImage(
   return undefined; // e.g. data: URLs
 }
 
-function serviceNames(customer: CustomerConfig): string[] {
+export function serviceNames(customer: CustomerConfig): string[] {
   const fromRows = customer.pricing?.rows?.map((row) => row.name) ?? [];
   const fromItems = customer.pricing?.items?.map((item) => item.label) ?? [];
   const fromServices = customer.services ?? [];
