@@ -1,4 +1,5 @@
 import HomePage from "@/components/HomePage_homeservice";
+import { getHostCustomer } from "@/app/lib/getHostCustomer";
 
 export const metadata = {
   title: "Create a Home Services Booking Website | Online Appointments for Trades",
@@ -32,6 +33,10 @@ export const metadata = {
 };
 
 
-export default function Page() {
-  return <HomePage />;
+export default async function Page() {
+  // Resolve sales vs customer-subdomain mode on the server so the
+  // HTML contains the full page for crawlers.
+  const customer = await getHostCustomer();
+
+  return <HomePage initialCustomer={customer} />;
 }

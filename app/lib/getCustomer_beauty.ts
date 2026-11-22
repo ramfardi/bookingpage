@@ -1,7 +1,7 @@
 import type { LandingConfig } from "./landingConfig";
 import type { CustomerConfig } from "./customerConfig";
 
-const SALES_CONFIG: LandingConfig = {
+export const SALES_CONFIG: LandingConfig = {
   heroImage: "/images/beauty.png",
   landing: {
     header1: "Create a Beauty Salon Website",

@@ -2,8 +2,12 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
-import { getCustomerConfigFromHost } from "@/app/lib/getCustomer_homeservice";
+import { useState } from "react";
+import { SALES_CONFIG } from "@/app/lib/getCustomer_homeservice";
+import {
+  useHostConfig,
+  type HostConfigProps,
+} from "@/app/lib/useHostConfig";
 import type { CustomerConfig } from "@/app/lib/customerConfig";
 import type { LandingConfig } from "@/app/lib/landingConfig";
 import { useRouter } from "next/navigation";
@@ -11,40 +15,21 @@ import { useRouter } from "next/navigation";
 
 export default function HomePage({
   activeCustomer,
-}: {
+  initialCustomer,
+}: HostConfigProps & {
   activeCustomer?: CustomerConfig;
 }) {
   const router = useRouter();
 
-  const [customer, setCustomer] = useState<
-    CustomerConfig | LandingConfig | null
-  >(null);
+  // SEO: render real content on the server (home-services sales
+  // config, or the customer resolved by app/home_services/page.tsx)
+  // instead of returning null until a client-side fetch finished.
+  const { customer, mode, customerKey } = useHostConfig(
+    { initialCustomer: activeCustomer ?? initialCustomer },
+    SALES_CONFIG
+  );
 
-  const [customerKey, setCustomerKey] = useState<string | null>(null);
-  const [mode, setMode] = useState<"sales" | "client">("sales");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (activeCustomer) {
-      setCustomer(activeCustomer);
-      setMode("client");
-    }
-  }, [activeCustomer]);
-
-  useEffect(() => {
-    async function load() {
-      const hostname = window.location.hostname;
-      const result = await getCustomerConfigFromHost(hostname);
-
-      setCustomer(result.config);
-      setMode(result.mode);
-      setCustomerKey(result.key);
-    }
-
-    load();
-  }, []);
-
-  if (!customer) return null;
 
   const landing = customer.landing;
 
