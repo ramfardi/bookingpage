@@ -58,7 +58,7 @@ const marketingMetadata: Metadata = {
 // On a customer subdomain ({sub}.simplebookme.com/about) use the
 // customer's own title, description, canonical and link preview.
 export async function generateMetadata(): Promise<Metadata> {
-  return (await customerPageMetadata("about")) ?? marketingMetadata;
+  return customerPageMetadata("about", marketingMetadata);
 }
 
 export default function AboutLayout({

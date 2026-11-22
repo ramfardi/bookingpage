@@ -19,6 +19,14 @@ export async function getRequestHostname(): Promise<string> {
 }
 
 /*
+ * True on {sub}.simplebookme.com (any subdomain except www),
+ * whether or not a booking website exists for it.
+ */
+export async function isSubdomainHost(): Promise<boolean> {
+  return (await getRequestHostname()).endsWith(`.${MAIN_DOMAIN}`);
+}
+
+/*
  * Server-side twin of getCustomerConfigFromHost (getCustomer.ts),
  * so pages that serve both simplebookme.com ("sales") and customer
  * subdomains ("client") can pick the right mode before rendering.
