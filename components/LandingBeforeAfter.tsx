@@ -16,7 +16,9 @@ export default function LandingBeforeAfter({
       {/* AFTER IMAGE */}
       <img
         src={afterImage}
-        alt="After"
+        alt="After: example portfolio photo"
+        loading="lazy"
+        decoding="async"
         className="absolute inset-0 w-full h-full object-cover"
       />
 
@@ -27,7 +29,9 @@ export default function LandingBeforeAfter({
       >
         <img
           src={beforeImage}
-          alt="Before"
+          alt="Before: example portfolio photo"
+          loading="lazy"
+          decoding="async"
           className="absolute inset-0 w-full h-full object-cover"
         />
       </div>

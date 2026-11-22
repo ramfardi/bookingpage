@@ -471,9 +471,13 @@ return (
 			  muted
 			  loop
 			  playsInline
+			  // Performance: 720p re-encode (0.95 MB, was 10.4 MB at 1080p;
+			  // it sits under a dark blurred overlay) + an instant poster frame.
+			  poster="/images/landing_page_clip-poster.webp"
+			  preload="metadata"
 			  className="absolute inset-0 w-full h-full object-cover"
 			>
-			  <source src="/videos/landing_page_clip.mp4" type="video/mp4" />
+			  <source src="/videos/landing_page_clip-720p.mp4" type="video/mp4" />
 			</video>
 		  ) : (
 			<div
@@ -1190,9 +1194,13 @@ return (
 
             <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border">
               <img
-                src="/images/summary-home.png"
-                alt="Homepage"
-                 className="w-full aspect-[16/14] object-cover"
+                src="/images/summary-home.webp"
+                alt="Example booking website for a car detailing business"
+                width={1200}
+                height={703}
+                loading="lazy"
+                decoding="async"
+                className="w-full aspect-[16/14] object-cover"
               />
 
               <div className="p-4 text-center">
@@ -1204,8 +1212,12 @@ return (
 
             <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border mt-12">
               <img
-                src="/images/summary-booking.png"
-                alt="Booking"
+                src="/images/summary-booking.webp"
+                alt="Example booking website for a pet grooming business"
+                width={1200}
+                height={710}
+                loading="lazy"
+                decoding="async"
                 className="w-full aspect-[16/12] object-cover"
               />
 
@@ -1221,8 +1233,12 @@ return (
           <div className="mt-5 bg-white rounded-3xl shadow-2xl overflow-hidden border max-w-sm mx-auto">
 
             <img
-              src="/images/summary-portfolio.png"
-              alt="Portfolio"
+              src="/images/summary-portfolio.webp"
+              alt="Example booking website for a cleaning service"
+              width={1200}
+              height={706}
+              loading="lazy"
+              decoding="async"
               className="w-full"
             />
 
@@ -1632,8 +1648,12 @@ return (
 
         <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
           <img
-            src="/images/book.png"
-            alt="Quote generator feature"
+            src="/images/book.webp"
+            alt="Online booking form where customers choose a service and time"
+            width={889}
+            height={1084}
+            loading="lazy"
+            decoding="async"
             className="w-full object-cover"
           />
         </div>
@@ -1656,8 +1676,12 @@ return (
 
         <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
           <img
-            src="/images/schedule.png"
-            alt="Availability feature"
+            src="/images/schedule.webp"
+            alt="Live weekly availability schedule"
+            width={1200}
+            height={626}
+            loading="lazy"
+            decoding="async"
             className="w-full object-cover"
           />
         </div>
@@ -1711,8 +1735,12 @@ return (
 
         <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
           <img
-            src="/images/price.png"
-            alt="Quote generator feature"
+            src="/images/price.webp"
+            alt="Services and pricing list on a booking website"
+            width={1200}
+            height={893}
+            loading="lazy"
+            decoding="async"
             className="w-full object-cover"
           />
         </div>
@@ -1736,8 +1764,12 @@ return (
 
         <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
           <img
-            src="/images/testi.png"
-            alt="Availability feature"
+            src="/images/testi.webp"
+            alt="Customer testimonials and Google reviews section"
+            width={1200}
+            height={1428}
+            loading="lazy"
+            decoding="async"
             className="w-full object-cover"
           />
         </div>
@@ -1797,8 +1829,12 @@ return (
 
         <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
           <img
-            src="/images/portfolio.png"
-            alt="Availability feature"
+            src="/images/portfolio.webp"
+            alt="Portfolio gallery of past work"
+            width={1200}
+            height={1390}
+            loading="lazy"
+            decoding="async"
             className="w-full object-cover"
           />
         </div>
@@ -1821,8 +1857,12 @@ return (
 
         <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
           <img
-            src="/images/contact.png"
-            alt="Availability feature"
+            src="/images/contact.webp"
+            alt="Business contact information and location"
+            width={1200}
+            height={764}
+            loading="lazy"
+            decoding="async"
             className="w-full object-cover"
           />
         </div>
@@ -1879,8 +1919,8 @@ return (
 
     <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white p-4">
       <LandingBeforeAfter
-        beforeImage="/images/before.png"
-        afterImage="/images/after.png"
+        beforeImage="/images/before.webp"
+        afterImage="/images/after.webp"
       />
     </div>
   </div>
@@ -1902,8 +1942,12 @@ return (
 
         <div className="relative rounded-3xl overflow-hidden border border-white/40 shadow-2xl bg-white">
           <img
-            src="/images/quote.png"
-            alt="Availability feature"
+            src="/images/quote.webp"
+            alt="Instant cleaning quote generator"
+            width={864}
+            height={931}
+            loading="lazy"
+            decoding="async"
             className="w-full object-cover"
           />
         </div>
