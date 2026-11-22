@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+// Form confirmation page: never index.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
+
 export default function SupportSuccessPage() {
   return (
     <main className="min-h-screen flex items-center justify-center px-4">

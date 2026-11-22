@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import GoogleAdsTag from "@/components/GoogleAdsTag";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://simplebookme.com"),
@@ -186,28 +187,8 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* =====================================================
-            GOOGLE ADS / GOOGLE TAG
-            ===================================================== */}
-        <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=AW-17894933160"
-        ></script>
-
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-
-              function gtag(){
-                dataLayer.push(arguments);
-              }
-
-              gtag('js', new Date());
-              gtag('config', 'AW-17894933160');
-            `,
-          }}
-        />
+        {/* Google Ads tag: rendered in <body> by <GoogleAdsTag />,
+            which skips private pages (edit/activation links). */}
 
         {/* =====================================================
             SIMPLEBOOKME STRUCTURED DATA
@@ -296,6 +277,8 @@ export default async function RootLayout({
             {children}
           </main>
         </Providers>
+
+        <GoogleAdsTag />
 
         <Analytics />
 

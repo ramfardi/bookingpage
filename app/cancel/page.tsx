@@ -1,4 +1,11 @@
 // app/cancel/page.tsx
+import type { Metadata } from "next";
+
+// Stripe return page: never index.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
+
 export default function CancelPage() {
   return (
     <div className="min-h-screen flex items-center justify-center text-center">
