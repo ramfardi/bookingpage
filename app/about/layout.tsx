@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { customerPageMetadata } from "@/app/lib/customerMetadata";
 
-export const metadata: Metadata = {
+// simplebookme.com/about
+const marketingMetadata: Metadata = {
   title: "About SimpleBookMe | Booking Website for Small Businesses",
   description:
     "Learn about SimpleBookMe — an easy-to-use booking website builder for small businesses. Create your own professional appointment booking website in minutes with no monthly fees.",
@@ -52,6 +54,12 @@ export const metadata: Metadata = {
     follow: true,
   },
 };
+
+// On a customer subdomain ({sub}.simplebookme.com/about) use the
+// customer's own title, description, canonical and link preview.
+export async function generateMetadata(): Promise<Metadata> {
+  return (await customerPageMetadata("about")) ?? marketingMetadata;
+}
 
 export default function AboutLayout({
   children,
