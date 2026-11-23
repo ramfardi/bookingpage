@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AD_BUDGET_LANGUAGES } from "@/app/lib/hreflang";
 
 export const metadata: Metadata = {
   title: "Advertising Budget Calculator for Small Businesses | SimpleBookMe",
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: "https://simplebookme.com/advertising-budget-calculator",
+    languages: AD_BUDGET_LANGUAGES,
   },
   openGraph: {
     title: "Advertising Budget Calculator for Small Businesses",

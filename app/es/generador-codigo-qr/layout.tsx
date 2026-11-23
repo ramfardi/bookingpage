@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { QR_CODE_LANGUAGES } from "@/app/lib/hreflang";
 
 export const metadata: Metadata = {
   title: "Generador Gratis de Códigos QR (Descarga PNG y SVG) | SimpleBookMe",
@@ -18,10 +19,7 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: "https://simplebookme.com/es/generador-codigo-qr",
-    languages: {
-      en: "https://simplebookme.com/qr-code-generator",
-      es: "https://simplebookme.com/es/generador-codigo-qr",
-    },
+    languages: QR_CODE_LANGUAGES,
   },
   openGraph: {
     title: "Generador Gratis de Códigos QR (PNG y SVG)",

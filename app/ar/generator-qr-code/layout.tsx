@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { QR_CODE_LANGUAGES } from "@/app/lib/hreflang";
 
 export const metadata: Metadata = {
   title: "مولد رمز QR مجاني (تحميل PNG و SVG) | SimpleBookMe",
@@ -17,12 +18,7 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: "https://simplebookme.com/ar/generator-qr-code",
-    languages: {
-      en: "https://simplebookme.com/qr-code-generator",
-      fr: "https://simplebookme.com/fr/generateur-code-qr",
-      es: "https://simplebookme.com/es/generador-codigo-qr",
-      ar: "https://simplebookme.com/ar/generator-qr-code",
-    },
+    languages: QR_CODE_LANGUAGES,
   },
   openGraph: {
     title: "مولد رمز QR مجاني (تحميل PNG و SVG)",

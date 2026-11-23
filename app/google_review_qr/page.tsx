@@ -295,7 +295,7 @@ for (let i = 0; i < googleText.length; i++) {
         {/* RESULT */}
         {pngDataUrl && (
           <div className="mt-12 text-center">
-            <img src={pngDataUrl} className="mx-auto w-64 border rounded-xl" />
+            <img src={pngDataUrl} alt="Your Google review QR code" className="mx-auto w-64 border rounded-xl" />
 
             <div className="mt-6 flex justify-center gap-4">
               <button onClick={downloadPNG} className="bg-green-600 text-white px-6 py-3 rounded-xl">

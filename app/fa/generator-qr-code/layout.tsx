@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { QR_CODE_LANGUAGES } from "@/app/lib/hreflang";
 
 export const metadata: Metadata = {
   title: "ساخت رایگان QR کد (دانلود PNG و SVG) | SimpleBookMe",
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: "https://simplebookme.com/fa/generator-qr-code",
+    languages: QR_CODE_LANGUAGES,
   },
   openGraph: {
     title: "ساخت رایگان QR کد (دانلود PNG و SVG)",

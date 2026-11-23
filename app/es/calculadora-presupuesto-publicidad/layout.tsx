@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AD_BUDGET_LANGUAGES } from "@/app/lib/hreflang";
 
 export const metadata: Metadata = {
   title: "Calculadora de Presupuesto Publicitario para Pequeñas Empresas | SimpleBookMe",
@@ -16,8 +17,8 @@ export const metadata: Metadata = {
     "herramienta planificación marketing negocio",
   ],
   alternates: {
-    canonical:
-      "https://simplebookme.com/es/calculadora-presupuesto-publicidad",
+    canonical: "https://simplebookme.com/es/calculadora-presupuesto-publicidad",
+    languages: AD_BUDGET_LANGUAGES,
   },
   openGraph: {
     title: "Calculadora de Presupuesto Publicitario para Pequeñas Empresas",

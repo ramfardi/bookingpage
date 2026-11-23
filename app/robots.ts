@@ -14,8 +14,8 @@ const MAIN_DOMAIN = "simplebookme.com";
  *
  * Host-aware because customer subdomains share this app:
  * - simplebookme.com: points crawlers at the main sitemap.
- * - {sub}.simplebookme.com: no sitemap line yet, since the current
- *   sitemap lists simplebookme.com pages (host-aware sitemap is M3).
+ * - {sub}.simplebookme.com: points at that subdomain's own sitemap,
+ *   which lists only that business's pages (app/sitemap.ts).
  */
 export default async function robots(): Promise<MetadataRoute.Robots> {
   const host = await getRequestHostname();
@@ -29,8 +29,8 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         disallow: ["/api/"],
       },
     ],
-    ...(isCustomerSubdomain
-      ? {}
-      : { sitemap: `https://${MAIN_DOMAIN}/sitemap.xml` }),
+    sitemap: isCustomerSubdomain
+      ? `https://${host}/sitemap.xml`
+      : `https://${MAIN_DOMAIN}/sitemap.xml`,
   };
 }

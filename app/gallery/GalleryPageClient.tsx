@@ -143,7 +143,7 @@ return (
                     <div className="overflow-hidden rounded-[1.5rem]">
                       <img
                         src={imageUrl}
-                        alt={`Gallery image ${index + 1}`}
+                        alt={`${customerConfig.businessName || "Our"} work: portfolio photo ${index + 1}`}
                         className="w-full object-cover transition duration-500 group-hover:scale-105"
                         loading="lazy"
                       />

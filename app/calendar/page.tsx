@@ -485,6 +485,7 @@ if (email) {
           <div className="mt-12 text-center">
             <img
               src={imageUrl}
+              alt="Your generated availability calendar"
               className="mx-auto w-64 rounded-xl border"
             />
 

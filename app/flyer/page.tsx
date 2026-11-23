@@ -308,7 +308,7 @@ const faqs = [
         {/* PREVIEW */}
         {imageUrl && (
           <div className="mt-12 text-center">
-            <img src={imageUrl} className="mx-auto w-72 rounded-xl border" />
+            <img src={imageUrl} alt="Your generated promo flyer" className="mx-auto w-72 rounded-xl border" />
 
             <button
               onClick={downloadImage}
