@@ -130,19 +130,29 @@ export const metadata: Metadata = {
     ],
   },
 
+  // Explicit small sizes, so browsers pick the pixel-sharp 16/32 icons
+  // for tabs instead of shrinking the 192px one (which looked blurry).
+  // "?v=2" makes browsers drop their cached copy of the old icon.
   icons: {
     icon: [
-      { url: "/favicon.ico" },
+      { url: "/favicon.ico?v=2", sizes: "16x16 32x32 48x48 64x64" },
+      { url: "/favicon_16.png?v=2", sizes: "16x16", type: "image/png" },
+      { url: "/favicon_32.png?v=2", sizes: "32x32", type: "image/png" },
       {
-        url: "/favicon_192.png",
+        url: "/favicon_192.png?v=2",
         sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        url: "/favicon_512.png?v=2",
+        sizes: "512x512",
         type: "image/png",
       },
     ],
 
     apple: [
       {
-        url: "/favicon_180.png",
+        url: "/favicon_180.png?v=2",
         sizes: "180x180",
         type: "image/png",
       },
